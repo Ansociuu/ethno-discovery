@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "name": "ethnodiscovery-frontend",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@ethnodiscovery_api_url"
+  },
+  "regions": ["sin1"]
+}
