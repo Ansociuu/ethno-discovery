@@ -101,29 +101,31 @@ export const getSuggestions = async (req: Request, res: Response) => {
     }),
   ]);
 
-  const suggestions = [
-    ...tours.map(t => ({ type: 'tour', label: t.title, slug: t.slug })),
-    ...destinations.map(d => ({ type: 'destination', label: d.nameVi, slug: d.slug })),
-    ...provinces.map(p => ({ type: 'province', label: p.province })),
-  ];
+  // Return flat string array for autocomplete
+  const suggestions: string[] = [
+    ...destinations.map(d => d.nameVi),
+    ...provinces.map(p => p.province),
+    ...tours.map(t => t.title),
+  ].filter((s, i, arr) => s && arr.indexOf(s) === i); // unique, non-empty
 
   res.json({ success: true, data: suggestions });
 };
 
 // GET /api/search/trending
 export const getTrending = async (req: Request, res: Response) => {
-  const [featuredTours, featuredDestinations] = await Promise.all([
-    prisma.tour.findMany({
-      where: { active: true, featured: true },
-      take: 4,
-      select: { id: true, title: true, slug: true, coverImage: true, pricePerPerson: true },
-    }),
-    prisma.destination.findMany({
-      where: { active: true, featured: true },
-      take: 4,
-      select: { id: true, nameVi: true, slug: true, coverImage: true, province: true },
-    }),
-  ]);
+  const destinations = await prisma.destination.findMany({
+    where: { active: true },
+    orderBy: { featured: 'desc' },
+    take: 8,
+    select: { nameVi: true },
+  });
 
-  res.json({ success: true, data: { tours: featuredTours, destinations: featuredDestinations } });
+  // Return trending as string array for the search page chips
+  const trending = destinations.map(d => d.nameVi);
+
+  // Also include some static popular searches
+  const popular = ['Trekking Sapa', 'Chợ phiên Bắc Hà', 'Ruộng bậc thang', 'Hà Giang Loop'];
+  const allTrending = [...new Set([...trending, ...popular])].slice(0, 8);
+
+  res.json({ success: true, data: allTrending });
 };
