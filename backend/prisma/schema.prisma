@@ -1,0 +1,232 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────
+
+enum Role {
+  USER
+  HOST
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum Difficulty {
+  EASY
+  MODERATE
+  HARD
+}
+
+// ─── MODELS ──────────────────────────────────────────────
+
+model User {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  name        String
+  phone       String?
+  avatarUrl   String?
+  role        Role      @default(USER)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  bookings    Booking[]
+  reviews     Review[]
+  aiTrips     AiTrip[]
+  wishlists   Wishlist[]
+  payments    Payment[]
+
+  @@map("users")
+}
+
+model Destination {
+  id            Int        @id @default(autoincrement())
+  nameVi        String
+  nameEn        String
+  slug          String     @unique
+  province      String
+  description   String     @db.Text
+  coverImage    String?
+  images        Json       @default("[]")
+  altitude      Int?
+  bestSeason    String?
+  difficulty    Difficulty @default(EASY)
+  latitude      Float?
+  longitude     Float?
+  featured      Boolean    @default(false)
+  active        Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  tours         Tour[]
+  homestays     Homestay[]
+
+  @@map("destinations")
+}
+
+model Tour {
+  id              Int       @id @default(autoincrement())
+  destinationId   Int
+  hostId          Int?
+  title           String
+  slug            String    @unique
+  description     String    @db.Text
+  durationDays    Int
+  maxGroupSize    Int
+  pricePerPerson  Decimal   @db.Decimal(12, 2)
+  includes        Json      @default("[]")
+  excludes        Json      @default("[]")
+  itinerary       Json      @default("[]")
+  coverImage      String?
+  images          Json      @default("[]")
+  active          Boolean   @default(true)
+  featured        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  destination     Destination @relation(fields: [destinationId], references: [id])
+  bookings        Booking[]
+  reviews         Review[]
+
+  @@map("tours")
+}
+
+model Homestay {
+  id              Int       @id @default(autoincrement())
+  hostId          Int?
+  destinationId   Int
+  name            String
+  slug            String    @unique
+  description     String    @db.Text
+  pricePerNight   Decimal   @db.Decimal(12, 2)
+  maxGuests       Int
+  amenities       Json      @default("[]")
+  coverImage      String?
+  images          Json      @default("[]")
+  address         String
+  latitude        Float?
+  longitude       Float?
+  active          Boolean   @default(true)
+  featured        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  destination     Destination @relation(fields: [destinationId], references: [id])
+  bookings        Booking[]
+  reviews         Review[]
+
+  @@map("homestays")
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  bookableType    String        // "tour" | "homestay"
+  tourId          Int?
+  homestayId      Int?
+  checkIn         DateTime
+  checkOut        DateTime
+  guests          Int
+  totalPrice      Decimal       @db.Decimal(12, 2)
+  status          BookingStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  addOns          Json?
+  notes           String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id])
+  tour            Tour?         @relation(fields: [tourId], references: [id])
+  homestay        Homestay?     @relation(fields: [homestayId], references: [id])
+  payment         Payment?
+
+  @@map("bookings")
+}
+
+model Payment {
+  id              Int       @id @default(autoincrement())
+  bookingId       Int       @unique
+  userId          Int
+  amount          Decimal   @db.Decimal(12, 2)
+  provider        String    @default("sepay")
+  orderCode       String    @unique
+  transactionId   String?
+  status          String    @default("pending") // pending | success | failed
+  sePayData       Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  booking         Booking   @relation(fields: [bookingId], references: [id])
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+model AiTrip {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  title           String
+  preferences     Json
+  itinerary       Json
+  isSaved         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@map("ai_trips")
+}
+
+model Review {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  reviewableType  String    // "tour" | "homestay"
+  tourId          Int?
+  homestayId      Int?
+  rating          Int       // 1-5
+  content         String    @db.Text
+  images          Json      @default("[]")
+  verifiedBooking Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id])
+  tour            Tour?     @relation(fields: [tourId], references: [id])
+  homestay        Homestay? @relation(fields: [homestayId], references: [id])
+
+  @@map("reviews")
+}
+
+model Wishlist {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  itemType        String    // "tour" | "homestay" | "destination"
+  itemId          Int
+  createdAt       DateTime  @default(now())
+
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, itemType, itemId])
+  @@map("wishlists")
+}
