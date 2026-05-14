@@ -20,7 +20,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, checkAuth } = useAuthStore();
+  const { user, isAuthenticated, fetchMe } = useAuthStore();
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   const {
