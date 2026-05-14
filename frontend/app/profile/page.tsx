@@ -46,7 +46,7 @@ export default function ProfilePage() {
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       await authApi.updateMe(data);
-      await checkAuth(); // refresh user info in store
+      await fetchMe(); // refresh user info in store
       toast.success("Cập nhật thành công!", { description: "Thông tin cá nhân của bạn đã được lưu lại." });
     } catch (err: any) {
       toast.error("Cập nhật thất bại", { description: err.response?.data?.message || "Vui lòng thử lại sau" });
