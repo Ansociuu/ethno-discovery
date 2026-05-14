@@ -1,71 +1,89 @@
 "use client";
+import { useState, useRef } from "react";
+import dynamic from "next/dynamic";
+
+// @ts-ignore
+const PannellumComponent = dynamic(
+  // @ts-ignore
+  () => import("pannellum-react").then((mod) => mod.Pannellum as any),
+  { ssr: false, loading: () => <div className="w-full h-full bg-white/5 animate-pulse flex items-center justify-center text-white/40">Đang tải VR 360...</div> }
+);
+const Pannellum = PannellumComponent as any;
 
 export function VRExperienceSection() {
+  const [location, setLocation] = useState<"sapa" | "fansipan">("sapa");
+  const vrRef = useRef<any>(null);
+
+  const images = {
+    sapa: "/vr/sapa.png",
+    fansipan: "/vr/fansipan.png"
+  };
+
   return (
     <div className="fade-up" style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 40px" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 80, alignItems: "center" }}>
 
         {/* Left: VR Visual */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", aspectRatio: "4/3" }}>
-          {/* Dark blue VR background */}
-          <div style={{
-            background: "linear-gradient(135deg, #0d2030, #1a4060, #0a1a2a)",
-            width: "100%", height: "100%", position: "relative",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            {/* Rotating circles */}
-            {[
-              { size: "80%", color: "rgba(255,60,172,0.15)", duration: "20s", direction: "normal" },
-              { size: "60%", color: "rgba(255,60,172,0.15)", duration: "15s", direction: "reverse" },
-              { size: "40%", color: "rgba(255,214,10,0.10)", duration: "10s", direction: "normal" },
-            ].map((circle, i) => (
-              <div key={i} style={{
-                position: "absolute",
-                width: circle.size, height: circle.size,
-                borderRadius: "50%",
-                border: `1px solid ${circle.color}`,
-                animation: `rotate ${circle.duration} linear infinite ${circle.direction === "reverse" ? "reverse" : ""}`,
-              }} />
-            ))}
+        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", aspectRatio: "4/3", background: "#0a1a2a" }}>
+          
+          <Pannellum
+            width="100%"
+            height="100%"
+            image={images[location]}
+            pitch={10}
+            yaw={180}
+            hfov={110}
+            autoLoad
+            onLoad={() => {
+              console.log("VR loaded");
+            }}
+          />
 
             {/* VR Badge center */}
             <div style={{
-              background: "rgba(255,214,10,0.15)", border: "1px solid rgba(255,214,10,0.3)",
+              position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", pointerEvents: "none",
+              background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,214,10,0.2)",
               padding: "10px 20px", borderRadius: 30, fontSize: 14, fontWeight: 600,
-              color: "var(--amber)", display: "flex", alignItems: "center", gap: 8, position: "relative", zIndex: 1,
+              color: "rgba(255,214,10,0.7)", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(4px)",
+              opacity: 0.8
             }}>
               <div className="animate-pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--pink)" }} />
-              360° Live Preview
+              Kéo để xoay 360°
             </div>
 
             {/* Location label 1: bottom-left */}
-            <div style={{
-              position: "absolute", bottom: 24, left: 24,
-              background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)",
-              border: "1px solid rgba(255,255,255,0.1)", padding: "10px 16px",
-              borderRadius: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 13,
-            }}>
+            <button 
+              onClick={() => setLocation("fansipan")}
+              style={{
+                position: "absolute", bottom: 24, left: 24,
+                background: location === "fansipan" ? "rgba(255,60,172,0.2)" : "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
+                border: `1px solid ${location === "fansipan" ? "rgba(255,60,172,0.5)" : "rgba(255,255,255,0.1)"}`, padding: "10px 16px",
+                borderRadius: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", transition: "all 0.3s",
+                zIndex: 10
+              }}>
               <span>🏔️</span>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>Fansipan Peak</div>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: location === "fansipan" ? "var(--pink)" : "#fff" }}>Fansipan Peak</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>3,143m · Lào Cai</div>
               </div>
-            </div>
+            </button>
 
             {/* Location label 2: top-right */}
-            <div style={{
-              position: "absolute", top: 24, right: 24,
-              background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)",
-              border: "1px solid rgba(255,255,255,0.1)", padding: "10px 16px",
-              borderRadius: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 13,
-            }}>
+            <button 
+              onClick={() => setLocation("sapa")}
+              style={{
+                position: "absolute", top: 24, right: 24,
+                background: location === "sapa" ? "rgba(255,214,10,0.2)" : "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
+                border: `1px solid ${location === "sapa" ? "rgba(255,214,10,0.5)" : "rgba(255,255,255,0.1)"}`, padding: "10px 16px",
+                borderRadius: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", transition: "all 0.3s",
+                zIndex: 10
+              }}>
               <span>🌾</span>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>Mù Cang Chải</div>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: location === "sapa" ? "var(--amber)" : "#fff" }}>Mù Cang Chải</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>Harvest Season</div>
               </div>
-            </div>
-          </div>
+            </button>
         </div>
 
         {/* Right: Content */}
@@ -101,6 +119,13 @@ export function VRExperienceSection() {
             padding: "14px 32px", borderRadius: 40, fontSize: 15, fontWeight: 600,
             cursor: "pointer", transition: "all 0.3s", display: "inline-flex", alignItems: "center", gap: 8,
           }}
+            onClick={() => {
+              // Pannellum creates a fullscreen button natively, but we can also trigger full screen on the container
+              const elem = document.querySelector('.pnlm-container');
+              if (elem && elem.requestFullscreen) {
+                elem.requestFullscreen();
+              }
+            }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--pink)"; (e.currentTarget as HTMLElement).style.color = "#fff"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--pink)"; (e.currentTarget as HTMLElement).style.transform = ""; }}>
             🥽 Try VR Tour Free
