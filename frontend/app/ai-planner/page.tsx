@@ -49,6 +49,11 @@ export default function AIPlannerPage() {
         interests: form.interests.join(", "),
       });
 
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Lỗi máy chủ (${res.status})`);
+      }
+
       if (!res.body) throw new Error("No stream");
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
