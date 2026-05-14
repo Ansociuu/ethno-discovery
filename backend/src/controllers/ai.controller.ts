@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import prisma from '../lib/prisma';
 import { createError } from '../middlewares/error.middleware';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import { asStr, asInt } from '../utils/typeHelpers';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `Bạn là chuyên gia du lịch văn hoá vùng cao Tây Bắc Việt Nam của EthnoDiscovery.
 Nhiệm vụ: Tạo lịch trình du lịch cá nhân hoá, tập trung vào:
@@ -78,15 +78,20 @@ ${toursContext || 'Chưa có tour nào được thêm'}`;
   res.setHeader('X-Accel-Buffering', 'no');
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-    const result = await model.generateContentStream([
-      { text: SYSTEM_PROMPT },
-      { text: userPrompt },
-    ]);
+    const stream = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt }
+      ],
+      model: 'llama3-70b-8192',
+      stream: true,
+      temperature: 0.7,
+      response_format: { type: 'json_object' }
+    });
 
     let fullText = '';
-    for await (const chunk of result.stream) {
-      const text = chunk.text();
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || '';
       fullText += text;
       res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
     }
