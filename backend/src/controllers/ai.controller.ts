@@ -33,7 +33,15 @@ Luôn trả về JSON hợp lệ theo schema sau, KHÔNG thêm text ngoài JSON:
       "tips": "string"
     }
   ],
-  "recommendedHomestays": ["string"],
+  "recommendedTours": [
+    {
+      "id": number,
+      "name": "string",
+      "price": number,
+      "slug": "string",
+      "image": "string"
+    }
+  ],
   "culturalNotes": "string",
   "packingList": ["string"],
   "bestTimeToVisit": "string"
@@ -41,7 +49,7 @@ Luôn trả về JSON hợp lệ theo schema sau, KHÔNG thêm text ngoài JSON:
 
 // POST /api/ai/generate (streaming SSE)
 export const generateTrip = async (req: AuthRequest, res: Response) => {
-  const { duration, budget, groupSize, interests, province, startDate } = req.body;
+  const { duration, budget, groupSize, interests, province, startDate, currentItinerary, message } = req.body;
 
   if (!duration || !budget) {
     throw createError('Thiếu thông tin: duration và budget là bắt buộc', 400);
@@ -51,13 +59,13 @@ export const generateTrip = async (req: AuthRequest, res: Response) => {
     where: { active: true, ...(province ? { destination: { province } } : {}) },
     take: 10,
     select: {
-      title: true, durationDays: true, pricePerPerson: true,
+      id: true, slug: true, coverImage: true, title: true, durationDays: true, pricePerPerson: true,
       destination: { select: { nameVi: true, province: true } },
     },
   });
 
   const toursContext = availableTours.map(t =>
-    `- ${t.title} (${t.durationDays} ngày, ${Number(t.pricePerPerson).toLocaleString('vi-VN')}đ/người, tại ${t.destination.nameVi})`
+    `- ID: ${t.id} | Tên: ${t.title} | Slug: ${t.slug} | Giá: ${Number(t.pricePerPerson)}đ | Ảnh: ${t.coverImage || ''} | Nơi: ${t.destination.nameVi}`
   ).join('\n');
 
   const userPrompt = `Tạo lịch trình du lịch với thông tin sau:
@@ -68,8 +76,19 @@ export const generateTrip = async (req: AuthRequest, res: Response) => {
 - Tỉnh ưu tiên: ${province || 'Hà Giang, Sapa, Mộc Châu'}
 - Ngày khởi hành: ${startDate || 'linh hoạt'}
 
-Các tour hiện có của EthnoDiscovery:
+Các tour hiện có của EthnoDiscovery (HÃY TRÍCH XUẤT chính xác ID, slug, giá và ảnh vào mảng recommendedTours nếu phù hợp):
 ${toursContext || 'Chưa có tour nào được thêm'}`;
+
+  // Build conversational context if refining
+  let messages: any[] = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    { role: 'user', content: userPrompt }
+  ];
+
+  if (currentItinerary && message) {
+    messages.push({ role: 'assistant', content: JSON.stringify(currentItinerary) });
+    messages.push({ role: 'user', content: `Hãy sửa đổi lịch trình hiện tại theo yêu cầu sau và trả về TOÀN BỘ JSON MỚI HOÀN CHỈNH: ${message}` });
+  }
 
   // SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
@@ -79,10 +98,7 @@ ${toursContext || 'Chưa có tour nào được thêm'}`;
 
   try {
     const stream = await groq.chat.completions.create({
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt }
-      ],
+      messages,
       model: 'llama-3.3-70b-versatile',
       stream: true,
       temperature: 0.7,

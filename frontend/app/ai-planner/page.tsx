@@ -6,6 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { aiApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
 import Link from "next/link";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const PROVINCES = ["Hà Giang", "Sapa / Lào Cai", "Mộc Châu / Sơn La", "Điện Biên", "Lai Châu", "Yên Bái / Mù Cang Chải"];
 const INTERESTS = ["Văn hoá bản địa", "Thiên nhiên & leo núi", "Ẩm thực", "Nhiếp ảnh", "Chợ phiên", "Homestay"];
@@ -23,6 +25,7 @@ export default function AIPlannerPage() {
   const [form, setForm] = useState({ duration: 3, budget: 5000000, groupSize: 2, province: "", interests: [] as string[] });
   const [result, setResult] = useState("");
   const [parsedResult, setParsedResult] = useState<any>(null);
+  const [chatMessage, setChatMessage] = useState("");
   const streamRef = useRef<string>("");
 
   const toggleInterest = (interest: string) => {
@@ -34,7 +37,19 @@ export default function AIPlannerPage() {
     }));
   };
 
-  const handleGenerate = async () => {
+  const exportPDF = async () => {
+    const element = document.getElementById("itinerary-content");
+    if (!element) return;
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: "#0F0F13" });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`EthnoDiscovery-Lich-Trinh.pdf`);
+  };
+
+  const handleGenerate = async (isRefining: boolean = false) => {
     if (!isAuthenticated) return;
     setStep("generating");
     setResult("");
@@ -47,6 +62,8 @@ export default function AIPlannerPage() {
         groupSize: form.groupSize,
         province: form.province,
         interests: form.interests.join(", "),
+        currentItinerary: isRefining ? parsedResult : undefined,
+        message: isRefining ? chatMessage : undefined,
       });
 
       if (!res.ok) {
@@ -93,8 +110,9 @@ export default function AIPlannerPage() {
         }
       }
       setStep("result");
+      if (isRefining) setChatMessage("");
     } catch (err: any) {
-      setStep("form");
+      setStep(isRefining ? "result" : "form");
       alert(`Có lỗi xảy ra: ${err.message || 'Vui lòng thử lại.'}`);
     }
   };
@@ -237,7 +255,7 @@ export default function AIPlannerPage() {
                 </div>
               </div>
 
-              <button onClick={handleGenerate} className="btn-primary" style={{ fontSize: 16, padding: "16px 40px", gap: 10 }}>
+              <button onClick={() => handleGenerate(false)} className="btn-primary" style={{ fontSize: 16, padding: "16px 40px", gap: 10 }}>
                 <Sparkles size={20} /> Tạo Lịch Trình AI
               </button>
             </div>
@@ -265,6 +283,9 @@ export default function AIPlannerPage() {
                   {parsedResult?.title || "Lịch trình của bạn ✦"}
                 </h2>
                 <div style={{ display: "flex", gap: 12 }}>
+                  <button onClick={exportPDF} className="btn-ghost" style={{ padding: "10px 20px", fontSize: 14, gap: 8, display: "flex", alignItems: "center" }}>
+                    <Download size={16} /> Xuất PDF
+                  </button>
                   <button onClick={() => setStep("form")} className="btn-ghost" style={{ padding: "10px 20px", fontSize: 14 }}>
                     Tạo mới
                   </button>
@@ -272,7 +293,7 @@ export default function AIPlannerPage() {
               </div>
 
               {parsedResult ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                <div id="itinerary-content" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {/* Summary */}
                   {parsedResult.summary && (
                     <div className="glass" style={{ borderRadius: 20, padding: 24 }}>
@@ -347,17 +368,56 @@ export default function AIPlannerPage() {
                     </div>
                   ))}
 
+                  {/* Recommended Tours */}
+                  {parsedResult.recommendedTours?.length > 0 && (
+                    <div className="glass" style={{ borderRadius: 20, padding: 24, marginTop: 10 }}>
+                      <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 700, marginBottom: 16 }}>✦ Tour Đề Xuất Dành Cho Bạn</h3>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+                        {parsedResult.recommendedTours.map((t: any) => (
+                          <div key={t.id} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 16, overflow: "hidden", border: "1px solid var(--glass-border)" }}>
+                            {t.image && <img src={t.image} alt={t.name} style={{ width: "100%", height: 140, objectFit: "cover" }} />}
+                            <div style={{ padding: 16 }}>
+                              <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8, color: "#fff" }}>{t.name}</h4>
+                              <p style={{ color: "var(--amber)", fontWeight: 700, marginBottom: 12 }}>{Number(t.price).toLocaleString('vi-VN')}₫</p>
+                              <Link href={`/tours/${t.slug}`} target="_blank" className="btn-primary" style={{ display: "block", textAlign: "center", padding: "8px", fontSize: 13 }}>
+                                Chi tiết & Đặt Tour
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* CTA */}
                   <div style={{ textAlign: "center", padding: "20px 0" }}>
                     <Link href="/tours" className="btn-primary" style={{ fontSize: 16 }}>
-                      Đặt Tour Ngay ✦
+                      Khám Phá Tất Cả Tour ✦
                     </Link>
                   </div>
                 </div>
               ) : (
                 /* Raw result fallback */
-                <div className="glass" style={{ borderRadius: 20, padding: 32, whiteSpace: "pre-wrap", color: "var(--text)", fontSize: 14, lineHeight: 1.8 }}>
+                <div id="itinerary-content" className="glass" style={{ borderRadius: 20, padding: 32, whiteSpace: "pre-wrap", color: "var(--text)", fontSize: 14, lineHeight: 1.8 }}>
                   {result}
+                </div>
+              )}
+
+              {/* Chat Refinement Co-pilot */}
+              {parsedResult && (
+                <div style={{ position: "sticky", bottom: 20, background: "rgba(10, 10, 15, 0.85)", backdropFilter: "blur(20px)", borderRadius: 24, padding: "12px 20px", display: "flex", gap: 12, border: "1px solid var(--amber)", zIndex: 100, boxShadow: "0 20px 40px rgba(0,0,0,0.6)", marginTop: 40, alignItems: "center" }}>
+                  <Sparkles size={20} style={{ color: "var(--amber)" }} />
+                  <input 
+                    type="text" 
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleGenerate(true)}
+                    placeholder="Bạn muốn sửa đổi lịch trình này như thế nào? (VD: Đổi ngày 2 sang đi chợ phiên...)"
+                    style={{ flex: 1, background: "transparent", border: "none", color: "#fff", outline: "none", fontSize: 15 }}
+                  />
+                  <button onClick={() => handleGenerate(true)} className="btn-primary" style={{ padding: "10px 20px", borderRadius: 16, display: "flex", gap: 8, alignItems: "center" }} disabled={!chatMessage.trim()}>
+                    <Send size={16} /> Gửi
+                  </button>
                 </div>
               )}
             </div>
