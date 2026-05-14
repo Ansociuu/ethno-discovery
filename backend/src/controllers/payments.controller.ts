@@ -88,12 +88,18 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   const webhookSecret = process.env.SEPAY_WEBHOOK_SECRET;
   
   if (webhookSecret) {
-    const signature = (req.headers['x-sepay-signature'] as string || '').trim();
+    let signature = (req.headers['x-sepay-signature'] as string || '').trim();
+    // Loại bỏ tiền tố sha256= nếu có (SePay đôi khi gửi định dạng này)
+    if (signature.startsWith('sha256=')) {
+      signature = signature.replace('sha256=', '');
+    }
+
     const rawBody = req.body instanceof Buffer ? req.body.toString() : JSON.stringify(req.body);
     const expectedSig = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
     
     if (signature !== expectedSig) {
-      console.log(`❌ Sig FAIL! Payload snippet: ${rawBody.substring(0, 50)}...`);
+      console.log(`❌ Sig FAIL! Raw Payload: "${rawBody}"`);
+      console.log(`🔐 Secret used: ${webhookSecret.substring(0, 3)}***${webhookSecret.substring(webhookSecret.length - 3)}`);
       console.log(`🔐 Expected: ${expectedSig}`);
       console.log(`🔐 Received: ${signature}`);
       return res.status(401).json({ success: false, message: 'Invalid signature' });
