@@ -104,7 +104,7 @@ export default function AIPlannerPage() {
         }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(255,214,10,0.1)", border: "1px solid rgba(255,214,10,0.2)", padding: "8px 20px", borderRadius: 30, marginBottom: 20 }}>
             <Sparkles size={16} style={{ color: "var(--amber)" }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--amber)" }}>AI-Powered by Google Gemini</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--amber)" }}>AI-Powered by Llama 3 (Meta)</span>
           </div>
           <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(36px, 5vw, 64px)", fontWeight: 900, margin: "0 0 12px" }}>
             AI <span className="text-gradient-amber">Journey Planner</span>
