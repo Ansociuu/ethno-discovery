@@ -58,29 +58,37 @@ export default function AIPlannerPage() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
 
+      let buffer = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const text = decoder.decode(value);
-        const lines = text.split("\n").filter(l => l.startsWith("data: "));
-        for (const line of lines) {
-          try {
-            const json = JSON.parse(line.slice(6));
-            if (json.error) {
-              throw new Error(json.error);
+        buffer += decoder.decode(value, { stream: true });
+        
+        const parts = buffer.split('\n\n');
+        buffer = parts.pop() || "";
+        
+        for (const part of parts) {
+          const lines = part.split('\n').filter(l => l.startsWith('data: '));
+          for (const line of lines) {
+            try {
+              const json = JSON.parse(line.slice(6));
+              if (json.error) throw new Error(json.error);
+              
+              if (json.chunk) {
+                streamRef.current += json.chunk;
+                setResult(streamRef.current);
+              }
+              if (json.done && json.fullText) {
+                try {
+                  const jsonStr = json.fullText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+                  setParsedResult(JSON.parse(jsonStr));
+                } catch { /* keep raw */ }
+              }
+            } catch (e: any) { 
+              if (!(e instanceof SyntaxError)) {
+                throw e; // Throw API errors, ignore JSON parsing fragments
+              }
             }
-            if (json.chunk) {
-              streamRef.current += json.chunk;
-              setResult(streamRef.current);
-            }
-            if (json.done && json.fullText) {
-              try {
-                const jsonStr = json.fullText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-                setParsedResult(JSON.parse(jsonStr));
-              } catch { /* keep raw */ }
-            }
-          } catch (e: any) { 
-            if (e.message && !e.message.includes('Unexpected token')) throw e;
           }
         }
       }
