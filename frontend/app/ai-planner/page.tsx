@@ -61,6 +61,9 @@ export default function AIPlannerPage() {
         for (const line of lines) {
           try {
             const json = JSON.parse(line.slice(6));
+            if (json.error) {
+              throw new Error(json.error);
+            }
             if (json.chunk) {
               streamRef.current += json.chunk;
               setResult(streamRef.current);
@@ -71,13 +74,15 @@ export default function AIPlannerPage() {
                 setParsedResult(JSON.parse(jsonStr));
               } catch { /* keep raw */ }
             }
-          } catch { /* skip non-json */ }
+          } catch (e: any) { 
+            if (e.message && !e.message.includes('Unexpected token')) throw e;
+          }
         }
       }
       setStep("result");
-    } catch (err) {
+    } catch (err: any) {
       setStep("form");
-      alert("Có lỗi xảy ra. Vui lòng thử lại.");
+      alert(`Có lỗi xảy ra: ${err.message || 'Vui lòng thử lại.'}`);
     }
   };
 
