@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { CustomerCareWidget } from "@/components/ui/CustomerCareWidget";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,6 +40,7 @@ export default function RootLayout({
       <body className={`${dmSans.variable} ${playfair.variable} antialiased`}>
         <Providers>
           {children}
+          <CustomerCareWidget />
           <Toaster position="top-center" theme="dark" richColors toastOptions={{ style: { background: "var(--midnight)", border: "1px solid var(--glass-border)", color: "#fff" } }} />
         </Providers>
       </body>

@@ -156,3 +156,55 @@ export const deleteTrip = async (req: AuthRequest, res: Response) => {
   await prisma.aiTrip.delete({ where: { id: trip.id } });
   res.json({ success: true, message: 'Đã xoá lịch trình' });
 };
+
+// POST /api/ai/chatbot
+export const chatCustomerCare = async (req: Request, res: Response) => {
+  const { messages } = req.body;
+
+  if (!messages || !Array.isArray(messages)) {
+    throw createError('Thiếu lịch sử tin nhắn', 400);
+  }
+
+  const CHATBOT_SYSTEM_PROMPT = `Bạn là Tư vấn viên Chăm sóc Khách hàng của EthnoDiscovery - Nền tảng Du lịch Văn hoá Tây Bắc Việt Nam.
+Giọng điệu: Chuyên nghiệp, thân thiện, lịch sự, và hữu ích.
+Nhiệm vụ: Giải đáp thắc mắc của khách hàng về các vấn đề chung như:
+- Cách đặt tour, homestay.
+- Chính sách thanh toán (Hỗ trợ chuyển khoản ngân hàng qua mã QR - SePay tự động).
+- Đặc điểm các vùng Tây Bắc (Sapa, Hà Giang, Mộc Châu).
+
+LƯU Ý QUAN TRỌNG:
+1. Trả lời NGẮN GỌN (tối đa 3-4 câu mỗi lần phản hồi), đi thẳng vào vấn đề.
+2. Định dạng text bình thường (có thể dùng Markdown in đậm, danh sách), KHÔNG trả về JSON.
+3. Nếu khách hàng hỏi những câu hỏi quá phức tạp hoặc yêu cầu hỗ trợ khẩn cấp, hãy khuyên họ liên hệ trực tiếp Hotline/Zalo: 0364603462.
+4. Luôn chào hỏi lễ phép nếu đây là tin nhắn đầu tiên.`;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+
+  try {
+    const stream = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: CHATBOT_SYSTEM_PROMPT },
+        ...messages
+      ],
+      model: 'llama-3.3-70b-versatile',
+      stream: true,
+      temperature: 0.5,
+    });
+
+    let fullText = '';
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || '';
+      fullText += text;
+      res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
+    }
+
+    res.write(`data: ${JSON.stringify({ done: true, fullText })}\n\n`);
+    res.end();
+  } catch (error: any) {
+    res.write(`data: ${JSON.stringify({ error: error.message || 'Có lỗi xảy ra kết nối với AI' })}\n\n`);
+    res.end();
+  }
+};
