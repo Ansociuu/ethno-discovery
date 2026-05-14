@@ -8,6 +8,7 @@ interface User {
   name: string;
   role: string;
   avatarUrl?: string | null;
+  phone?: string | null;
 }
 
 interface AuthState {
