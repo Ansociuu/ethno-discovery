@@ -98,7 +98,7 @@ export default function LoginPage() {
                 </div>
                 {errors.password && <p className="text-pink text-xs mt-2 font-medium">{errors.password.message}</p>}
                 <div className="flex justify-end mt-2">
-                  <Link href="/forgot-password" size="sm" className="text-xs text-white/40 hover:text-pink transition-colors no-underline">
+                  <Link href="/forgot-password" className="text-xs text-white/40 hover:text-pink transition-colors no-underline">
                     Quên mật khẩu?
                   </Link>
                 </div>
