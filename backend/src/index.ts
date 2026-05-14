@@ -29,18 +29,35 @@ import passport from 'passport';
 import session from 'express-session';
 import './config/passport';
 
+import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import prisma from './lib/prisma';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Trust proxy (Required for express-rate-limit on Render/Vercel)
 app.set('trust proxy', 1);
 
-// Session for passport (optional if using pure JWT, but needed for the flow)
+// Session store for production
+const sessionStore = new PrismaSessionStore(
+  prisma,
+  {
+    checkPeriod: 2 * 60 * 1000,  // 2 phút kiểm tra session hết hạn
+    dbRecordIdIsSessionId: true,
+    dbRecordIdFunction: undefined,
+  }
+);
+
+// Session configuration
 app.use(session({
   secret: process.env.JWT_SECRET || 'secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  store: sessionStore,
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 giờ
+  }
 }));
 
 app.use(passport.initialize());

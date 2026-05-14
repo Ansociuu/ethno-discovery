@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@quixo3/prisma-session-store": "^3.1.19",
     "@sendgrid/mail": "^8.1.6",
     "@types/express-session": "^1.19.0",
     "@types/passport": "^1.0.17",
