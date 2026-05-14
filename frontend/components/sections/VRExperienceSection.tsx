@@ -1,18 +1,16 @@
 "use client";
-import { useState, useRef } from "react";
-import dynamic from "next/dynamic";
-
-// @ts-ignore
-const PannellumComponent = dynamic(
-  // @ts-ignore
-  () => import("pannellum-react").then((mod) => mod.Pannellum as any),
-  { ssr: false, loading: () => <div className="w-full h-full bg-white/5 animate-pulse flex items-center justify-center text-white/40">Đang tải VR 360...</div> }
-);
-const Pannellum = PannellumComponent as any;
+import { useState, useEffect, useRef } from "react";
 
 export function VRExperienceSection() {
   const [location, setLocation] = useState<"sapa" | "fansipan">("sapa");
-  const vrRef = useRef<any>(null);
+  const [baseUrl, setBaseUrl] = useState("");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setBaseUrl(window.location.origin);
+    }
+  }, []);
 
   const images = {
     sapa: "/vr/sapa.png",
@@ -26,18 +24,18 @@ export function VRExperienceSection() {
         {/* Left: VR Visual */}
         <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", aspectRatio: "4/3", background: "#0a1a2a" }}>
           
-          <Pannellum
-            width="100%"
-            height="100%"
-            image={images[location]}
-            pitch={10}
-            yaw={180}
-            hfov={110}
-            autoLoad
-            onLoad={() => {
-              console.log("VR loaded");
-            }}
-          />
+          {baseUrl ? (
+            <iframe 
+              ref={iframeRef}
+              width="100%" 
+              height="100%" 
+              style={{ border: "none" }}
+              allow="fullscreen"
+              src={`https://cdn.pannellum.org/2.5/pannellum.htm#panorama=${encodeURIComponent(baseUrl + images[location])}&autoLoad=true&pitch=10&yaw=180&hfov=110`}
+            />
+          ) : (
+            <div className="w-full h-full bg-white/5 animate-pulse flex items-center justify-center text-white/40">Đang khởi tạo VR 360...</div>
+          )}
 
             {/* VR Badge center */}
             <div style={{
@@ -120,10 +118,8 @@ export function VRExperienceSection() {
             cursor: "pointer", transition: "all 0.3s", display: "inline-flex", alignItems: "center", gap: 8,
           }}
             onClick={() => {
-              // Pannellum creates a fullscreen button natively, but we can also trigger full screen on the container
-              const elem = document.querySelector('.pnlm-container');
-              if (elem && elem.requestFullscreen) {
-                elem.requestFullscreen();
+              if (iframeRef.current && iframeRef.current.requestFullscreen) {
+                iframeRef.current.requestFullscreen();
               }
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--pink)"; (e.currentTarget as HTMLElement).style.color = "#fff"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
