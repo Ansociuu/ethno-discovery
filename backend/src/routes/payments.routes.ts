@@ -5,8 +5,8 @@ import express from 'express';
 
 const router = Router();
 
-router.post('/create', authenticate, createPayment);
-// Webhook không cần auth (SePay gọi trực tiếp)
+router.post('/create', express.json(), authenticate, createPayment);
+// Webhook cần raw body để kiểm tra chữ ký (signature)
 router.post('/sepay/webhook', express.raw({ type: 'application/json' }), sePayWebhook);
 router.get('/status/:orderCode', authenticate, getPaymentStatus);
 

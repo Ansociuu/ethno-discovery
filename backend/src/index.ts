@@ -72,8 +72,10 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth', authLimiter);
 
+// ─── Special Routes (Raw Body) ──────────────────────────
+app.use('/api/payments', paymentsRoutes);
+
 // ─── Body Parsers ────────────────────────────────────────
-// Note: /api/payments/sepay/webhook uses raw body (defined in route)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -98,7 +100,6 @@ app.use('/api/destinations', destinationsRoutes);
 app.use('/api/tours', toursRoutes);
 app.use('/api/homestays', homestaysRoutes);
 app.use('/api/bookings', bookingsRoutes);
-app.use('/api/payments', paymentsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/wishlist', wishlistRoutes);

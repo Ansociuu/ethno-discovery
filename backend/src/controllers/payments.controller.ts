@@ -88,14 +88,18 @@ export const sePayWebhook = async (req: Request, res: Response) => {
 
   if (webhookSecret) {
     const signature = req.headers['x-sepay-signature'] as string;
-    const payload = JSON.stringify(req.body);
+    const payload = req.body instanceof Buffer ? req.body.toString() : JSON.stringify(req.body);
     const expectedSig = crypto.createHmac('sha256', webhookSecret).update(payload).digest('hex');
     if (signature !== expectedSig) {
       return res.status(401).json({ success: false, message: 'Invalid signature' });
     }
   }
 
-  const { content, transferAmount, referenceCode } = req.body;
+  // Nếu là Buffer (do express.raw), parse thành JSON object
+  const body = req.body instanceof Buffer ? JSON.parse(req.body.toString()) : req.body;
+  const { content, transferAmount, referenceCode } = body;
+
+  console.log(`📥 Received SePay Webhook:`, { content, transferAmount, referenceCode });
   
   // Sửa Regex để tránh khớp với prefix "ETHNOPAY"
   // OrderCode có dạng ETH + timestamp + random string, nên có số ngay sau ETH
@@ -106,6 +110,8 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   }
 
   const orderCode = orderCodeMatch[0];
+  console.log(`🔍 Extracted orderCode: ${orderCode}`);
+
   const payment = await prisma.payment.findUnique({ 
     where: { orderCode },
     include: { booking: { include: { user: true, tour: true, homestay: true } } } 
@@ -116,11 +122,13 @@ export const sePayWebhook = async (req: Request, res: Response) => {
     return res.json({ success: true, message: 'Order not found' });
   }
 
+  console.log(`💳 Found payment for ${orderCode}, expected amount: ${payment.amount}`);
+
   if (payment.status === 'success') {
     return res.json({ success: true, message: 'Already processed' });
   }
 
-  // Kiểm tra số tiền (Cho phép sai số nhỏ do làm tròn nếu cần, ở đây kiểm tra khớp >=)
+  // Kiểm tra số tiền
   if (Number(transferAmount) < Number(payment.amount)) {
     console.log(`⚠️ Partial payment for ${orderCode}: expected ${payment.amount}, got ${transferAmount}`);
     return res.json({ success: true, message: 'Partial payment received' });
@@ -129,7 +137,7 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   await prisma.$transaction([
     prisma.payment.update({
       where: { orderCode },
-      data: { status: 'success', transactionId: referenceCode, sePayData: req.body },
+      data: { status: 'success', transactionId: referenceCode, sePayData: body },
     }),
     prisma.booking.update({
       where: { id: payment.bookingId },
@@ -137,7 +145,7 @@ export const sePayWebhook = async (req: Request, res: Response) => {
     }),
   ]);
 
-  console.log(`✅ Payment confirmed: ${orderCode}`);
+  console.log(`✅ Payment confirmed and booking updated: ${orderCode}`);
 
   const itemName = payment.booking.bookableType === 'tour' ? payment.booking.tour?.title : payment.booking.homestay?.name;
   if (payment.booking.user?.email) {
