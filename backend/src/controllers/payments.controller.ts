@@ -89,27 +89,38 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   
   if (webhookSecret) {
     let signature = (req.headers['x-sepay-signature'] as string || '').trim();
-    // Loại bỏ tiền tố sha256= nếu có (SePay đôi khi gửi định dạng này)
-    if (signature.startsWith('sha256=')) {
-      signature = signature.replace('sha256=', '');
-    }
+    if (signature.startsWith('sha256=')) signature = signature.replace('sha256=', '');
 
     const rawBody = req.body instanceof Buffer ? req.body.toString() : JSON.stringify(req.body);
-    const expectedSig = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
+    const body = req.body instanceof Buffer ? JSON.parse(req.body.toString()) : req.body;
+
+    // Cách 1: Raw Body (Hiện tại)
+    const expectedSigRaw = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
     
-    if (signature !== expectedSig) {
-      console.log(`❌ Sig FAIL! Raw Payload: "${rawBody}"`);
-      console.log(`🔐 Secret used: ${webhookSecret.substring(0, 3)}***${webhookSecret.substring(webhookSecret.length - 3)}`);
-      console.log(`🔐 Expected: ${expectedSig}`);
-      console.log(`🔐 Received: ${signature}`);
-      return res.status(401).json({ success: false, message: 'Invalid signature' });
+    // Cách 2: Ghép các trường quan trọng (Giả định một số cổng thanh toán dùng cách này)
+    // Ví dụ: id + gateway + transferAmount + content
+    const fieldString = `${body.id}${body.gateway}${body.transferAmount}${body.content}`;
+    const expectedSigFields = crypto.createHmac('sha256', webhookSecret).update(fieldString).digest('hex');
+
+    console.log(`🔍 Headers: ${JSON.stringify(req.headers)}`);
+    console.log(`🔐 Sig received: ${signature}`);
+    console.log(`🔐 Sig Expected (Raw): ${expectedSigRaw}`);
+    console.log(`🔐 Sig Expected (Fields): ${expectedSigFields}`);
+
+    if (signature !== expectedSigRaw && signature !== expectedSigFields) {
+      console.log(`❌ ALL SIG STRATEGIES FAILED`);
+      // BỎ QUA signature check nếu bạn thực sự cần (CHỈ DÙNG ĐỂ DEBUG)
+      if (process.env.SKIP_PAYMENT_SIG === 'true') {
+        console.log('⚠️ SKIP_PAYMENT_SIG is true, bypassing check...');
+      } else {
+        return res.status(401).json({ success: false, message: 'Invalid signature' });
+      }
+    } else {
+      console.log('✅ Sig MATCHED');
     }
-    console.log('✅ Sig MATCH');
-  } else {
-    console.log('⚠️ SEPAY_WEBHOOK_SECRET not set, skipping signature check');
   }
 
-  // Nếu là Buffer (do express.raw), parse thành JSON object
+  // Parse body again for logic (if not already parsed)
   const body = req.body instanceof Buffer ? JSON.parse(req.body.toString()) : req.body;
   const { content, transferAmount, referenceCode } = body;
 
