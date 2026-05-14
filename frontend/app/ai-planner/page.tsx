@@ -374,14 +374,16 @@ export default function AIPlannerPage() {
                       <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 700, marginBottom: 16 }}>✦ Tour Đề Xuất Dành Cho Bạn</h3>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
                         {parsedResult.recommendedTours.map((t: any) => (
-                          <div key={t.id} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 16, overflow: "hidden", border: "1px solid var(--glass-border)" }}>
+                          <div key={t.id} style={{ display: "flex", flexDirection: "column", background: "rgba(255,255,255,0.05)", borderRadius: 16, overflow: "hidden", border: "1px solid var(--glass-border)", height: "100%" }}>
                             {t.image && <img src={t.image} alt={t.name} style={{ width: "100%", height: 140, objectFit: "cover" }} />}
-                            <div style={{ padding: 16 }}>
+                            <div style={{ padding: 16, display: "flex", flexDirection: "column", flex: 1 }}>
                               <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8, color: "#fff" }}>{t.name}</h4>
-                              <p style={{ color: "var(--amber)", fontWeight: 700, marginBottom: 12 }}>{Number(t.price).toLocaleString('vi-VN')}₫</p>
-                              <Link href={`/tours/${t.slug}`} target="_blank" className="btn-primary" style={{ display: "block", textAlign: "center", padding: "8px", fontSize: 13 }}>
-                                Chi tiết & Đặt Tour
-                              </Link>
+                              <p style={{ color: "var(--amber)", fontWeight: 700, marginBottom: 16 }}>{Number(t.price).toLocaleString('vi-VN')}₫</p>
+                              <div style={{ marginTop: "auto" }}>
+                                <Link href={`/tours/${t.id}`} target="_blank" className="btn-primary" style={{ display: "block", textAlign: "center", padding: "8px", fontSize: 13 }}>
+                                  Chi tiết & Đặt Tour
+                                </Link>
+                              </div>
                             </div>
                           </div>
                         ))}
