@@ -22,20 +22,29 @@ const AI_FEATURES = [
 const DESTINATIONS = ["Sapa", "Hà Giang", "Mộc Châu"];
 const TRAVEL_TYPES = ["Solo", "Couple", "Family", "Group"];
 const VIBES = ["Văn hoá", "Adventure", "Chill", "Photography"];
+const DURATIONS = [2, 3, 4, 5, 6, 7];
+const BUDGETS = [
+  { label: "Tiết kiệm (< 2tr)", value: 2000000 },
+  { label: "Trung bình (2-5tr)", value: 5000000 },
+  { label: "Thoải mái (5-10tr)", value: 10000000 },
+  { label: "Cao cấp (> 10tr)", value: 15000000 },
+];
 
 export function AIPlannerTeaser() {
   const router = useRouter();
   const [destination, setDestination] = useState("Sapa");
   const [companion, setCompanion] = useState("Couple");
   const [vibe, setVibe] = useState("Văn hoá");
+  const [days, setDays] = useState(5);
+  const [budget, setBudget] = useState(5000000);
 
   const handleStart = () => {
     const query = new URLSearchParams({
       destination,
       companion,
       vibe,
-      days: "5",
-      budget: "5000000",
+      days: days.toString(),
+      budget: budget.toString(),
       auto: "true"
     });
     router.push(`/ai-planner?${query.toString()}`);
@@ -136,13 +145,29 @@ export function AIPlannerTeaser() {
                 <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
                   <Calendar size={14} className="text-pink" /> Số ngày
                 </label>
-                <div className="text-xl font-bold text-white">5 ngày</div>
+                <select 
+                  value={days}
+                  onChange={(e) => setDays(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold outline-none focus:border-pink/50 appearance-none"
+                >
+                  {DURATIONS.map(d => (
+                    <option key={d} value={d} style={{ color: '#000' }}>{d} ngày</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
                   <Wallet size={14} className="text-pink" /> Ngân sách
                 </label>
-                <div className="text-xl font-bold text-white">~5,000,000đ</div>
+                <select 
+                  value={budget}
+                  onChange={(e) => setBudget(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold outline-none focus:border-pink/50 appearance-none"
+                >
+                  {BUDGETS.map(b => (
+                    <option key={b.value} value={b.value} style={{ color: '#000' }}>{b.label}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
