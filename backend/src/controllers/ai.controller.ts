@@ -83,7 +83,7 @@ ${toursContext || 'Chưa có tour nào được thêm'}`;
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userPrompt }
       ],
-      model: 'llama3-70b-8192',
+      model: 'llama-3.3-70b-versatile',
       stream: true,
       temperature: 0.7,
       response_format: { type: 'json_object' }
