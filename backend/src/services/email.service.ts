@@ -80,6 +80,7 @@ export const sendBookingPendingEmail = async (
     };
 
     await sgMail.send(msg);
+    console.log(`✅ Success: Pending email sent to ${email}`);
   } catch (err: any) {
     if (err.response) {
       console.error('SendGrid Error (Pending):', err.response.body);
@@ -136,6 +137,7 @@ export const sendPaymentSuccessEmail = async (
     };
 
     await sgMail.send(msg);
+    console.log(`✅ Success: Payment success email sent to ${email}`);
   } catch (err: any) {
     if (err.response) {
       console.error('SendGrid Error (Success):', err.response.body);
