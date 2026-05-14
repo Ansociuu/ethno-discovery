@@ -88,15 +88,17 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   const webhookSecret = process.env.SEPAY_WEBHOOK_SECRET;
   
   if (webhookSecret) {
-    const signature = req.headers['x-sepay-signature'] as string;
-    const payload = req.body instanceof Buffer ? req.body.toString() : JSON.stringify(req.body);
-    const expectedSig = crypto.createHmac('sha256', webhookSecret).update(payload).digest('hex');
-    
-    console.log(`🔐 Sig check: ${signature === expectedSig ? 'MATCH' : 'FAIL'} (Expected: ${expectedSig.substring(0, 8)}..., Got: ${signature?.substring(0, 8)}...)`);
+    const signature = (req.headers['x-sepay-signature'] as string || '').trim();
+    const rawBody = req.body instanceof Buffer ? req.body.toString() : JSON.stringify(req.body);
+    const expectedSig = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
     
     if (signature !== expectedSig) {
+      console.log(`❌ Sig FAIL! Payload snippet: ${rawBody.substring(0, 50)}...`);
+      console.log(`🔐 Expected: ${expectedSig}`);
+      console.log(`🔐 Received: ${signature}`);
       return res.status(401).json({ success: false, message: 'Invalid signature' });
     }
+    console.log('✅ Sig MATCH');
   } else {
     console.log('⚠️ SEPAY_WEBHOOK_SECRET not set, skipping signature check');
   }
