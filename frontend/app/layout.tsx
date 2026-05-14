@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 };
 
 import { CustomerCareWidget } from "@/components/ui/CustomerCareWidget";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 
 export default function RootLayout({
   children,
@@ -41,6 +42,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <CustomerCareWidget />
+          <ScrollToTop />
           <Toaster position="top-center" theme="dark" richColors toastOptions={{ style: { background: "var(--midnight)", border: "1px solid var(--glass-border)", color: "#fff" } }} />
         </Providers>
       </body>
