@@ -32,6 +32,9 @@ import './config/passport';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy (Required for express-rate-limit on Render/Vercel)
+app.set('trust proxy', 1);
+
 // Session for passport (optional if using pure JWT, but needed for the flow)
 app.use(session({
   secret: process.env.JWT_SECRET || 'secret',
