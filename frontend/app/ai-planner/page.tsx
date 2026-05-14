@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Sparkles, Send, Loader2, Save, Download } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -27,6 +27,41 @@ export default function AIPlannerPage() {
   const [parsedResult, setParsedResult] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
   const streamRef = useRef<string>("");
+  const [autoStart, setAutoStart] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const destination = params.get("destination");
+      const companion = params.get("companion");
+      const vibe = params.get("vibe");
+      const days = params.get("days");
+      const budget = params.get("budget");
+      const auto = params.get("auto");
+
+      if (destination || vibe) {
+        setForm(f => ({
+          ...f,
+          province: destination || f.province,
+          interests: vibe && !f.interests.includes(vibe) ? [...f.interests, vibe] : f.interests,
+          duration: days ? parseInt(days) : f.duration,
+          budget: budget ? parseInt(budget) : f.budget,
+          groupSize: companion === "Solo" ? 1 : companion === "Couple" ? 2 : companion === "Family" ? 4 : companion === "Group" ? 6 : f.groupSize,
+        }));
+      }
+
+      if (auto === "true") {
+        setAutoStart(true);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (autoStart && isAuthenticated && form.province) {
+      handleGenerate();
+      setAutoStart(false);
+    }
+  }, [autoStart, isAuthenticated, form.province]);
 
   const toggleInterest = (interest: string) => {
     setForm(f => ({

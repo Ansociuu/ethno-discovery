@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   Sparkles, 
@@ -17,10 +19,27 @@ const AI_FEATURES = [
   { icon: MessageSquare, color: "bg-blue-500/20 text-blue-400", title: "Chatbot 24/7", desc: "Hỗ trợ đa ngôn ngữ xuyên suốt hành trình của bạn" },
 ];
 
+const DESTINATIONS = ["Sapa", "Hà Giang", "Mộc Châu"];
 const TRAVEL_TYPES = ["Solo", "Couple", "Family", "Group"];
 const VIBES = ["Văn hoá", "Adventure", "Chill", "Photography"];
 
 export function AIPlannerTeaser() {
+  const router = useRouter();
+  const [destination, setDestination] = useState("Sapa");
+  const [companion, setCompanion] = useState("Couple");
+  const [vibe, setVibe] = useState("Văn hoá");
+
+  const handleStart = () => {
+    const query = new URLSearchParams({
+      destination,
+      companion,
+      vibe,
+      days: "5",
+      budget: "5000000",
+      auto: "true"
+    });
+    router.push(`/ai-planner?${query.toString()}`);
+  };
   return (
     <div className="fade-up relative overflow-hidden py-24 px-6 md:px-12 bg-midnight">
       {/* Background glow */}
@@ -64,15 +83,31 @@ export function AIPlannerTeaser() {
             </div>
             <p className="text-white/40 text-sm mb-10">Trả lời vài câu hỏi — AI sẽ làm phần còn lại.</p>
 
+            {/* Destination */}
+            <div className="mb-6">
+              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
+                <Map size={14} className="text-pink" /> Điểm đến?
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {DESTINATIONS.map((d) => (
+                  <button key={d} onClick={() => setDestination(d)} className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                    destination === d ? "bg-blue-500/20 border-blue-400/40 text-blue-400" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
+                  }`}>
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Travel Type */}
-            <div className="mb-8">
-              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-4">
+            <div className="mb-6">
+              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
                 <Target size={14} className="text-pink" /> Bạn đi cùng ai?
               </label>
               <div className="flex flex-wrap gap-2">
-                {TRAVEL_TYPES.map((t, i) => (
-                  <button key={t} className={`px-5 py-2 rounded-full text-xs font-bold border transition-all ${
-                    i === 0 ? "bg-pink/20 border-pink/40 text-pink" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
+                {TRAVEL_TYPES.map((t) => (
+                  <button key={t} onClick={() => setCompanion(t)} className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                    companion === t ? "bg-pink/20 border-pink/40 text-pink" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
                   }`}>
                     {t}
                   </button>
@@ -82,13 +117,13 @@ export function AIPlannerTeaser() {
 
             {/* Vibe */}
             <div className="mb-8">
-              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-4">
+              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
                 <Sparkles size={14} className="text-pink" /> Vibe chuyến đi?
               </label>
               <div className="flex flex-wrap gap-2">
-                {VIBES.map((v, i) => (
-                  <button key={v} className={`px-5 py-2 rounded-full text-xs font-bold border transition-all ${
-                    i === 0 ? "bg-amber/20 border-amber/40 text-amber" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
+                {VIBES.map((v) => (
+                  <button key={v} onClick={() => setVibe(v)} className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                    vibe === v ? "bg-amber/20 border-amber/40 text-amber" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
                   }`}>
                     {v}
                   </button>
@@ -111,9 +146,9 @@ export function AIPlannerTeaser() {
               </div>
             </div>
 
-            <Link href="/ai-planner" className="btn-primary w-full py-5 rounded-2xl justify-center font-black text-lg no-underline shadow-xl shadow-pink/30 hover:shadow-pink/50 transition-all">
+            <button onClick={handleStart} className="btn-primary w-full py-5 rounded-2xl flex justify-center items-center gap-2 font-black text-lg shadow-xl shadow-pink/30 hover:shadow-pink/50 transition-all">
               Bắt Đầu Ngay <ArrowRight size={20} />
-            </Link>
+            </button>
           </div>
         </div>
       </div>
