@@ -4,6 +4,8 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import { createError } from '../middlewares/error.middleware';
 import { AuthRequest } from '../middlewares/auth.middleware';
+import { sendWelcomeEmail, sendOTPEmail } from '../services/email.service';
+import crypto from 'crypto';
 
 const generateTokens = (user: { id: number; email: string; role: string }) => {
   const opts: SignOptions = { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as any };
@@ -37,18 +39,73 @@ export const register = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user = await prisma.user.create({
-    data: { email, password: hashedPassword, name, phone },
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  // Tạo một token tạm thời chứa thông tin đăng ký (hết hạn trong 15p)
+  const registrationToken = jwt.sign(
+    { name, email, password: hashedPassword, phone, otp },
+    process.env.JWT_SECRET!,
+    { expiresIn: '15m' }
+  );
+
+  await sendOTPEmail(email, name, otp).catch(err => {
+    console.error('Failed to send registration OTP email:', err);
   });
 
-  const tokens = generateTokens({ id: user.id, email: user.email, role: user.role });
-
-  res.status(201).json({
+  res.status(200).json({
     success: true,
-    message: 'Đăng ký thành công',
-    data: { user, ...tokens },
+    message: 'Mã xác thực đã được gửi vào email của bạn',
+    data: { registrationToken }
   });
+};
+
+// POST /api/auth/verify-register
+export const verifyRegisterOTP = async (req: Request, res: Response) => {
+  const { otp, registrationToken } = req.body;
+  if (!otp || !registrationToken) throw createError('Thiếu thông tin xác thực', 400);
+
+  try {
+    const decoded = jwt.verify(registrationToken, process.env.JWT_SECRET!) as any;
+    
+    const submittedOtp = otp.toString().trim();
+    const expectedOtp = decoded.otp.toString().trim();
+
+    console.log(`[Debug OTP] Submitted: "${submittedOtp}" | Expected: "${expectedOtp}"`);
+    
+    if (expectedOtp !== submittedOtp) {
+      throw createError('Mã OTP không chính xác', 400);
+    }
+
+    // Kiểm tra lại lần cuối xem email đã bị ai khác đăng ký trong lúc chờ không
+    const existing = await prisma.user.findUnique({ where: { email: decoded.email } });
+    if (existing) throw createError('Email đã được đăng ký', 409);
+
+    // Bây giờ mới chính thức tạo User trong DB
+    const user = await prisma.user.create({
+      data: { 
+        email: decoded.email, 
+        password: decoded.password, 
+        name: decoded.name, 
+        phone: decoded.phone,
+        isVerified: true
+      },
+      select: { id: true, email: true, name: true, role: true }
+    });
+
+    const tokens = generateTokens(user);
+    sendWelcomeEmail(user.email, user.name).catch(console.error);
+
+    res.json({
+      success: true,
+      message: 'Đăng ký tài khoản thành công',
+      data: { user, ...tokens }
+    });
+  } catch (err: any) {
+    if (err.name === 'TokenExpiredError') {
+      throw createError('Phiên đăng ký đã hết hạn, vui lòng thử lại từ đầu', 400);
+    }
+    throw err;
+  }
 };
 
 // POST /api/auth/login
@@ -62,6 +119,10 @@ export const login = async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({ where: { email, isActive: true } });
   if (!user) {
     throw createError('Email hoặc mật khẩu không đúng', 401);
+  }
+
+  if (!user.isVerified && !user.provider) {
+    throw createError('Tài khoản chưa được xác thực email. Vui lòng kiểm tra email của bạn.', 403);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -131,4 +192,68 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
   await prisma.user.update({ where: { id: user.id }, data: { password: hashed } });
 
   res.json({ success: true, message: 'Đổi mật khẩu thành công' });
+};
+
+// POST /api/auth/forgot-password
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email) throw createError('Email là bắt buộc', 400);
+
+  const user = await prisma.user.findUnique({ where: { email, isActive: true } });
+  if (!user) {
+    // Để bảo mật, không báo lỗi nếu email không tồn tại, chỉ trả về thành công giả
+    return res.json({ success: true, message: 'Nếu email tồn tại, mã OTP đã được gửi' });
+  }
+
+  // Tạo OTP 6 số
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { otpCode: otp, otpExpires: expires },
+  });
+
+  await sendOTPEmail(user.email, user.name, otp).catch(err => {
+    console.error('Failed to send forgot-password OTP email:', err);
+  });
+
+  res.json({ success: true, message: 'Mã OTP đã được gửi vào email của bạn' });
+};
+
+// POST /api/auth/verify-otp
+export const verifyOTP = async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) throw createError('Email và OTP là bắt buộc', 400);
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || user.otpCode !== otp || !user.otpExpires || user.otpExpires < new Date()) {
+    throw createError('Mã OTP không đúng hoặc đã hết hạn', 400);
+  }
+
+  res.json({ success: true, message: 'Xác thực OTP thành công' });
+};
+
+// POST /api/auth/reset-password
+export const resetPassword = async (req: Request, res: Response) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) throw createError('Thiếu thông tin bắt buộc', 400);
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || user.otpCode !== otp || !user.otpExpires || user.otpExpires < new Date()) {
+    throw createError('Mã OTP không đúng hoặc đã hết hạn', 400);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { 
+      password: hashedPassword, 
+      otpCode: null, 
+      otpExpires: null 
+    },
+  });
+
+  res.json({ success: true, message: 'Đặt lại mật khẩu thành công' });
 };

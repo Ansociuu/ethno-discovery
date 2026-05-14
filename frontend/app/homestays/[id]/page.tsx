@@ -3,7 +3,29 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Users, Star, MapPin, ChevronRight, Calendar, Heart, Wifi, Coffee, Mountain } from "lucide-react";
+import { 
+  Users, 
+  Star, 
+  MapPin, 
+  ChevronRight, 
+  Calendar, 
+  Heart, 
+  Wifi, 
+  Coffee, 
+  Mountain,
+  Clock,
+  XCircle,
+  Info,
+  VolumeX,
+  Leaf,
+  Plus,
+  Minus,
+  CreditCard,
+  ArrowRight,
+  Smartphone,
+  ShieldCheck,
+  CheckCircle
+} from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { homestaysApi, bookingsApi } from "@/lib/api";
@@ -19,7 +41,6 @@ export default function HomestayDetailPage() {
   const [checkOut, setCheckOut] = useState("");
   const [nights, setNights] = useState(1);
 
-  // Calculate nights when dates change
   const calcNights = (ci: string, co: string) => {
     if (!ci || !co) return 1;
     const diff = (new Date(co).getTime() - new Date(ci).getTime()) / 86400000;
@@ -36,7 +57,7 @@ export default function HomestayDetailPage() {
       bookableType: "homestay",
       homestayId: Number(id),
       checkIn: checkIn || new Date().toISOString(),
-      checkOut: checkOut || new Date(Date.now() + nights * 86400000).toISOString(),
+      checkOut: new Date(Date.now() + nights * 86400000).toISOString(),
       guests,
     }),
     onSuccess: (res) => router.push(`/bookings/${res.data.data.id}/payment`),
@@ -47,8 +68,8 @@ export default function HomestayDetailPage() {
     return (
       <>
         <Navbar />
-        <div style={{ paddingTop: 70 }}>
-          <div className="skeleton" style={{ height: 480 }} />
+        <div className="pt-[70px]">
+          <div className="skeleton h-[480px]" />
         </div>
       </>
     );
@@ -59,250 +80,230 @@ export default function HomestayDetailPage() {
   const price = Number(hs.pricePerNight);
   const total = price * nights * guests;
 
-  // Parse amenities
   let amenities: string[] = [];
   if (Array.isArray(hs.amenities)) amenities = hs.amenities;
   else if (typeof hs.amenities === "string") {
     try { amenities = JSON.parse(hs.amenities); } catch {}
   }
 
-  const AMENITY_ICONS: Record<string, string> = {
-    wifi: "📶", "mountain view": "🏔️", breakfast: "🍳", fireplace: "🔥",
-    "hot tub": "🛁", yoga: "🧘", "live music": "🎵", "local food": "🍜",
-    "farm tour": "🌿", "cloud view": "☁️",
+  const AMENITY_MAP: Record<string, any> = {
+    wifi: { icon: Wifi, color: "text-blue-400" },
+    mountain: { icon: Mountain, color: "text-pink" },
+    breakfast: { icon: Coffee, color: "text-amber" },
+    cloud: { icon: Mountain, color: "text-blue-300" },
+    default: { icon: CheckCircle, color: "text-pink" }
   };
 
-  const getAmenityIcon = (amenity: string) => {
+  const getAmenityConfig = (amenity: string) => {
     const lower = amenity.toLowerCase();
-    for (const [key, icon] of Object.entries(AMENITY_ICONS)) {
-      if (lower.includes(key)) return icon;
-    }
-    return "✦";
+    if (lower.includes("wifi")) return AMENITY_MAP.wifi;
+    if (lower.includes("view") || lower.includes("núi")) return AMENITY_MAP.mountain;
+    if (lower.includes("sáng") || lower.includes("ăn")) return AMENITY_MAP.breakfast;
+    return AMENITY_MAP.default;
   };
 
   return (
     <>
       <Navbar />
-      <main style={{ paddingTop: 70 }}>
-        {/* Hero Images */}
-        <div style={{ position: "relative", height: 500, overflow: "hidden" }}>
-          {hs.coverImage
-            ? <img src={hs.coverImage} alt={hs.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            : <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--midnight), var(--amber))" }} />
-          }
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(20,13,31,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)" }} />
-
-          {/* Breadcrumb */}
-          <div style={{ position: "absolute", bottom: 48, left: 0, right: 0, maxWidth: 1280, margin: "0 auto", padding: "0 40px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
-              <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>Trang chủ</Link>
+      <main className="pt-[70px]">
+        {/* Hero Banner */}
+        <div className="relative h-[550px] overflow-hidden">
+          <img 
+            src={hs.coverImage || '/placeholder.jpg'} 
+            alt={hs.name} 
+            className="w-full h-full object-cover animate-fade-up duration-1000"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/40 to-transparent" />
+          
+          <div className="absolute bottom-16 left-0 right-0 max-w-7xl mx-auto px-6 animate-fade-up">
+            <div className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest mb-6">
+              <Link href="/" className="text-inherit no-underline hover:text-white transition-colors">Trang chủ</Link>
               <ChevronRight size={14} />
-              <Link href="/homestays" style={{ color: "inherit", textDecoration: "none" }}>Homestay</Link>
+              <Link href="/homestays" className="text-inherit no-underline hover:text-white transition-colors">Homestays</Link>
               <ChevronRight size={14} />
-              <span style={{ color: "#fff" }}>{hs.name}</span>
+              <span className="text-white">{hs.name}</span>
             </div>
-            {hs.featured && <span className="badge badge-amber" style={{ marginBottom: 12 }}>⭐ Superhost</span>}
-            <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 60px)", fontWeight: 900, lineHeight: 1.1, marginBottom: 16 }}>
+
+            {hs.featured && (
+              <div className="inline-flex items-center gap-2 bg-amber/20 backdrop-blur-md border border-amber/40 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-amber mb-6">
+                <Star size={12} className="fill-amber" /> Superhost
+              </div>
+            )}
+
+            <h1 className="font-serif text-[clamp(32px,5vw,60px)] font-black text-white leading-[1.1] mb-8 max-w-4xl">
               {hs.name}
             </h1>
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
-                <MapPin size={16} style={{ color: "var(--amber)" }} />
+
+            <div className="flex flex-wrap gap-8">
+              <div className="flex items-center gap-2 text-white/70 font-bold">
+                <MapPin size={18} className="text-amber" />
                 {hs.destination?.nameVi}, {hs.destination?.province}
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
-                <Users size={16} style={{ color: "var(--pink)" }} />
+              </div>
+              <div className="flex items-center gap-2 text-white/70 font-bold">
+                <Users size={18} className="text-pink" />
                 Tối đa {hs.maxGuests} khách
-              </span>
+              </div>
               {hs._count?.reviews > 0 && (
-                <span style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--amber)" }}>
-                  <Star size={16} fill="currentColor" />
+                <div className="flex items-center gap-2 text-amber font-bold">
+                  <Star size={18} className="fill-amber" />
                   {hs._count.reviews} đánh giá
-                </span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "60px 40px", display: "grid", gridTemplateColumns: "1fr 380px", gap: 48, alignItems: "start" }}>
-          {/* Left */}
-          <div>
-            {/* Description */}
-            {hs.description && (
-              <div style={{ marginBottom: 48 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Về Homestay Này</h2>
-                <p style={{ color: "var(--text)", fontSize: 16, lineHeight: 1.8 }}>{hs.description}</p>
-              </div>
-            )}
+        {/* Content Section */}
+        <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Left Column */}
+          <div className="lg:col-span-8 space-y-16">
+            <div>
+              <h2 className="font-serif text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                <Info size={24} className="text-pink" /> Trải Nghiệm Nghỉ Dưỡng
+              </h2>
+              <p className="text-white/60 text-lg leading-relaxed">{hs.description}</p>
+            </div>
 
             {/* Amenities */}
-            {amenities.length > 0 && (
-              <div style={{ marginBottom: 48 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Tiện Ích</h2>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-                  {amenities.map((a: string) => (
-                    <div key={a} className="glass" style={{ borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 20 }}>{getAmenityIcon(a)}</span>
-                      <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>{a}</span>
+            <div>
+              <h2 className="font-serif text-2xl font-bold text-white mb-8">Tiện Nghi Có Sẵn</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {amenities.map((a, i) => {
+                  const cfg = getAmenityConfig(a);
+                  return (
+                    <div key={i} className="glass p-4 rounded-2xl flex items-center gap-3 border-white/5 hover:bg-white/10 transition-colors">
+                      <cfg.icon size={20} className={cfg.color} />
+                      <span className="text-sm font-medium text-white/80">{a}</span>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
             {/* House Rules */}
-            <div style={{ marginBottom: 48 }}>
-              <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Nội Quy</h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div className="glass rounded-[32px] p-8 md:p-10 border-white/5">
+              <h2 className="font-serif text-2xl font-bold text-white mb-8">Nội Quy & Chính Sách</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
                 {[
-                  { icon: "🕐", rule: "Check-in: 14:00 — Check-out: 12:00" },
-                  { icon: "🚭", rule: "Không hút thuốc trong phòng" },
-                  { icon: "🐾", rule: "Không mang thú cưng" },
-                  { icon: "🔕", rule: "Giờ yên tĩnh: 22:00 — 07:00" },
-                  { icon: "🌿", rule: "Ủng hộ du lịch bền vững" },
-                ].map(r => (
-                  <div key={r.rule} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 15, color: "rgba(255,255,255,0.75)" }}>
-                    <span>{r.icon}</span> {r.rule}
+                  { icon: Clock, label: "Check-in: 14:00 • Check-out: 12:00" },
+                  { icon: XCircle, label: "Không hút thuốc trong phòng" },
+                  { icon: Info, label: "Không mang theo thú cưng" },
+                  { icon: VolumeX, label: "Giờ yên tĩnh: 22:00 - 07:00" },
+                  { icon: Leaf, label: "Khuyến khích bảo vệ môi trường" },
+                  { icon: ShieldCheck, label: "Bảo hiểm lưu trú cơ bản" },
+                ].map((rule, i) => (
+                  <div key={i} className="flex items-center gap-4 text-white/60 text-sm font-medium">
+                    <rule.icon size={18} className="text-pink shrink-0" />
+                    {rule.label}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Location info */}
+            {/* Location Section */}
             {hs.destination && (
-              <div style={{ marginBottom: 48 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Vị Trí</h2>
-                <div className="glass" style={{ borderRadius: 20, padding: 24 }}>
-                  <div style={{ display: "flex", gap: 16, marginBottom: 12 }}>
-                    <MapPin size={20} style={{ color: "var(--amber)", flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 4 }}>{hs.destination.nameVi}</div>
-                      <div style={{ fontSize: 14, color: "var(--text)" }}>{hs.destination.province}</div>
-                    </div>
-                  </div>
-                  <Link href={`/destinations/${hs.destination.slug}`} className="btn-ghost" style={{ padding: "8px 16px", fontSize: 13 }}>
-                    Khám phá {hs.destination.nameVi} →
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {/* Reviews */}
-            {hs.reviews?.length > 0 && (
               <div>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>
-                  Đánh Giá ({hs.reviews.length})
-                </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  {hs.reviews.map((review: any) => (
-                    <div key={review.id} className="glass" style={{ borderRadius: 16, padding: 20 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, alignItems: "center" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, var(--pink), var(--amber))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#000", fontSize: 14 }}>
-                            {review.user?.name?.[0]}
-                          </div>
-                          <span style={{ fontWeight: 600, color: "#fff" }}>{review.user?.name}</span>
-                        </div>
-                        <div style={{ display: "flex", gap: 2 }}>
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} size={14} style={{ color: i < review.rating ? "var(--amber)" : "rgba(255,255,255,0.2)" }} fill={i < review.rating ? "var(--amber)" : "none"} />
-                          ))}
-                        </div>
-                      </div>
-                      <p style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.6 }}>{review.content}</p>
-                    </div>
-                  ))}
+                <h2 className="font-serif text-2xl font-bold text-white mb-8">Vị Trí & Điểm Đến</h2>
+                <div className="glass rounded-[32px] p-8 flex flex-col md:flex-row items-center gap-8 group">
+                  <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shrink-0">
+                    <img src={hs.destination.coverImage} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h4 className="text-xl font-bold text-white mb-2">{hs.destination.nameVi}</h4>
+                    <p className="text-sm text-white/40 mb-6">{hs.destination.province}</p>
+                    <Link href={`/destinations/${hs.destination.slug}`} className="btn-ghost py-2 px-6 no-underline text-xs inline-flex items-center gap-2 uppercase tracking-widest font-bold">
+                      Khám phá khu vực <ArrowRight size={14} />
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Right: Booking Widget */}
-          <div style={{ position: "sticky", top: 90 }}>
-            <div className="glass" style={{ borderRadius: 24, padding: 32 }}>
-              {/* Price display */}
-              <div style={{ marginBottom: 24 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Giá từ</span>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
-                  <span style={{ fontFamily: "var(--font-serif)", fontSize: 38, fontWeight: 900, color: "var(--amber)" }}>
+          {/* Right Column: Booking Widget */}
+          <div className="lg:col-span-4 sticky top-24">
+            <div className="glass rounded-[32px] p-8 border-white/10 shadow-2xl shadow-black/40">
+              <div className="mb-8">
+                <span className="text-xs font-bold text-white/30 uppercase tracking-widest">Giá mỗi đêm</span>
+                <div className="flex items-baseline gap-2 mt-2">
+                  <span className="font-serif text-4xl font-black text-white">
                     {price.toLocaleString("vi-VN")}₫
                   </span>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 14 }}>/đêm/phòng</span>
+                  <span className="text-white/30 text-sm">/ đêm</span>
                 </div>
               </div>
 
-              {/* Check-in / Check-out */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: "var(--pink)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
-                    Nhận phòng
-                  </label>
-                  <input type="date" value={checkIn} min={new Date().toISOString().split("T")[0]}
-                    onChange={e => { setCheckIn(e.target.value); setNights(calcNights(e.target.value, checkOut)); }}
-                    className="input" style={{ fontSize: 14, padding: "10px 12px" }} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: "var(--pink)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
-                    Trả phòng
-                  </label>
-                  <input type="date" value={checkOut} min={checkIn || new Date().toISOString().split("T")[0]}
-                    onChange={e => { setCheckOut(e.target.value); setNights(calcNights(checkIn, e.target.value)); }}
-                    className="input" style={{ fontSize: 14, padding: "10px 12px" }} />
-                </div>
-              </div>
-
-              {/* Guests */}
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "var(--pink)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                  Số Khách
-                </label>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <button onClick={() => setGuests(Math.max(1, guests - 1))} style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid var(--glass-border)", background: "transparent", color: "#fff", cursor: "pointer", fontSize: 18 }}>−</button>
-                  <span style={{ fontSize: 18, fontWeight: 700, flex: 1, textAlign: "center" }}>{guests}</span>
-                  <button onClick={() => setGuests(Math.min(hs.maxGuests, guests + 1))} style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid var(--glass-border)", background: "transparent", color: "#fff", cursor: "pointer", fontSize: 18 }}>+</button>
-                </div>
-              </div>
-
-              {/* Price breakdown */}
-              <div style={{ borderTop: "1px solid var(--glass-border)", paddingTop: 16, marginBottom: 20 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: "var(--text)" }}>{price.toLocaleString("vi-VN")} × {nights} đêm × {guests} khách</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--text)", fontSize: 15 }}>Tổng</span>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: "var(--amber)" }}>{total.toLocaleString("vi-VN")}₫</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => bookMutation.mutate()}
-                disabled={bookMutation.isPending}
-                className="btn-primary"
-                style={{ width: "100%", justifyContent: "center", fontSize: 16, padding: "14px", opacity: bookMutation.isPending ? 0.7 : 1 }}
-              >
-                {bookMutation.isPending ? "Đang xử lý..." : isAuthenticated ? "Đặt Phòng Ngay ✦" : "Đăng nhập để đặt"}
-              </button>
-              <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 12 }}>
-                Miễn phí huỷ trong 24 giờ · Thanh toán an toàn
-              </p>
-            </div>
-
-            {/* Host info */}
-            {hs.host && (
-              <div className="glass" style={{ borderRadius: 20, padding: 24, marginTop: 16 }}>
-                <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, marginBottom: 12 }}>Chủ Homestay</h3>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, var(--pink), var(--amber))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 18, color: "#000" }}>
-                    {hs.host.name?.[0]}
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-3">Nhận phòng</label>
+                    <input 
+                      type="date" 
+                      value={checkIn} 
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={e => { setCheckIn(e.target.value); setNights(calcNights(e.target.value, checkOut)); }}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-xs text-white outline-none focus:border-amber/50"
+                    />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 600, color: "#fff" }}>{hs.host.name}</div>
-                    <div style={{ fontSize: 13, color: "var(--text)" }}>Host EthnoDiscovery</div>
+                    <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-3">Trả phòng</label>
+                    <input 
+                      type="date" 
+                      value={checkOut} 
+                      min={checkIn || new Date().toISOString().split("T")[0]}
+                      onChange={e => { setCheckOut(e.target.value); setNights(calcNights(checkIn, e.target.value)); }}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-xs text-white outline-none focus:border-amber/50"
+                    />
                   </div>
                 </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-3">Số lượng khách</label>
+                  <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-2">
+                    <button 
+                      onClick={() => setGuests(Math.max(1, guests - 1))}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/10 border-none bg-transparent cursor-pointer"
+                    >
+                      <Minus size={18} />
+                    </button>
+                    <span className="text-lg font-bold text-white">{guests}</span>
+                    <button 
+                      onClick={() => setGuests(Math.min(hs.maxGuests, guests + 1))}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/10 border-none bg-transparent cursor-pointer"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-white/5 space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-white/40">{price.toLocaleString("vi-VN")} × {nights} đêm</span>
+                    <span className="text-white font-bold">{(price * nights).toLocaleString("vi-VN")}₫</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                    <span className="text-white/40">Phí khách (x{guests})</span>
+                    <span className="text-white font-bold">0₫</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-sm font-black text-white">Tổng số tiền</span>
+                    <span className="text-2xl font-black text-amber">{total.toLocaleString("vi-VN")}₫</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => bookMutation.mutate()}
+                  disabled={bookMutation.isPending}
+                  className="btn-primary w-full py-5 rounded-2xl justify-center font-black text-lg no-underline shadow-xl shadow-pink/30 hover:shadow-pink/50 disabled:opacity-50"
+                >
+                  {bookMutation.isPending ? "Đang xử lý..." : isAuthenticated ? "Đặt Phòng Ngay" : "Đăng nhập để đặt"}
+                </button>
+
+                <div className="flex items-center justify-center gap-2 text-[10px] text-white/30 font-bold uppercase tracking-widest mt-4">
+                  <Smartphone size={12} /> Xác nhận tức thì qua tin nhắn
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </main>

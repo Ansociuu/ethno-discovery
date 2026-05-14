@@ -1,166 +1,178 @@
 "use client";
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { 
+  User, 
+  MapPin, 
+  Calendar, 
+  Heart, 
+  Sparkles, 
+  Settings, 
+  ChevronRight, 
+  Clock, 
+  CheckCircle,
+  Package,
+  Compass
+} from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Calendar, CreditCard, Heart, MapPin, Clock, ChevronRight, LogOut } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { bookingsApi } from "@/lib/api";
+import { MobileTabBar } from "@/components/layout/MobileTabBar";
+import { authApi, bookingsApi, wishlistApi, aiApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  PENDING:   { label: "Chờ thanh toán", color: "var(--amber)" },
-  CONFIRMED: { label: "Đã xác nhận",    color: "#10b981" },
-  COMPLETED: { label: "Hoàn thành",     color: "rgba(255,255,255,0.5)" },
-  CANCELLED: { label: "Đã huỷ",         color: "var(--pink)" },
-};
+import { AuthGuard } from "@/components/auth-guard";
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const { user, isAuthenticated, logout, fetchMe } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
 
-  useEffect(() => {
-    if (!isAuthenticated) { router.replace("/login"); return; }
-    fetchMe();
-  }, [isAuthenticated]);
-
-  const { data: bookingsData, isLoading } = useQuery({
-    queryKey: ["my-bookings"],
-    queryFn: () => bookingsApi.getMy({ limit: 5 }).then(r => r.data),
-    enabled: isAuthenticated,
+  const { data: userData } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => authApi.getMe().then(r => r.data.data),
+    enabled: isAuthenticated
   });
 
-  const bookings = bookingsData?.data || [];
+  const { data: bookings } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: () => bookingsApi.getMy({ limit: 3 }).then(r => r.data.data),
+    enabled: isAuthenticated
+  });
 
-  if (!isAuthenticated) return null;
+  const { data: aiTrips } = useQuery({
+    queryKey: ["my-ai-trips"],
+    queryFn: () => aiApi.getTrips().then(r => r.data.data),
+    enabled: isAuthenticated
+  });
 
   return (
-    <>
+    <AuthGuard>
       <Navbar />
-      <main style={{ paddingTop: 70, minHeight: "100vh" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 40px" }}>
-          {/* Header */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 48, flexWrap: "wrap", gap: 16 }}>
-            <div>
-              <p style={{ color: "var(--text)", fontSize: 14, marginBottom: 6 }}>Xin chào 👋</p>
-              <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700 }}>
-                {user?.name}
-              </h1>
-              <p style={{ color: "var(--text)", fontSize: 14, marginTop: 6 }}>{user?.email}</p>
+      <main className="pt-[100px] min-h-screen pb-20">
+        <div className="max-w-7xl mx-auto px-6">
+          
+          {/* Header Profile */}
+          <section className="glass rounded-[32px] p-8 mb-12 flex flex-col md:flex-row items-center gap-8 animate-fade-up">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-pink to-amber flex items-center justify-center text-4xl font-bold text-white shadow-xl shadow-pink/20">
+              {user?.name?.[0]}
             </div>
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              {user?.role === "ADMIN" && (
-                <Link href="/admin" className="btn-ghost" style={{ padding: "10px 20px", fontSize: 14 }}>
-                  Admin Panel ⚙️
-                </Link>
-              )}
-              <button onClick={() => { logout(); router.push("/"); }} className="btn-ghost"
-                style={{ padding: "10px 20px", fontSize: 14, display: "flex", alignItems: "center", gap: 8 }}>
-                <LogOut size={16} /> Đăng xuất
-              </button>
+            <div className="text-center md:text-left flex-1">
+              <h1 className="font-serif text-4xl font-bold mb-2">{user?.name}</h1>
+              <p className="text-text flex items-center justify-center md:justify-start gap-2">
+                <User size={16} className="text-pink" />
+                {user?.email} • Khách hàng hạng Vàng
+              </p>
             </div>
-          </div>
+            <div className="flex gap-4">
+              <Link href="/profile" className="btn-ghost py-2 px-6 text-sm no-underline">
+                <Settings size={16} /> Cài đặt
+              </Link>
+            </div>
+          </section>
 
-          {/* Quick Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16, marginBottom: 48 }}>
-            {[
-              { icon: "🗺", label: "Tổng Booking", value: bookingsData?.pagination?.total || 0, color: "var(--pink)" },
-              { icon: "✅", label: "Đã Hoàn Thành", value: bookings.filter((b: any) => b.status === "COMPLETED").length, color: "#10b981" },
-              { icon: "⏳", label: "Đang Chờ", value: bookings.filter((b: any) => b.status === "PENDING").length, color: "var(--amber)" },
-              { icon: "❤️", label: "Yêu Thích", value: 0, color: "var(--pink)" },
-            ].map(stat => (
-              <div key={stat.label} className="glass" style={{ borderRadius: 20, padding: 24 }}>
-                <div style={{ fontSize: 32, marginBottom: 12 }}>{stat.icon}</div>
-                <div style={{ fontFamily: "var(--font-serif)", fontSize: 36, fontWeight: 700, color: stat.color }}>{stat.value}</div>
-                <div style={{ color: "var(--text)", fontSize: 14, marginTop: 4 }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Bookings */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 24 }}>
-            <div className="glass" style={{ borderRadius: 24, padding: 32 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, fontWeight: 700 }}>Booking Gần Đây</h2>
-                <Link href="/dashboard/bookings" style={{ color: "var(--pink)", textDecoration: "none", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
-                  Xem tất cả <ChevronRight size={16} />
-                </Link>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Stats & Bookings */}
+            <div className="lg:col-span-2 space-y-8">
+              
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: "Đã đặt", value: bookings?.length || 0, icon: Package, color: "text-pink" },
+                  { label: "Yêu thích", value: "12", icon: Heart, color: "text-red-500" },
+                  { label: "AI Trips", value: aiTrips?.length || 0, icon: Sparkles, color: "text-amber" },
+                  { label: "Tours đi", value: "3", icon: Compass, color: "text-blue-400" },
+                ].map((stat, i) => (
+                  <div key={i} className="glass rounded-2xl p-6 text-center">
+                    <stat.icon className={`${stat.color} mx-auto mb-2`} size={24} />
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <div className="text-xs text-text uppercase tracking-wider font-semibold">{stat.label}</div>
+                  </div>
+                ))}
               </div>
 
-              {isLoading ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {[...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 12 }} />)}
-                </div>
-              ) : bookings.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text)" }}>
-                  <div style={{ fontSize: 48, marginBottom: 16 }}>🗺</div>
-                  <p style={{ marginBottom: 20 }}>Bạn chưa có booking nào</p>
-                  <Link href="/tours" className="btn-primary" style={{ fontSize: 14, padding: "10px 24px" }}>
-                    Khám phá Tours
+              {/* Recent Bookings */}
+              <div className="glass rounded-[32px] p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="font-serif text-2xl font-bold flex items-center gap-3">
+                    <Calendar className="text-pink" />
+                    Chuyến đi gần đây
+                  </h2>
+                  <Link href="/bookings" className="text-pink text-sm font-bold no-underline flex items-center gap-1">
+                    Tất cả <ChevronRight size={16} />
                   </Link>
                 </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {bookings.map((booking: any) => {
-                    const item = booking.tour || booking.homestay;
-                    const status = STATUS_LABELS[booking.status] || { label: booking.status, color: "var(--text)" };
-                    return (
-                      <Link key={booking.id} href={`/bookings/${booking.id}`} style={{ textDecoration: "none" }}>
-                        <div style={{
-                          background: "rgba(255,255,255,0.04)", border: "1px solid var(--glass-border)",
-                          borderRadius: 16, padding: "16px 20px",
-                          display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16,
-                          transition: "background 0.2s",
-                        }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
-                          onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                              {item?.title || item?.name || `Booking #${booking.id}`}
-                            </h3>
-                            <div style={{ display: "flex", gap: 16, color: "var(--text)", fontSize: 13 }}>
-                              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                <Calendar size={13} /> {new Date(booking.checkIn).toLocaleDateString("vi-VN")}
-                              </span>
-                              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                <CreditCard size={13} /> {Number(booking.totalPrice).toLocaleString("vi-VN")}₫
-                              </span>
+
+                <div className="space-y-4">
+                  {!bookings?.length ? (
+                    <div className="text-center py-12 text-text">
+                      Bạn chưa có chuyến đi nào. 
+                      <Link href="/tours" className="text-pink block mt-2 no-underline font-bold">Khám phá ngay!</Link>
+                    </div>
+                  ) : (
+                    bookings.map((booking: any) => (
+                      <Link key={booking.id} href={`/bookings/${booking.id}`} className="block glass bg-white/5 border-glass-border rounded-2xl p-4 no-underline hover:bg-white/10 transition-all">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 flex-shrink-0">
+                            <img src={booking.tour?.coverImage || booking.homestay?.coverImage} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-white truncate">{booking.tour?.title || booking.homestay?.name}</h3>
+                            <p className="text-xs text-text mb-0 flex items-center gap-2">
+                              <MapPin size={12} /> {booking.tour?.destination?.nameVi}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className={`text-[10px] font-bold px-2 py-1 rounded-full mb-1 inline-block ${
+                              booking.status === 'CONFIRMED' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
+                            }`}>
+                              {booking.status}
+                            </div>
+                            <div className="text-sm font-bold text-white">
+                              {Number(booking.totalPrice).toLocaleString()}đ
                             </div>
                           </div>
-                          <span style={{ color: status.color, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
-                            {status.label}
-                          </span>
                         </div>
                       </Link>
-                    );
-                  })}
+                    ))
+                  )}
                 </div>
-              )}
+              </div>
             </div>
-          </div>
 
-          {/* Quick Links */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16, marginTop: 24 }}>
-            {[
-              { icon: "🗺", label: "Khám phá Tours", href: "/tours", color: "var(--pink)" },
-              { icon: "🏠", label: "Homestay", href: "/homestays", color: "var(--amber)" },
-              { icon: "✨", label: "AI Planner", href: "/ai-planner", color: "var(--amber)" },
-              { icon: "🏔", label: "Điểm Đến", href: "/destinations", color: "var(--pink)" },
-            ].map(link => (
-              <Link key={link.href} href={link.href} style={{ textDecoration: "none" }}>
-                <div className="glass" style={{ borderRadius: 16, padding: 20, textAlign: "center", transition: "transform 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-4px)")}
-                  onMouseLeave={e => (e.currentTarget.style.transform = "")}>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>{link.icon}</div>
-                  <div style={{ fontSize: 14, color: link.color, fontWeight: 600 }}>{link.label}</div>
+            {/* Right Column: AI Planner & Settings */}
+            <div className="space-y-8">
+              {/* AI Planner Promo */}
+              <div className="glass rounded-[32px] p-8 bg-gradient-to-br from-pink/20 to-amber/10 border-pink/30 relative overflow-hidden group">
+                <Sparkles className="absolute -right-4 -top-4 text-pink/20 w-32 h-32 group-hover:rotate-12 transition-transform" />
+                <h3 className="font-serif text-2xl font-bold mb-4 relative z-10">Lên kế hoạch với AI</h3>
+                <p className="text-text text-sm mb-6 relative z-10">Tạo lịch trình cá nhân hóa cho chuyến đi tiếp theo của bạn chỉ trong 30 giây.</p>
+                <Link href="/ai-planner" className="btn-primary w-full justify-center no-underline relative z-10">
+                  Thử ngay
+                </Link>
+              </div>
+
+              {/* Saved AI Trips */}
+              <div className="glass rounded-[32px] p-8">
+                <h3 className="font-serif text-xl font-bold mb-6 flex items-center gap-2">
+                  <Sparkles className="text-amber" size={20} />
+                  AI Trips đã lưu
+                </h3>
+                <div className="space-y-4">
+                  {!aiTrips?.length ? (
+                    <p className="text-text text-sm text-center py-4">Chưa có lịch trình nào được lưu.</p>
+                  ) : (
+                    aiTrips.slice(0, 3).map((trip: any) => (
+                      <div key={trip.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-glass-border">
+                        <div className="text-sm font-medium truncate pr-4">{trip.title}</div>
+                        <ChevronRight size={16} className="text-text" />
+                      </div>
+                    ))
+                  )}
                 </div>
-              </Link>
-            ))}
+              </div>
+            </div>
           </div>
         </div>
       </main>
       <Footer />
-    </>
+      <MobileTabBar />
+    </AuthGuard>
   );
 }

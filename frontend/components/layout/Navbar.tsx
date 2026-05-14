@@ -1,121 +1,133 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, MapPin, Compass, Home, Sparkles } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { 
+  Leaf, 
+  Search, 
+  User, 
+  Menu, 
+  X, 
+  Compass, 
+  Home, 
+  Calendar,
+  Sparkles,
+  Map,
+  LogOut
+} from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuthStore();
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handler);
-    return () => window.removeEventListener("scroll", handler);
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navLinks = [
+    { href: "/", label: "Trang Chủ", icon: Home },
+    { href: "/destinations", label: "Điểm Đến", icon: Map },
+    { href: "/tours", label: "Tours", icon: Compass },
+    { href: "/homestays", label: "Homestays", icon: Home },
+    { href: "/ai-planner", label: "AI Planner", icon: Sparkles },
+  ];
+
   return (
-    <nav
-      style={{
-        position: "fixed",
-        top: 0, left: 0, right: 0,
-        zIndex: 1000,
-        padding: "0 40px",
-        height: 70,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        backdropFilter: "blur(24px)",
-        background: scrolled ? "rgba(20,13,31,0.9)" : "var(--glass)",
-        borderBottom: "1px solid var(--glass-border)",
-        transition: "all 0.3s",
-      }}
-    >
-      {/* Logo */}
-      <Link href="/" style={{ textDecoration: "none" }}>
-        <div style={{ fontFamily: "var(--font-serif)", fontSize: 22, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-          🌿 <span className="text-gradient">EthnoDiscovery</span>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled ? "bg-midnight/80 backdrop-blur-md border-b border-glass-border py-3" : "bg-transparent py-5"
+    }`}>
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 no-underline group">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink to-amber flex items-center justify-center shadow-lg shadow-pink/20 group-hover:scale-110 transition-transform">
+            <Leaf className="text-white w-6 h-6" />
+          </div>
+          <span className="font-serif text-2xl font-black text-white tracking-tight">
+            Ethno<span className="text-gradient">Discovery</span>
+          </span>
+        </Link>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.href} 
+              href={link.href}
+              className={`text-sm font-medium transition-colors hover:text-pink flex items-center gap-2 no-underline ${
+                pathname === link.href ? "text-pink" : "text-text"
+              }`}
+            >
+              <link.icon size={16} />
+              {link.label}
+            </Link>
+          ))}
         </div>
-      </Link>
 
-      {/* Desktop Nav */}
-      <ul style={{ display: "flex", gap: 32, listStyle: "none", margin: 0, padding: 0 }}
-          className="hidden md:flex">
-        <li><Link href="/destinations" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 14, fontWeight: 500, transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}>
-          Điểm Đến
-        </Link></li>
-        <li><Link href="/tours" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 14, fontWeight: 500 }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}>
-          Tours
-        </Link></li>
-        <li><Link href="/homestays" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 14, fontWeight: 500 }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}>
-          Homestay
-        </Link></li>
-        <li><Link href="/ai-planner" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 14, fontWeight: 500 }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}>
-          AI Planner ✨
-        </Link></li>
-      </ul>
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          <Link href="/search" className="p-2 text-text hover:text-white transition-colors">
+            <Search size={20} />
+          </Link>
 
-      {/* Right */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        {isAuthenticated ? (
-          <>
-            <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, textDecoration: "none" }}>
-              Xin chào, {user?.name?.split(" ")[0]}
+          {isAuthenticated ? (
+            <div className="hidden md:flex items-center gap-4">
+              <Link href="/dashboard" className="flex items-center gap-2 text-sm font-medium text-white no-underline bg-white/5 px-4 py-2 rounded-full border border-glass-border hover:bg-white/10 transition-all">
+                <User size={16} className="text-pink" />
+                {user?.name?.split(' ')[0]}
+              </Link>
+              {user?.role === 'ADMIN' && (
+                <Link href="/admin" className="text-xs font-bold text-amber border border-amber/30 px-3 py-1 rounded-md hover:bg-amber/10 no-underline">
+                  ADMIN
+                </Link>
+              )}
+              <button onClick={logout} className="p-2 text-text hover:text-pink transition-colors bg-transparent border-none cursor-pointer">
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" className="btn-primary py-2 px-6 text-sm no-underline">
+              Đăng Nhập
             </Link>
-            <button onClick={logout} className="btn-ghost" style={{ padding: "8px 20px", fontSize: 14 }}>
-              Đăng xuất
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/login" style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, textDecoration: "none" }}>
-              Đăng nhập
-            </Link>
-            <Link href="/register" className="btn-primary" style={{ padding: "8px 20px", fontSize: 14 }}>
-              Đăng ký
-            </Link>
-          </>
-        )}
+          )}
 
-        {/* Mobile menu toggle */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", display: "none" }}
-          className="block md:hidden"
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          {/* Mobile Toggle */}
+          <button 
+            className="md:hidden p-2 text-white bg-transparent border-none cursor-pointer"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div style={{
-          position: "absolute", top: 70, left: 0, right: 0,
-          background: "rgba(20,13,31,0.98)", backdropFilter: "blur(24px)",
-          borderBottom: "1px solid var(--glass-border)", padding: "24px 40px",
-          display: "flex", flexDirection: "column", gap: 20,
-        }}>
-          <Link href="/destinations" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 16, display: "flex", alignItems: "center", gap: 12 }}>
-            <MapPin size={18} style={{ color: "var(--pink)" }} /> Điểm Đến
-          </Link>
-          <Link href="/tours" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 16, display: "flex", alignItems: "center", gap: 12 }}>
-            <Compass size={18} style={{ color: "var(--amber)" }} /> Tours
-          </Link>
-          <Link href="/homestays" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 16, display: "flex", alignItems: "center", gap: 12 }}>
-            <Home size={18} style={{ color: "var(--pink)" }} /> Homestay
-          </Link>
-          <Link href="/ai-planner" onClick={() => setMenuOpen(false)} style={{ color: "#fff", textDecoration: "none", fontSize: 16, display: "flex", alignItems: "center", gap: 12 }}>
-            <Sparkles size={18} style={{ color: "var(--amber)" }} /> AI Planner
-          </Link>
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 top-[70px] bg-midnight z-40 p-6 flex flex-col gap-6 md:hidden">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.href} 
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-2xl font-serif font-bold text-white no-underline flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-glass-border"
+            >
+              <link.icon size={24} className="text-pink" />
+              {link.label}
+            </Link>
+          ))}
+          {isAuthenticated ? (
+            <Link href="/dashboard" className="btn-primary no-underline justify-center">
+              Vào Dashboard
+            </Link>
+          ) : (
+            <Link href="/login" className="btn-primary no-underline justify-center">
+              Đăng Nhập
+            </Link>
+          )}
         </div>
       )}
     </nav>

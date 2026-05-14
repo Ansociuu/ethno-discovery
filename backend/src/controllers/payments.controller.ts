@@ -4,6 +4,7 @@ import prisma from '../lib/prisma';
 import { createError } from '../middlewares/error.middleware';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import { asStr } from '../utils/typeHelpers';
+import { sendBookingPendingEmail, sendPaymentSuccessEmail } from '../services/email.service';
 
 // Tạo mã đơn hàng unique
 const generateOrderCode = () => {
@@ -17,6 +18,7 @@ export const createPayment = async (req: AuthRequest, res: Response) => {
 
   const booking = await prisma.booking.findFirst({
     where: { id: bookingId, userId },
+    include: { user: true, tour: true, homestay: true }
   });
 
   if (!booking) throw createError('Không tìm thấy đơn đặt chỗ', 404);
@@ -37,6 +39,21 @@ export const createPayment = async (req: AuthRequest, res: Response) => {
   await prisma.payment.create({
     data: { bookingId, userId, amount: booking.totalPrice, orderCode, provider: 'sepay' },
   });
+
+  const itemName = booking.bookableType === 'tour' ? booking.tour?.title : booking.homestay?.name;
+  const paymentLink = `${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/bookings/${bookingId}/payment`;
+
+  // Send email async
+  if (booking.user?.email) {
+    sendBookingPendingEmail(
+      booking.user.email,
+      booking.user.name || 'Quý khách',
+      bookingId,
+      itemName || 'Dịch vụ EthnoDiscovery',
+      amount,
+      paymentLink
+    );
+  }
 
   res.status(201).json({
     success: true,
@@ -79,13 +96,34 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   }
 
   const { content, transferAmount, referenceCode } = req.body;
-  const orderCodeMatch = (content as string)?.match(/ETH[A-Z0-9]+/);
-  if (!orderCodeMatch) return res.json({ success: true, message: 'No matching order' });
+  
+  // Sửa Regex để tránh khớp với prefix "ETHNOPAY"
+  // OrderCode có dạng ETH + timestamp + random string, nên có số ngay sau ETH
+  const orderCodeMatch = (content as string)?.match(/ETH\d+[A-Z0-9]+/);
+  if (!orderCodeMatch) {
+    console.log(`⚠️ Webhook received but no order code found in content: "${content}"`);
+    return res.json({ success: true, message: 'No matching order code' });
+  }
 
   const orderCode = orderCodeMatch[0];
-  const payment = await prisma.payment.findUnique({ where: { orderCode } });
-  if (!payment || payment.status === 'success') {
+  const payment = await prisma.payment.findUnique({ 
+    where: { orderCode },
+    include: { booking: { include: { user: true, tour: true, homestay: true } } } 
+  });
+
+  if (!payment) {
+    console.log(`⚠️ Order code ${orderCode} not found in database`);
+    return res.json({ success: true, message: 'Order not found' });
+  }
+
+  if (payment.status === 'success') {
     return res.json({ success: true, message: 'Already processed' });
+  }
+
+  // Kiểm tra số tiền (Cho phép sai số nhỏ do làm tròn nếu cần, ở đây kiểm tra khớp >=)
+  if (Number(transferAmount) < Number(payment.amount)) {
+    console.log(`⚠️ Partial payment for ${orderCode}: expected ${payment.amount}, got ${transferAmount}`);
+    return res.json({ success: true, message: 'Partial payment received' });
   }
 
   await prisma.$transaction([
@@ -100,6 +138,17 @@ export const sePayWebhook = async (req: Request, res: Response) => {
   ]);
 
   console.log(`✅ Payment confirmed: ${orderCode}`);
+
+  const itemName = payment.booking.bookableType === 'tour' ? payment.booking.tour?.title : payment.booking.homestay?.name;
+  if (payment.booking.user?.email) {
+    sendPaymentSuccessEmail(
+      payment.booking.user.email,
+      payment.booking.user.name || 'Quý khách',
+      payment.bookingId,
+      itemName || 'Dịch vụ EthnoDiscovery'
+    );
+  }
+
   res.json({ success: true, message: 'Payment confirmed' });
 };
 

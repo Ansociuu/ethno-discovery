@@ -1,18 +1,44 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Clock, Users, Star, Search, Filter, ChevronRight } from "lucide-react";
+import { 
+  Clock, 
+  Users, 
+  Star, 
+  Search, 
+  ChevronRight,
+  Compass,
+  MapPin,
+  Sparkles,
+  ArrowUpRight
+} from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { toursApi } from "@/lib/api";
 
-export default function ToursPage() {
-  const [search, setSearch] = useState("");
-  const [duration, setDuration] = useState("");
-  const [priceMax, setPriceMax] = useState("");
-  const [sortBy, setSortBy] = useState("featured");
-  const [page, setPage] = useState(1);
+function ToursContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [duration, setDuration] = useState(searchParams.get("duration") || "");
+  const [priceMax, setPriceMax] = useState(searchParams.get("priceMax") || "");
+  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "featured");
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+
+  // Sync state to URL without reloading page
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (duration) params.set("duration", duration);
+    if (priceMax) params.set("priceMax", priceMax);
+    if (sortBy !== "featured") params.set("sortBy", sortBy);
+    if (page > 1) params.set("page", String(page));
+    
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [search, duration, priceMax, sortBy, page, router]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["tours", { search, duration, priceMax, sortBy, page }],
@@ -33,104 +59,114 @@ export default function ToursPage() {
   return (
     <>
       <Navbar />
-      <main style={{ paddingTop: 70 }}>
+      <main className="pt-[70px]">
         {/* Header */}
-        <div style={{
-          background: "linear-gradient(135deg, rgba(255,214,10,0.08) 0%, rgba(255,60,172,0.08) 100%)",
-          borderBottom: "1px solid var(--glass-border)",
-          padding: "60px 40px",
-          textAlign: "center",
-        }}>
-          <span className="section-tag">🗺 Tours Văn Hoá</span>
-          <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(36px, 5vw, 64px)", fontWeight: 900, margin: "16px 0 12px", lineHeight: 1.1 }}>
+        <div className="bg-gradient-to-br from-amber/10 to-pink/5 border-b border-white/5 py-20 px-6 text-center animate-fade-up">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-amber uppercase tracking-widest bg-amber/10 px-4 py-2 rounded-full mb-6">
+            <Compass size={14} /> Tours Văn Hoá
+          </div>
+          <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-black mb-4 leading-tight">
             Hành Trình <span className="text-gradient-amber">Đáng Nhớ</span>
           </h1>
-          <p style={{ color: "var(--text)", fontSize: 17, maxWidth: 500, margin: "0 auto" }}>
-            {pagination?.total || 0} tours đang chờ bạn khám phá
+          <p className="text-white/50 text-lg max-w-lg mx-auto">
+            {pagination?.total || 0} trải nghiệm độc bản đang chờ bạn.
           </p>
         </div>
 
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px" }}>
-          {/* Filters */}
-          <div style={{ display: "flex", gap: 12, marginBottom: 40, flexWrap: "wrap", alignItems: "center" }}>
-            <div style={{ position: "relative", flex: "1 1 260px" }}>
-              <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          {/* Advanced Filters */}
+          <div className="flex flex-wrap items-center gap-4 mb-12">
+            <div className="relative flex-1 min-w-[280px]">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
               <input
                 value={search}
                 onChange={e => { setSearch(e.target.value); setPage(1); }}
                 placeholder="Tìm kiếm tour..."
-                className="input"
-                style={{ paddingLeft: 42 }}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-pink/50 transition-all"
               />
             </div>
 
-            <select value={duration} onChange={e => { setDuration(e.target.value); setPage(1); }} className="input" style={{ width: "auto" }}>
-              <option value="">Thời gian</option>
-              {[2, 3, 4, 5, 6, 7].map(d => <option key={d} value={d} style={{ background: "var(--dark)" }}>{d} ngày</option>)}
-            </select>
+            <div className="flex gap-4">
+              <select value={duration} onChange={e => { setDuration(e.target.value); setPage(1); }} className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none">
+                <option value="">Thời gian</option>
+                {[2, 3, 4, 5, 6, 7].map(d => <option key={d} value={d} className="bg-midnight">{d} ngày</option>)}
+              </select>
 
-            <select value={priceMax} onChange={e => { setPriceMax(e.target.value); setPage(1); }} className="input" style={{ width: "auto" }}>
-              <option value="">Mức giá</option>
-              <option value="2000000" style={{ background: "var(--dark)" }}>Dưới 2 triệu</option>
-              <option value="5000000" style={{ background: "var(--dark)" }}>Dưới 5 triệu</option>
-              <option value="10000000" style={{ background: "var(--dark)" }}>Dưới 10 triệu</option>
-            </select>
+              <select value={priceMax} onChange={e => { setPriceMax(e.target.value); setPage(1); }} className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none">
+                <option value="">Mức giá</option>
+                <option value="2000000" className="bg-midnight">Dưới 2 triệu</option>
+                <option value="5000000" className="bg-midnight">Dưới 5 triệu</option>
+                <option value="10000000" className="bg-midnight">Dưới 10 triệu</option>
+              </select>
 
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="input" style={{ width: "auto" }}>
-              <option value="featured" style={{ background: "var(--dark)" }}>Nổi bật</option>
-              <option value="price_asc" style={{ background: "var(--dark)" }}>Giá thấp → cao</option>
-              <option value="price_desc" style={{ background: "var(--dark)" }}>Giá cao → thấp</option>
-            </select>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none">
+                <option value="featured" className="bg-midnight">Nổi bật</option>
+                <option value="price_asc" className="bg-midnight">Giá thấp → cao</option>
+                <option value="price_desc" className="bg-midnight">Giá cao → thấp</option>
+              </select>
+            </div>
           </div>
 
-          {/* Grid */}
+          {/* Tour Grid */}
           {isLoading ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
-              {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: 400, borderRadius: 20 }} />)}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-[450px] rounded-[32px]" />)}
             </div>
           ) : tours.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "80px 0", color: "var(--text)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>🗺</div>
-              <p>Không tìm thấy tour phù hợp</p>
+            <div className="text-center py-24 animate-fade-up">
+              <Compass size={64} className="mx-auto text-white/10 mb-6" />
+              <h3 className="text-xl font-bold mb-2">Không có tour phù hợp</h3>
+              <p className="text-white/40">Hãy thử tìm kiếm với từ khóa khác.</p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {tours.map((tour: any) => (
-                <Link key={tour.id} href={`/tours/${tour.id}`} style={{ textDecoration: "none" }}>
-                  <div className="card"
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 24px 60px rgba(0,0,0,0.5)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}>
-                    <div style={{ position: "relative", height: 220, overflow: "hidden" }}>
-                      {tour.coverImage
-                        ? <img src={tour.coverImage} alt={tour.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        : <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--midnight), var(--amber))" }} />
-                      }
-                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)" }} />
-                      {tour.featured && <span className="badge badge-pink" style={{ position: "absolute", top: 12, left: 12 }}>✦ Nổi bật</span>}
+                <Link key={tour.id} href={`/tours/${tour.id}`} className="no-underline group">
+                  <div className="glass rounded-[32px] overflow-hidden h-full border-white/10 hover:border-amber/30 hover:scale-[1.02] transition-all">
+                    {/* Thumbnail */}
+                    <div className="relative h-60 overflow-hidden">
+                      <img 
+                        src={tour.coverImage || '/placeholder.jpg'} 
+                        alt={tour.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-midnight/80 via-transparent to-transparent" />
+                      {tour.featured && (
+                        <div className="absolute top-6 left-6">
+                          <span className="bg-amber/20 backdrop-blur-md border border-amber/40 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-amber flex items-center gap-1">
+                            <Sparkles size={10} /> Nổi bật
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div style={{ padding: 20 }}>
-                      <p style={{ fontSize: 12, color: "var(--pink)", marginBottom: 8 }}>
-                        📍 {tour.destination?.nameVi}, {tour.destination?.province}
-                      </p>
-                      <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 12, lineHeight: 1.3 }}>
-                        {tour.title}
-                      </h3>
-                      <div style={{ display: "flex", gap: 16, marginBottom: 16, color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={14} /> {tour.durationDays} ngày</span>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Users size={14} /> {tour.maxGroupSize} người</span>
+
+                    {/* Content */}
+                    <div className="p-8">
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-pink uppercase tracking-widest mb-3">
+                        <MapPin size={12} /> {tour.destination?.nameVi}, {tour.destination?.province}
+                      </div>
+                      
+                      <h3 className="font-serif text-xl font-bold text-white mb-4 leading-snug group-hover:text-amber transition-colors line-clamp-2">{tour.title}</h3>
+                      
+                      <div className="flex items-center gap-6 mb-8 text-white/40 text-xs font-bold">
+                        <span className="flex items-center gap-1.5"><Clock size={14} className="text-amber" /> {tour.durationDays} ngày</span>
+                        <span className="flex items-center gap-1.5"><Users size={14} className="text-amber" /> {tour.maxGroupSize} người</span>
                         {tour._count?.reviews > 0 && (
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Star size={14} style={{ color: "var(--amber)" }} /> {tour._count.reviews}</span>
+                          <span className="flex items-center gap-1.5"><Star size={14} className="text-amber fill-amber" /> {tour._count.reviews}</span>
                         )}
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+
+                      <div className="flex justify-between items-end pt-6 border-t border-white/5">
                         <div>
-                          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Từ</div>
-                          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--amber)" }}>
+                          <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Giá từ</div>
+                          <div className="text-2xl font-black text-white">
                             {Number(tour.pricePerPerson).toLocaleString("vi-VN")}₫
                           </div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>/người</div>
+                          <div className="text-[10px] text-white/30">/ người</div>
                         </div>
-                        <button className="btn-primary" style={{ padding: "10px 20px", fontSize: 14 }}>Đặt ngay</button>
+                        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white group-hover:bg-amber group-hover:text-midnight transition-all">
+                          <ArrowUpRight size={20} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -141,15 +177,15 @@ export default function ToursPage() {
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 48 }}>
+            <div className="flex justify-center gap-3 mt-16">
               {[...Array(pagination.totalPages)].map((_, i) => (
-                <button key={i} onClick={() => setPage(i + 1)} style={{
-                  width: 40, height: 40, borderRadius: 10, border: "1px solid",
-                  cursor: "pointer", fontSize: 14, fontWeight: 500,
-                  background: page === i + 1 ? "var(--pink)" : "transparent",
-                  borderColor: page === i + 1 ? "var(--pink)" : "var(--glass-border)",
-                  color: "#fff",
-                }}>
+                <button 
+                  key={i} 
+                  onClick={() => setPage(i + 1)}
+                  className={`w-12 h-12 rounded-2xl font-bold text-sm transition-all border ${
+                    page === i + 1 ? "bg-amber border-amber text-midnight shadow-lg shadow-amber/20" : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                  }`}
+                >
                   {i + 1}
                 </button>
               ))}
@@ -159,5 +195,13 @@ export default function ToursPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function ToursPage() {
+  return (
+    <Suspense fallback={<div className="pt-[70px] min-h-screen text-center flex items-center justify-center text-white/40">Loading...</div>}>
+      <ToursContent />
+    </Suspense>
   );
 }

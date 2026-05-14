@@ -1,6 +1,20 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ─────────────────────────────────────── */
+/* ─── Design Tokens (Tailwind v4) ────────────────────────── */
+@theme {
+  --color-pink: #FF3CAC;
+  --color-amber: #FFD60A;
+  --color-dark: #140D1F;
+  --color-midnight: #1A1028;
+  --color-bg3: #24163A;
+  --color-text: #B9B2D0;
+  --color-white: #F5F1FF;
+
+  --font-dm: var(--font-dm-sans), 'DM Sans', sans-serif;
+  --font-serif: var(--font-playfair), 'Playfair Display', serif;
+}
+
+/* ─── Design Tokens (CSS Variables) ─────────────────────── */
 :root {
   --pink: #FF3CAC;
   --amber: #FFD60A;
@@ -26,10 +40,12 @@ body {
     radial-gradient(circle at top left, rgba(255,60,172,0.12), transparent 30%),
     radial-gradient(circle at bottom right, rgba(255,214,10,0.06), transparent 30%),
     linear-gradient(135deg, var(--dark) 0%, var(--midnight) 40%, var(--bg3) 100%);
+  background-attachment: fixed;
   color: var(--white);
   font-family: var(--font-dm);
   overflow-x: hidden;
   min-height: 100vh;
+  margin: 0;
 }
 
 /* Grain overlay */

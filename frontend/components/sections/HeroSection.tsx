@@ -1,10 +1,18 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { 
+  Compass, 
+  Sparkles, 
+  MapPin, 
+  Calendar, 
+  Wallet, 
+  Search,
+  ChevronDown
+} from "lucide-react";
 
-// Terrain SVG component
+// Terrain SVG component (unchanged)
 function TerrainSVG() {
   return (
     <svg
@@ -40,124 +48,96 @@ export function HeroSection() {
   };
 
   return (
-    <section
-      style={{
-        position: "relative",
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        maxWidth: "100%",
-        padding: 0,
-        margin: 0,
-      }}
-    >
-      {/* Background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        {/* Gradient */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse 80% 60% at 20% 40%, rgba(255,60,172,0.15) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 60%, rgba(255,214,10,0.12) 0%, transparent 60%), linear-gradient(180deg, var(--midnight) 0%, var(--dark) 40%, rgba(20,13,31,0.95) 100%)",
-        }} />
-        {/* Dots grid */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-        {/* Terrain SVG */}
+    <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden max-w-full p-0 m-0">
+      {/* Background Orbs & Effects */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_40%,rgba(255,60,172,0.15)_0%,transparent_60%),radial-gradient(ellipse_60%_80%_at_80%_60%,rgba(255,214,10,0.12)_0%,transparent_60%),linear-gradient(180deg,var(--midnight)_0%,var(--dark)_40%,rgba(20,13,31,0.95)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[length:40px_40px]" />
         <TerrainSVG />
-        {/* Floating Orbs */}
-        <div className="animate-float" style={{ position: "absolute", width: 400, height: 400, borderRadius: "50%", background: "rgba(255,60,172,0.12)", filter: "blur(80px)", top: -100, left: -100, animationDelay: "0s" }} />
-        <div className="animate-float" style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "rgba(255,214,10,0.10)", filter: "blur(80px)", bottom: -50, right: -50, animationDelay: "-4s" }} />
-        <div className="animate-float" style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", background: "rgba(255,214,10,0.08)", filter: "blur(80px)", top: "30%", right: "15%", animationDelay: "-2s" }} />
+        <div className="animate-float absolute w-[400px] h-[400px] rounded-full bg-pink/10 blur-[80px] -top-[100px] -left-[100px]" />
+        <div className="animate-float absolute w-[300px] h-[300px] rounded-full bg-amber/10 blur-[80px] -bottom-[50px] -right-[50px] [animation-delay:-4s]" />
       </div>
 
-      {/* Content */}
-      <div style={{ position: "relative", zIndex: 2, textAlign: "center", maxWidth: 900, padding: "0 24px", width: "100%" }}>
+      {/* Content Container */}
+      <div className="relative z-10 text-center max-w-[1000px] px-6 w-full animate-fade-up">
         {/* Badge */}
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          background: "var(--glass)", border: "1px solid var(--glass-border)",
-          padding: "8px 20px", borderRadius: 30, fontSize: 13,
-          color: "var(--text)", marginBottom: 28, backdropFilter: "blur(10px)",
-        }}>
-          <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pink)" }} />
-          AI-powered cultural travel · Est. 2024
+        <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-xl px-5 py-2 rounded-full text-xs font-medium text-text mb-8">
+          <div className="animate-pulse-dot w-1.5 h-1.5 rounded-full bg-pink" />
+          Nền tảng du lịch văn hóa AI · Hà Giang - Sa Pa - Mộc Châu
         </div>
 
-        {/* Title */}
-        <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(48px, 7vw, 88px)", fontWeight: 900, lineHeight: 1.05, marginBottom: 20 }}>
-          <span style={{ display: "block", color: "var(--white)" }}>Discover The</span>
-          <span className="text-gradient-pink">Soul</span>{" "}of{" "}
-          <span className="text-gradient-amber">Northern</span>
-          <br />Vietnam
+        {/* Heading */}
+        <h1 className="font-serif text-[clamp(40px,8vw,80px)] font-black leading-[1.1] mb-6 tracking-tight">
+          Khám Phá <span className="text-gradient-pink">Tâm Hồn</span><br />
+          Vùng Cao <span className="text-gradient-amber">Việt Nam</span>
         </h1>
 
-        <p style={{ fontSize: 18, color: "rgba(255,255,255,0.55)", fontWeight: 300, lineHeight: 1.6, marginBottom: 40, maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
-          AI-powered journeys through H&apos;Mông &amp; Dao culture — where mountain mist meets ancient tradition.
+        <p className="text-lg md:text-xl text-white/60 font-light leading-relaxed mb-10 max-w-2xl mx-auto">
+          Hành trình được cá nhân hóa bởi trí tuệ nhân tạo — nơi sương mù đại ngàn hòa quyện cùng bản sắc H&apos;Mông &amp; Dao.
         </p>
 
-        {/* Buttons */}
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", marginBottom: 60, flexWrap: "wrap" }}>
-          <Link href="/tours" className="btn-primary" style={{ fontSize: 16 }}>
-            🌿 Explore Tours
+        {/* Main Actions */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
+          <Link href="/tours" className="btn-primary no-underline flex items-center gap-2 px-8">
+            <Compass size={20} /> Khám Phá Tours
           </Link>
-          <Link href="/ai-planner" className="btn-ghost" style={{ fontSize: 16 }}>
-            ✨ Plan with AI
+          <Link href="/ai-planner" className="btn-ghost no-underline flex items-center gap-2 px-8">
+            <Sparkles size={20} className="text-amber" /> Lập Kế Hoạch AI
           </Link>
         </div>
 
-        {/* Search Bar — 4 fields */}
-        <form onSubmit={handleSearch} style={{
-          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(24px)",
-          border: "1px solid rgba(255,255,255,0.14)", borderRadius: 20,
-          padding: "20px 24px", display: "flex", gap: 0, alignItems: "stretch",
-          maxWidth: 820, width: "100%", margin: "0 auto",
-        }}>
-          {/* Field 1 */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "0 16px", borderRight: "1px solid rgba(255,255,255,0.1)" }}>
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", color: "var(--pink)", textTransform: "uppercase" }}>📍 Đi đâu?</span>
-            <input value={fields.destination} onChange={e => setFields(f => ({ ...f, destination: e.target.value }))}
-              placeholder="Sa Pa, Hà Giang, Bắc Hà..."
-              style={{ background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 14, fontFamily: "var(--font-dm)", width: "100%" }} />
+        {/* Advanced Search Bar */}
+        <form onSubmit={handleSearch} className="glass mx-auto max-w-[860px] p-2 rounded-[24px] flex flex-col md:flex-row items-stretch gap-2 shadow-2xl shadow-black/40">
+          <div className="flex-1 flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10">
+            <MapPin size={18} className="text-pink shrink-0" />
+            <div className="text-left w-full">
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Điểm đến</span>
+              <input 
+                value={fields.destination} 
+                onChange={e => setFields(f => ({ ...f, destination: e.target.value }))}
+                placeholder="Sa Pa, Hà Giang..." 
+                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/20"
+              />
+            </div>
           </div>
-          {/* Field 2 */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "0 16px", borderRight: "1px solid rgba(255,255,255,0.1)" }}>
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", color: "var(--pink)", textTransform: "uppercase" }}>📅 Bao nhiêu ngày?</span>
-            <input value={fields.days} onChange={e => setFields(f => ({ ...f, days: e.target.value }))}
-              placeholder="3 - 7 ngày"
-              style={{ background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 14, fontFamily: "var(--font-dm)", width: "100%" }} />
+
+          <div className="flex-1 flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10">
+            <Calendar size={18} className="text-pink shrink-0" />
+            <div className="text-left w-full">
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Thời gian</span>
+              <input 
+                value={fields.days} 
+                onChange={e => setFields(f => ({ ...f, days: e.target.value }))}
+                placeholder="3 - 5 ngày" 
+                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/20"
+              />
+            </div>
           </div>
-          {/* Field 3 */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "0 16px", borderRight: "1px solid rgba(255,255,255,0.1)" }}>
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", color: "var(--pink)", textTransform: "uppercase" }}>🎯 Vibe?</span>
-            <input value={fields.vibe} onChange={e => setFields(f => ({ ...f, vibe: e.target.value }))}
-              placeholder="Văn hoá / Nghỉ dưỡng"
-              style={{ background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 14, fontFamily: "var(--font-dm)", width: "100%" }} />
+
+          <div className="flex-1 flex items-center gap-4 px-4 py-3">
+            <Wallet size={18} className="text-pink shrink-0" />
+            <div className="text-left w-full">
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Ngân sách</span>
+              <input 
+                value={fields.budget} 
+                onChange={e => setFields(f => ({ ...f, budget: e.target.value }))}
+                placeholder="2tr - 5tr" 
+                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/20"
+              />
+            </div>
           </div>
-          {/* Field 4 */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "0 16px" }}>
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", color: "var(--pink)", textTransform: "uppercase" }}>💰 Ngân sách?</span>
-            <input value={fields.budget} onChange={e => setFields(f => ({ ...f, budget: e.target.value }))}
-              placeholder="$500 - $2000"
-              style={{ background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 14, fontFamily: "var(--font-dm)", width: "100%" }} />
-          </div>
-          {/* Search btn */}
-          <button type="submit" style={{
-            background: "linear-gradient(135deg, var(--pink), var(--amber))", border: "none",
-            padding: "12px 24px", borderRadius: 12, color: "#000", fontSize: 14,
-            fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap", marginLeft: 16,
-            transition: "all 0.2s",
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.03)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(255,214,10,0.4)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}>
-            🔍 AI Search
+
+          <button type="submit" className="bg-gradient-to-r from-pink to-amber text-midnight font-bold px-8 py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 border-none cursor-pointer">
+            <Search size={20} />
+            AI Search
           </button>
         </form>
       </div>
 
-      {/* Scroll indicator */}
-      <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, opacity: 0.5 }}>
-        <div style={{ width: 1, height: 50, background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.5))", animation: "scroll-anim 2s ease-in-out infinite" }} />
+      {/* Scroll Hint */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-30 flex flex-col items-center gap-3">
+        <span className="text-[10px] uppercase tracking-[0.3em] font-bold">Cuộn xuống</span>
+        <div className="w-px h-12 bg-gradient-to-b from-pink to-transparent animate-pulse" />
       </div>
     </section>
   );

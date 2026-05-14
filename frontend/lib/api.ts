@@ -54,7 +54,14 @@ export const authApi = {
   register: (data: { email: string; password: string; name: string; phone?: string }) =>
     api.post('/auth/register', data),
   getMe: () => api.get('/auth/me'),
+  updateMe: (data: any) => api.put('/auth/me', data),
   refresh: (refreshToken: string) => api.post('/auth/refresh', { refreshToken }),
+  forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
+  verifyOTP: (email: string, otp: string) => api.post('/auth/verify-otp', { email, otp }),
+  verifyRegister: (otp: string, registrationToken: string) => 
+    api.post('/auth/verify-register', { otp, registrationToken }),
+  resetPassword: (email: string, otp: string, newPassword: string) => 
+    api.post('/auth/reset-password', { email, otp, newPassword }),
 };
 
 export const bookingsApi = {

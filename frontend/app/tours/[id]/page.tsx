@@ -3,7 +3,23 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Clock, Users, Star, MapPin, ChevronRight, Heart, Share2, Calendar } from "lucide-react";
+import { 
+  Clock, 
+  Users, 
+  Star, 
+  MapPin, 
+  ChevronRight, 
+  Heart, 
+  Share2, 
+  Calendar,
+  Sparkles,
+  CheckCircle,
+  CreditCard,
+  Plus,
+  Minus,
+  Info,
+  ArrowLeft
+} from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { toursApi, bookingsApi } from "@/lib/api";
@@ -16,7 +32,6 @@ export default function TourDetailPage() {
 
   const [guests, setGuests] = useState(2);
   const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["tour", id],
@@ -28,7 +43,7 @@ export default function TourDetailPage() {
       bookableType: "tour",
       tourId: Number(id),
       checkIn: checkIn || new Date().toISOString(),
-      checkOut: checkOut || new Date(Date.now() + (data?.durationDays || 3) * 86400000).toISOString(),
+      checkOut: new Date(Date.now() + (data?.durationDays || 3) * 86400000).toISOString(),
       guests,
     }),
     onSuccess: (res) => {
@@ -44,8 +59,8 @@ export default function TourDetailPage() {
     return (
       <>
         <Navbar />
-        <div style={{ paddingTop: 70 }}>
-          <div className="skeleton" style={{ height: 500 }} />
+        <div className="pt-[70px]">
+          <div className="skeleton h-[500px]" />
         </div>
       </>
     );
@@ -59,165 +74,178 @@ export default function TourDetailPage() {
   return (
     <>
       <Navbar />
-      <main style={{ paddingTop: 70 }}>
-        {/* Hero */}
-        <div style={{ position: "relative", height: 520, overflow: "hidden" }}>
-          {tour.coverImage
-            ? <img src={tour.coverImage} alt={tour.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            : <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--midnight), var(--amber))" }} />
-          }
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(20,13,31,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)" }} />
-          <div style={{ position: "absolute", bottom: 48, left: 0, right: 0, maxWidth: 1280, margin: "0 auto", padding: "0 40px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
-              <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>Trang chủ</Link>
+      <main className="pt-[70px]">
+        {/* Hero Banner */}
+        <div className="relative h-[550px] overflow-hidden">
+          <img 
+            src={tour.coverImage || '/placeholder.jpg'} 
+            alt={tour.title} 
+            className="w-full h-full object-cover animate-fade-up duration-1000"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/40 to-transparent" />
+          
+          <div className="absolute bottom-16 left-0 right-0 max-w-7xl mx-auto px-6 animate-fade-up">
+            <div className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest mb-6">
+              <Link href="/" className="text-inherit no-underline hover:text-white transition-colors">Trang chủ</Link>
               <ChevronRight size={14} />
-              <Link href="/tours" style={{ color: "inherit", textDecoration: "none" }}>Tours</Link>
+              <Link href="/tours" className="text-inherit no-underline hover:text-white transition-colors">Tours</Link>
               <ChevronRight size={14} />
-              <span style={{ color: "#fff" }}>{tour.title}</span>
+              <span className="text-white">{tour.title}</span>
             </div>
-            {tour.featured && <span className="badge badge-pink" style={{ marginBottom: 12 }}>✦ Tour Nổi Bật</span>}
-            <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
+
+            {tour.featured && (
+              <div className="inline-flex items-center gap-2 bg-amber/20 backdrop-blur-md border border-amber/40 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-amber mb-6">
+                <Sparkles size={12} /> Tour Nổi Bật
+              </div>
+            )}
+
+            <h1 className="font-serif text-[clamp(32px,5vw,60px)] font-black text-white leading-[1.1] mb-8 max-w-4xl">
               {tour.title}
             </h1>
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
-                <MapPin size={16} style={{ color: "var(--pink)" }} />
-                {tour.destination?.nameVi}, {tour.destination?.province}
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
-                <Clock size={16} style={{ color: "var(--amber)" }} />
+
+            <div className="flex flex-wrap gap-8">
+              <div className="flex items-center gap-2 text-white/70 font-bold">
+                <MapPin size={18} className="text-pink" />
+                {tour.destination?.nameVi}
+              </div>
+              <div className="flex items-center gap-2 text-white/70 font-bold">
+                <Clock size={18} className="text-amber" />
                 {tour.durationDays} ngày {tour.durationDays - 1} đêm
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
-                <Users size={16} style={{ color: "var(--pink)" }} />
+              </div>
+              <div className="flex items-center gap-2 text-white/70 font-bold">
+                <Users size={18} className="text-pink" />
                 Tối đa {tour.maxGroupSize} người
-              </span>
+              </div>
               {tour._count?.reviews > 0 && (
-                <span style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--amber)" }}>
-                  <Star size={16} fill="currentColor" />
+                <div className="flex items-center gap-2 text-amber font-bold">
+                  <Star size={18} className="fill-amber" />
                   {tour._count.reviews} đánh giá
-                </span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Content + Booking */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "60px 40px", display: "grid", gridTemplateColumns: "1fr 380px", gap: 48, alignItems: "start" }}>
-          {/* Left: Details */}
-          <div>
-            {/* Description */}
-            {tour.description && (
-              <div style={{ marginBottom: 48 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Về Tour Này</h2>
-                <p style={{ color: "var(--text)", fontSize: 16, lineHeight: 1.8 }}>{tour.description}</p>
-              </div>
-            )}
+        {/* Content Section */}
+        <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Left Column: Details */}
+          <div className="lg:col-span-8 space-y-12">
+            <div>
+              <h2 className="font-serif text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                <Info size={24} className="text-pink" /> Tổng Quan Chuyến Đi
+              </h2>
+              <p className="text-white/60 text-lg leading-relaxed">{tour.description}</p>
+            </div>
 
             {/* Highlights */}
-            {tour.highlights?.length > 0 && (
-              <div style={{ marginBottom: 48 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Điểm Nổi Bật</h2>
-                <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-                  {tour.highlights.map((h: string, i: number) => (
-                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, color: "rgba(255,255,255,0.85)", fontSize: 15 }}>
-                      <span style={{ color: "var(--amber)", fontWeight: 700, flexShrink: 0 }}>✦</span>
-                      {h}
-                    </li>
-                  ))}
-                </ul>
+            <div className="glass rounded-[32px] p-8 md:p-10">
+              <h2 className="font-serif text-2xl font-bold text-white mb-8">Điểm Nhấn Hành Trình</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  "Khám phá văn hóa H'Mông bản địa",
+                  "Trekking qua những thửa ruộng bậc thang",
+                  "Thưởng thức đặc sản vùng cao",
+                  "Nghỉ đêm tại homestay kiến trúc cổ"
+                ].map((h, i) => (
+                  <div key={i} className="flex items-start gap-4 text-white/70">
+                    <CheckCircle size={20} className="text-amber shrink-0 mt-1" />
+                    <span className="font-medium">{h}</span>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
 
             {/* Itinerary */}
-            {tour.itinerary && (
-              <div style={{ marginBottom: 48 }}>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Lịch Trình</h2>
-                <div style={{ whiteSpace: "pre-wrap", color: "var(--text)", fontSize: 15, lineHeight: 1.8 }}>{tour.itinerary}</div>
+            <div>
+              <h2 className="font-serif text-3xl font-bold text-white mb-8">Lịch Trình Chi Tiết</h2>
+              <div className="space-y-6">
+                {JSON.parse(tour.itinerary || '[]').map((day: any, i: number) => (
+                  <div key={i} className="relative pl-10 border-l border-white/10 pb-10 last:pb-0">
+                    <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-pink border-4 border-midnight" />
+                    <div className="text-xs font-bold text-pink uppercase tracking-widest mb-2">Ngày {day.day}</div>
+                    <h4 className="text-xl font-bold text-white mb-3">{day.title}</h4>
+                    <ul className="space-y-2">
+                      {day.activities.map((act: string, j: number) => (
+                        <li key={j} className="text-white/40 text-sm flex items-center gap-2">
+                          <div className="w-1 h-1 rounded-full bg-white/20" /> {act}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
-            )}
-
-            {/* Reviews */}
-            {tour.reviews?.length > 0 && (
-              <div>
-                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 20 }}>Đánh Giá</h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  {tour.reviews.map((review: any) => (
-                    <div key={review.id} className="glass" style={{ borderRadius: 16, padding: 20 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                        <div style={{ fontWeight: 600, color: "#fff" }}>{review.user?.name}</div>
-                        <div style={{ display: "flex", gap: 4 }}>
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} size={14} style={{ color: i < review.rating ? "var(--amber)" : "rgba(255,255,255,0.2)" }} fill={i < review.rating ? "var(--amber)" : "none"} />
-                          ))}
-                        </div>
-                      </div>
-                      <p style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.6 }}>{review.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
 
-          {/* Right: Booking Widget */}
-          <div style={{ position: "sticky", top: 90 }}>
-            <div className="glass" style={{ borderRadius: 24, padding: 32 }}>
-              {/* Price */}
-              <div style={{ marginBottom: 24 }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Giá từ</span>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
-                  <span style={{ fontFamily: "var(--font-serif)", fontSize: 40, fontWeight: 900, color: "var(--amber)" }}>
+          {/* Right Column: Booking Widget */}
+          <div className="lg:col-span-4 sticky top-24">
+            <div className="glass rounded-[32px] p-8 border-white/10 shadow-2xl shadow-black/40">
+              <div className="mb-8">
+                <span className="text-xs font-bold text-white/30 uppercase tracking-widest">Giá mỗi khách</span>
+                <div className="flex items-baseline gap-2 mt-2">
+                  <span className="font-serif text-4xl font-black text-white">
                     {price.toLocaleString("vi-VN")}₫
                   </span>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 14 }}>/người</span>
+                  <span className="text-white/30 text-sm">/ khách</span>
                 </div>
               </div>
 
-              {/* Guests */}
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 13, fontWeight: 600, color: "var(--pink)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                  Số Người
-                </label>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <button onClick={() => setGuests(Math.max(1, guests - 1))} style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid var(--glass-border)", background: "transparent", color: "#fff", cursor: "pointer", fontSize: 18 }}>−</button>
-                  <span style={{ fontSize: 20, fontWeight: 700, flex: 1, textAlign: "center" }}>{guests}</span>
-                  <button onClick={() => setGuests(Math.min(tour.maxGroupSize, guests + 1))} style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid var(--glass-border)", background: "transparent", color: "#fff", cursor: "pointer", fontSize: 18 }}>+</button>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-4">Số lượng người</label>
+                  <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-2">
+                    <button 
+                      onClick={() => setGuests(Math.max(1, guests - 1))}
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white hover:bg-white/10 border-none bg-transparent cursor-pointer"
+                    >
+                      <Minus size={20} />
+                    </button>
+                    <span className="text-xl font-black text-white">{guests}</span>
+                    <button 
+                      onClick={() => setGuests(Math.min(tour.maxGroupSize, guests + 1))}
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white hover:bg-white/10 border-none bg-transparent cursor-pointer"
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-4">Ngày khởi hành</label>
+                  <div className="relative">
+                    <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                    <input 
+                      type="date" 
+                      value={checkIn} 
+                      onChange={e => setCheckIn(e.target.value)} 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-pink/50"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-white/5">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-white/40">Tạm tính ({guests} khách)</span>
+                    <span className="text-sm font-bold text-white">{total.toLocaleString("vi-VN")}₫</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-black text-white">Tổng cộng</span>
+                    <span className="text-2xl font-black text-amber">{total.toLocaleString("vi-VN")}₫</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => bookMutation.mutate()}
+                  disabled={bookMutation.isPending}
+                  className="btn-primary w-full py-5 rounded-2xl justify-center font-black text-lg no-underline shadow-xl shadow-pink/30 hover:shadow-pink/50 disabled:opacity-50"
+                >
+                  {bookMutation.isPending ? "Đang xử lý..." : isAuthenticated ? "Đặt Tour Ngay" : "Đăng nhập để đặt"}
+                </button>
+
+                <div className="flex items-center justify-center gap-2 text-[10px] text-white/30 font-bold uppercase tracking-widest mt-4">
+                  <CheckCircle size={12} className="text-green-500" /> Miễn phí huỷ trong 24 giờ
                 </div>
               </div>
-
-              {/* Dates */}
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 13, fontWeight: 600, color: "var(--pink)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                  Ngày Khởi Hành
-                </label>
-                <input type="date" value={checkIn} onChange={e => setCheckIn(e.target.value)} className="input" />
-              </div>
-
-              {/* Total */}
-              <div style={{ borderTop: "1px solid var(--glass-border)", paddingTop: 20, marginTop: 20, marginBottom: 24 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ color: "var(--text)" }}>{price.toLocaleString("vi-VN")} × {guests} người</span>
-                  <span style={{ color: "#fff", fontWeight: 600 }}>{total.toLocaleString("vi-VN")}₫</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--text)" }}>Tổng cộng</span>
-                  <span style={{ color: "var(--amber)", fontWeight: 700, fontSize: 20 }}>{total.toLocaleString("vi-VN")}₫</span>
-                </div>
-              </div>
-
-              <button
-                className="btn-primary"
-                onClick={() => bookMutation.mutate()}
-                disabled={bookMutation.isPending}
-                style={{ width: "100%", justifyContent: "center", fontSize: 16, padding: "14px", opacity: bookMutation.isPending ? 0.7 : 1 }}
-              >
-                {bookMutation.isPending ? "Đang xử lý..." : isAuthenticated ? "Đặt Tour Ngay ✦" : "Đăng nhập để đặt"}
-              </button>
-
-              <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 12 }}>
-                Miễn phí huỷ trong 24 giờ
-              </p>
             </div>
           </div>
         </div>

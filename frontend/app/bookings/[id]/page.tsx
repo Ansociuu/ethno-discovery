@@ -2,56 +2,53 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Calendar, CreditCard, CheckCircle, Clock, XCircle, Copy } from "lucide-react";
+import { 
+  ChevronRight, 
+  Calendar, 
+  CreditCard, 
+  CheckCircle, 
+  Clock, 
+  XCircle, 
+  MapPin,
+  ArrowLeft,
+  Smartphone,
+  Info,
+  Compass,
+  Home,
+  Users,
+  Wallet
+} from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { bookingsApi, paymentsApi } from "@/lib/api";
-import { useState } from "react";
+import { bookingsApi } from "@/lib/api";
 
-const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
-  PENDING:   { label: "Chờ Thanh Toán", color: "var(--amber)",          icon: Clock },
-  CONFIRMED: { label: "Đã Xác Nhận",    color: "#10b981",               icon: CheckCircle },
-  COMPLETED: { label: "Hoàn Thành",     color: "rgba(255,255,255,0.5)", icon: CheckCircle },
-  CANCELLED: { label: "Đã Huỷ",         color: "var(--pink)",           icon: XCircle },
+const STATUS_MAP: Record<string, { label: string; color: string; icon: any; bg: string }> = {
+  PENDING:   { label: "Chờ Thanh Toán", color: "var(--amber)",          icon: Clock,       bg: "rgba(255,214,10,0.1)" },
+  CONFIRMED: { label: "Đã Xác Nhận",    color: "#10b981",               icon: CheckCircle, bg: "rgba(16,185,129,0.1)" },
+  COMPLETED: { label: "Hoàn Thành",     color: "rgba(255,255,255,0.5)", icon: CheckCircle, bg: "rgba(255,255,255,0.05)" },
+  CANCELLED: { label: "Đã Huỷ",         color: "var(--pink)",           icon: XCircle,     bg: "rgba(255,60,172,0.1)" },
 };
 
 export default function BookingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [paying, setPaying] = useState(false);
-  const [paymentData, setPaymentData] = useState<any>(null);
-  const [copied, setCopied] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["booking", id],
     queryFn: () => bookingsApi.getById(Number(id)).then(r => r.data.data),
   });
 
-  const handlePay = async () => {
-    setPaying(true);
-    try {
-      const res = await paymentsApi.create(Number(id));
-      setPaymentData(res.data.data);
-    } catch (e: any) {
-      alert(e.response?.data?.message || "Lỗi tạo thanh toán");
-    } finally {
-      setPaying(false);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   if (isLoading) {
     return (
       <>
         <Navbar />
-        <main style={{ paddingTop: 70, minHeight: "100vh" }}>
-          <div style={{ maxWidth: 800, margin: "80px auto", padding: "0 40px" }}>
-            {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 100, borderRadius: 16, marginBottom: 16 }} />)}
+        <main className="pt-[100px] min-h-screen">
+          <div className="max-w-3xl mx-auto px-6">
+            <div className="skeleton h-48 rounded-[32px] mb-8" />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="skeleton h-64 rounded-[32px]" />
+              <div className="skeleton h-64 rounded-[32px]" />
+            </div>
           </div>
         </main>
       </>
@@ -62,143 +59,124 @@ export default function BookingDetailPage() {
   const booking = data;
   const item = booking.tour || booking.homestay;
   const statusInfo = STATUS_MAP[booking.status] || STATUS_MAP.PENDING;
-  const StatusIcon = statusInfo.icon;
 
   return (
     <>
       <Navbar />
-      <main style={{ paddingTop: 70, minHeight: "100vh" }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "60px 40px" }}>
+      <main className="pt-[100px] min-h-screen pb-20">
+        <div className="max-w-4xl mx-auto px-6">
           {/* Breadcrumb */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 32, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
-            <Link href="/dashboard" style={{ color: "inherit", textDecoration: "none" }}>Dashboard</Link>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/30 mb-8">
+            <Link href="/dashboard" className="text-inherit no-underline hover:text-white transition-colors">Dashboard</Link>
             <ChevronRight size={14} />
-            <span style={{ color: "#fff" }}>Booking #{booking.id}</span>
+            <span className="text-white/60">Booking #{booking.id}</span>
           </div>
 
-          {/* Status Banner */}
-          <div className="glass" style={{
-            borderRadius: 20, padding: 28, marginBottom: 24,
-            borderLeft: `4px solid ${statusInfo.color}`,
-            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <StatusIcon size={28} style={{ color: statusInfo.color }} />
-              <div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: "#fff" }}>{statusInfo.label}</div>
-                <div style={{ fontSize: 13, color: "var(--text)" }}>Booking #{booking.id} · {new Date(booking.createdAt).toLocaleDateString("vi-VN")}</div>
-              </div>
-            </div>
-            {booking.status === "PENDING" && (
-              <button
-                onClick={handlePay}
-                disabled={paying}
-                className="btn-primary"
-                style={{ padding: "12px 28px", fontSize: 15 }}
-              >
-                {paying ? "Đang xử lý..." : "💳 Thanh Toán Ngay"}
-              </button>
-            )}
-          </div>
-
-          {/* SePay QR Payment Modal */}
-          {paymentData && (
-            <div className="glass" style={{ borderRadius: 20, padding: 32, marginBottom: 24, textAlign: "center" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,214,10,0.1)", border: "1px solid rgba(255,214,10,0.2)", padding: "8px 16px", borderRadius: 20, marginBottom: 20 }}>
-                <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--amber)" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--amber)" }}>Chờ Thanh Toán · {Math.ceil(paymentData.expiredAt ? (new Date(paymentData.expiredAt).getTime() - Date.now()) / 60000 : 15)} phút</span>
-              </div>
-
-              <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, marginBottom: 8 }}>Quét Mã QR Để Thanh Toán</h2>
-              <p style={{ color: "var(--text)", marginBottom: 24 }}>Dùng app ngân hàng quét mã QR hoặc chuyển khoản thủ công</p>
-
-              {/* QR Code */}
-              {paymentData.qrCode ? (
-                <img src={paymentData.qrCode} alt="QR Payment" style={{ width: 220, height: 220, borderRadius: 16, border: "4px solid var(--glass-border)", marginBottom: 24 }} />
-              ) : (
-                <div style={{ width: 220, height: 220, borderRadius: 16, border: "2px solid var(--glass-border)", margin: "0 auto 24px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48 }}>
-                  📱
+          {/* Status Hero Card */}
+          <section className="glass rounded-[32px] p-8 md:p-12 mb-8 relative overflow-hidden border-white/10" style={{ borderLeft: `6px solid ${statusInfo.color}` }}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+              <div className="flex items-center gap-6">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${statusInfo.bg}`}>
+                  <statusInfo.icon size={32} style={{ color: statusInfo.color }} />
                 </div>
+                <div>
+                  <h1 className="font-serif text-3xl font-black text-white mb-2">{statusInfo.label}</h1>
+                  <p className="text-white/40 text-sm font-medium">Mã đơn hàng: #{booking.id} • {new Date(booking.createdAt).toLocaleDateString("vi-VN")}</p>
+                </div>
+              </div>
+              
+              {booking.status === "PENDING" && (
+                <Link 
+                  href={`/bookings/${id}/payment`}
+                  className="btn-primary py-4 px-10 no-underline text-lg font-black shadow-xl shadow-pink/20 hover:scale-[1.02] transition-all"
+                >
+                  <CreditCard size={20} /> Thanh Toán Ngay
+                </Link>
               )}
+            </div>
+          </section>
 
-              {/* Transfer info */}
-              <div style={{ maxWidth: 360, margin: "0 auto", textAlign: "left" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            {/* Left: Item Info */}
+            <div className="glass rounded-[32px] p-8 border-white/5">
+              <h3 className="font-serif text-xl font-bold text-white mb-6 flex items-center gap-3">
+                {booking.tour ? <Compass size={20} className="text-pink" /> : <Home size={20} className="text-pink" />}
+                {booking.tour ? "Thông Tin Tour" : "Thông Tin Homestay"}
+              </h3>
+              
+              <div className="relative h-48 rounded-2xl overflow-hidden mb-6">
+                <img 
+                  src={item?.coverImage || '/placeholder.jpg'} 
+                  alt={item?.title || item?.name} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-midnight/80 to-transparent" />
+                <div className="absolute bottom-4 left-4">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-white">
+                    <MapPin size={14} className="text-pink" /> {item?.destination?.nameVi}
+                  </span>
+                </div>
+              </div>
+
+              <h4 className="text-xl font-bold text-white mb-2">{item?.title || item?.name}</h4>
+              <p className="text-sm text-white/40 leading-relaxed line-clamp-3">
+                {item?.description}
+              </p>
+            </div>
+
+            {/* Right: Booking Details */}
+            <div className="glass rounded-[32px] p-8 border-white/5">
+              <h3 className="font-serif text-xl font-bold text-white mb-6 flex items-center gap-3">
+                <Info size={20} className="text-amber" /> Chi Tiết Đặt Chỗ
+              </h3>
+
+              <div className="space-y-6">
                 {[
-                  { label: "Ngân hàng", value: paymentData.bankName || "MB Bank" },
-                  { label: "Số tài khoản", value: paymentData.accountNumber || "N/A", copy: true },
-                  { label: "Nội dung CK", value: paymentData.description || `ETHNO${booking.id}`, copy: true },
-                  { label: "Số tiền", value: `${Number(booking.totalPrice).toLocaleString("vi-VN")}₫` },
-                ].map(item => (
-                  <div key={item.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--glass-border)" }}>
-                    <span style={{ fontSize: 13, color: "var(--text)" }}>{item.label}</span>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{item.value}</span>
-                      {item.copy && (
-                        <button onClick={() => copyToClipboard(item.value)}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--pink)", padding: 2 }}>
-                          <Copy size={14} />
-                        </button>
-                      )}
+                  { label: "Ngày nhận", value: new Date(booking.checkIn).toLocaleDateString("vi-VN"), icon: Calendar },
+                  { label: "Ngày trả", value: new Date(booking.checkOut).toLocaleDateString("vi-VN"), icon: Calendar },
+                  { label: "Số lượng khách", value: `${booking.guests} khách`, icon: Users },
+                  { label: "Tổng chi phí", value: `${Number(booking.totalPrice).toLocaleString("vi-VN")}₫`, icon: Wallet, color: "text-amber" },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/30">
+                      <row.icon size={18} />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{row.label}</div>
+                      <div className={`text-base font-bold ${row.color || "text-white"}`}>{row.value}</div>
                     </div>
                   </div>
                 ))}
-              </div>
-              {copied && <div style={{ marginTop: 12, color: "var(--amber)", fontSize: 13 }}>✓ Đã sao chép</div>}
-              <p style={{ marginTop: 20, fontSize: 13, color: "var(--text)" }}>Hệ thống sẽ tự động xác nhận sau khi nhận được chuyển khoản</p>
-            </div>
-          )}
 
-          {/* Booking Details */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-            {/* Item info */}
-            <div className="glass" style={{ borderRadius: 20, padding: 24 }}>
-              <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, marginBottom: 16 }}>
-                {booking.tour ? "🗺 Tour" : "🏠 Homestay"}
-              </h3>
-              {item?.coverImage && (
-                <img src={item.coverImage} alt={item.title || item.name} style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 12, marginBottom: 12 }} />
-              )}
-              <div style={{ fontWeight: 600, color: "#fff", marginBottom: 4 }}>{item?.title || item?.name}</div>
-              {item?.destination && (
-                <div style={{ fontSize: 13, color: "var(--text)" }}>📍 {item.destination.nameVi}</div>
-              )}
-            </div>
-
-            {/* Booking info */}
-            <div className="glass" style={{ borderRadius: 20, padding: 24 }}>
-              <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Chi Tiết</h3>
-              {[
-                { icon: Calendar, label: "Nhận phòng", value: new Date(booking.checkIn).toLocaleDateString("vi-VN") },
-                { icon: Calendar, label: "Trả phòng", value: new Date(booking.checkOut).toLocaleDateString("vi-VN") },
-                { icon: CreditCard, label: "Tổng tiền", value: `${Number(booking.totalPrice).toLocaleString("vi-VN")}₫` },
-              ].map(item => (
-                <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                  <item.icon size={16} style={{ color: "var(--pink)", flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: "var(--text)" }}>{item.label}</div>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>{item.value}</div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Payment status */}
-              <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 10, background: booking.payment?.status === "PAID" ? "rgba(16,185,129,0.1)" : "rgba(255,214,10,0.1)", border: `1px solid ${booking.payment?.status === "PAID" ? "rgba(16,185,129,0.3)" : "rgba(255,214,10,0.3)"}` }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: booking.payment?.status === "PAID" ? "#10b981" : "var(--amber)" }}>
-                  {booking.payment?.status === "PAID" ? "✓ Đã thanh toán" : "⏳ Chưa thanh toán"}
+                <div className={`mt-4 p-4 rounded-2xl border flex items-center gap-3 ${
+                  booking.paymentStatus === "PAID" 
+                    ? "bg-green-500/10 border-green-500/20 text-green-400" 
+                    : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                }`}>
+                  {booking.paymentStatus === "PAID" ? <CheckCircle size={18} /> : <Clock size={18} />}
+                  <span className="text-sm font-bold uppercase tracking-wider">
+                    {booking.paymentStatus === "PAID" ? "Đã Thanh Toán" : "Chờ Thanh Toán"}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Actions */}
-          <div style={{ display: "flex", gap: 12 }}>
-            <Link href="/dashboard" className="btn-ghost" style={{ padding: "12px 24px" }}>
-              ← Về Dashboard
+          {/* Footer Actions */}
+          <div className="flex flex-wrap gap-4">
+            <Link href="/dashboard" className="btn-ghost py-4 px-8 no-underline flex items-center gap-2">
+              <ArrowLeft size={18} /> Quay lại Dashboard
             </Link>
             {booking.status === "PENDING" && (
-              <button onClick={() => bookingsApi.cancel(Number(id)).then(() => router.push("/dashboard"))}
-                style={{ padding: "12px 24px", border: "1px solid var(--pink)", background: "transparent", color: "var(--pink)", borderRadius: 12, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
-                Huỷ Booking
+              <button 
+                onClick={() => {
+                  if(confirm("Bạn có chắc muốn huỷ đơn đặt chỗ này?")) {
+                    bookingsApi.cancel(Number(id)).then(() => router.push("/dashboard"));
+                  }
+                }}
+                className="bg-transparent border border-white/10 text-white/30 hover:text-pink hover:border-pink/30 py-4 px-8 rounded-2xl text-sm font-bold transition-all cursor-pointer"
+              >
+                <XCircle size={18} /> Huỷ Booking
               </button>
             )}
           </div>

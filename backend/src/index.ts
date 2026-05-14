@@ -25,9 +25,23 @@ import adminRoutes from './routes/admin.routes';
 
 // Middlewares
 import { errorHandler, notFound } from './middlewares/error.middleware';
+import passport from 'passport';
+import session from 'express-session';
+import './config/passport';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Session for passport (optional if using pure JWT, but needed for the flow)
+app.use(session({
+  secret: process.env.JWT_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // ─── Security Middlewares ──────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));

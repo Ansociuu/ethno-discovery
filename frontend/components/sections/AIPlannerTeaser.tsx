@@ -1,12 +1,20 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
+import { 
+  Sparkles, 
+  Brain, 
+  Map, 
+  MessageSquare, 
+  Target, 
+  Calendar, 
+  Wallet,
+  ArrowRight
+} from "lucide-react";
 
 const AI_FEATURES = [
-  { icon: "🧠", color: "rgba(255,60,172,0.15)", title: "Hiểu sở thích cá nhân", desc: "AI phân tích budget, thời gian, và vibe để gợi ý phù hợp nhất" },
-  { icon: "🗺️", color: "rgba(255,214,10,0.15)", title: "Tối ưu lộ trình", desc: "Kết hợp điểm đến, phương tiện, và thời điểm lý tưởng" },
-  { icon: "💬", color: "rgba(255,214,10,0.15)", title: "Chatbot 24/7 đa ngôn ngữ", desc: "Hỗ trợ VN · EN · JP · KR trong suốt hành trình" },
+  { icon: Brain, color: "bg-pink/20 text-pink", title: "Hiểu sở thích cá nhân", desc: "AI phân tích budget, thời gian, và vibe để gợi ý phù hợp nhất" },
+  { icon: Map, color: "bg-amber/20 text-amber", title: "Tối ưu lộ trình", desc: "Kết hợp điểm đến, phương tiện, và thời điểm lý tưởng" },
+  { icon: MessageSquare, color: "bg-blue-500/20 text-blue-400", title: "Chatbot 24/7", desc: "Hỗ trợ đa ngôn ngữ xuyên suốt hành trình của bạn" },
 ];
 
 const TRAVEL_TYPES = ["Solo", "Couple", "Family", "Group"];
@@ -14,121 +22,99 @@ const VIBES = ["Văn hoá", "Adventure", "Chill", "Photography"];
 
 export function AIPlannerTeaser() {
   return (
-    <div className="fade-up" style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 40px", position: "relative", overflow: "hidden" }}>
-      {/* BG glow */}
-      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 800, height: 600, background: "radial-gradient(ellipse, rgba(255,60,172,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+    <div className="fade-up relative overflow-hidden py-24 px-6 md:px-12 bg-midnight">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-pink/5 blur-[120px] pointer-events-none" />
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 1 }}>
-        {/* Left: AI Features */}
-        <div>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
+        {/* Left Content */}
+        <div className="animate-fade-up">
           <span className="section-tag">AI Journey Planner</span>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 3.5vw, 48px)", fontWeight: 700, lineHeight: 1.1, margin: "12px 0 0" }}>
-            Lịch trình hoàn hảo —{" "}
-            <em style={{ color: "var(--amber)", fontStyle: "italic" }}>chỉ trong 30 giây</em>
+          <h2 className="font-serif text-[clamp(32px,5vw,56px)] font-black leading-tight mt-4">
+            Lịch trình hoàn hảo —<br />
+            <span className="italic text-gradient-amber">chỉ trong 30 giây</span>
           </h2>
-          <p style={{ color: "var(--text)", fontSize: 16, lineHeight: 1.7, marginTop: 12, marginBottom: 0, maxWidth: 500 }}>
-            AI hiểu văn hoá, địa lý, và sở thích của bạn để tạo hành trình độc nhất.
+          <p className="text-white/60 text-lg leading-relaxed mt-6 max-w-lg">
+            AI thông minh thấu hiểu văn hóa, địa lý và sở thích cá nhân của bạn để kiến tạo những hành trình độc bản.
           </p>
 
-          {/* Feature list */}
-          <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 16 }}>
-            {AI_FEATURES.map(feat => (
-              <div key={feat.title} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: 16, background: "var(--glass)", border: "1px solid var(--glass-border)", borderRadius: 14, backdropFilter: "blur(8px)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: feat.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                  {feat.icon}
+          <div className="mt-12 space-y-4">
+            {AI_FEATURES.map((feat, i) => (
+              <div key={i} className="glass p-5 rounded-[20px] flex items-start gap-4 hover:bg-white/10 transition-colors">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${feat.color}`}>
+                  <feat.icon size={24} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 2, color: "#fff" }}>{feat.title}</h4>
-                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                  <h4 className="text-white font-bold mb-1">{feat.title}</h4>
+                  <p className="text-white/40 text-sm leading-snug">{feat.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Right: Interactive Form Card */}
-        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24, padding: 32, backdropFilter: "blur(16px)" }}>
-          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, display: "flex", alignItems: "center", gap: 8, color: "#fff" }}>
-            <span style={{ color: "var(--amber)" }}>✨</span> Generate My Trip
-          </div>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginBottom: 28 }}>Trả lời vài câu — AI sẽ làm phần còn lại.</p>
-
-          {/* Travel type */}
-          <div style={{ marginBottom: 20 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
-              🎯 Bạn đi với ai?
-            </span>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {TRAVEL_TYPES.map((t, i) => (
-                <span key={t} style={{
-                  background: i === 0 ? "rgba(255,60,172,0.15)" : "var(--glass)",
-                  border: `1px solid ${i === 0 ? "rgba(255,60,172,0.4)" : "var(--glass-border)"}`,
-                  color: i === 0 ? "var(--pink)" : "rgba(255,255,255,0.6)",
-                  padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
-                  transition: "all 0.2s", whiteSpace: "nowrap",
-                }}>
-                  {t}
-                </span>
-              ))}
+        {/* Right Form Card */}
+        <div className="glass p-8 md:p-10 rounded-[32px] border-white/10 relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-pink/5 to-amber/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[32px]" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 text-white font-bold text-xl mb-2">
+              <Sparkles className="text-amber" size={24} />
+              Tạo Lịch Trình Ngay
             </div>
-          </div>
+            <p className="text-white/40 text-sm mb-10">Trả lời vài câu hỏi — AI sẽ làm phần còn lại.</p>
 
-          {/* Vibe */}
-          <div style={{ marginBottom: 20 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
-              🌈 Vibe chuyến đi?
-            </span>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {VIBES.map((v, i) => (
-                <span key={v} style={{
-                  background: i === 0 ? "rgba(255,214,10,0.15)" : "var(--glass)",
-                  border: `1px solid ${i === 0 ? "rgba(255,214,10,0.4)" : "var(--glass-border)"}`,
-                  color: i === 0 ? "var(--amber)" : "rgba(255,255,255,0.6)",
-                  padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
-                  transition: "all 0.2s", whiteSpace: "nowrap",
-                }}>
-                  {v}
-                </span>
-              ))}
+            {/* Travel Type */}
+            <div className="mb-8">
+              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-4">
+                <Target size={14} className="text-pink" /> Bạn đi cùng ai?
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {TRAVEL_TYPES.map((t, i) => (
+                  <button key={t} className={`px-5 py-2 rounded-full text-xs font-bold border transition-all ${
+                    i === 0 ? "bg-pink/20 border-pink/40 text-pink" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
+                  }`}>
+                    {t}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Days slider */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>📅 Số ngày</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--pink)" }}>5 ngày</span>
+            {/* Vibe */}
+            <div className="mb-8">
+              <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-4">
+                <Sparkles size={14} className="text-pink" /> Vibe chuyến đi?
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {VIBES.map((v, i) => (
+                  <button key={v} className={`px-5 py-2 rounded-full text-xs font-bold border transition-all ${
+                    i === 0 ? "bg-amber/20 border-amber/40 text-amber" : "bg-white/5 border-white/10 text-white/60 hover:border-white/30"
+                  }`}>
+                    {v}
+                  </button>
+                ))}
+              </div>
             </div>
-            <input type="range" min={2} max={14} defaultValue={5} style={{
-              width: "100%", WebkitAppearance: "none", height: 4, borderRadius: 2,
-              background: "rgba(255,255,255,0.1)", outline: "none",
-            }} />
-          </div>
 
-          {/* Budget slider */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>💰 Budget (USD)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--pink)" }}>$800</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+              <div>
+                <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
+                  <Calendar size={14} className="text-pink" /> Số ngày
+                </label>
+                <div className="text-xl font-bold text-white">5 ngày</div>
+              </div>
+              <div>
+                <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
+                  <Wallet size={14} className="text-pink" /> Ngân sách
+                </label>
+                <div className="text-xl font-bold text-white">~5,000,000đ</div>
+              </div>
             </div>
-            <input type="range" min={200} max={3000} defaultValue={800} step={100} style={{
-              width: "100%", WebkitAppearance: "none", height: 4, borderRadius: 2,
-              background: "rgba(255,255,255,0.1)", outline: "none",
-            }} />
-          </div>
 
-          {/* Generate button */}
-          <Link href="/ai-planner" style={{
-            width: "100%", background: "linear-gradient(135deg, var(--pink), var(--amber))",
-            border: "none", padding: "16px", borderRadius: 14, color: "#000",
-            fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex",
-            alignItems: "center", justifyContent: "center", gap: 8, letterSpacing: "0.02em",
-            textDecoration: "none", transition: "all 0.3s",
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(255,60,172,0.4)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}>
-            ✨ Generate My Perfect Trip ↗
-          </Link>
+            <Link href="/ai-planner" className="btn-primary w-full py-5 rounded-2xl justify-center font-black text-lg no-underline shadow-xl shadow-pink/30 hover:shadow-pink/50 transition-all">
+              Bắt Đầu Ngay <ArrowRight size={20} />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

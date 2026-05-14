@@ -14,17 +14,53 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
   }
 
   let unitPrice = 0;
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+
   if (bookableType === 'tour' && tourId) {
     const tour = await prisma.tour.findUnique({ where: { id: tourId } });
     if (!tour) throw createError('Tour không tồn tại', 404);
+    
+    // Kiểm tra sức chứa của tour vào ngày này
+    const confirmedGuests = await prisma.booking.aggregate({
+      where: {
+        tourId,
+        checkIn: start,
+        status: { in: ['PENDING', 'CONFIRMED'] }
+      },
+      _sum: { guests: true }
+    });
+    
+    const currentTotal = confirmedGuests._sum.guests || 0;
+    if (currentTotal + guests > tour.maxGroupSize) {
+      throw createError(`Tour đã hết chỗ vào ngày này (Còn lại ${tour.maxGroupSize - currentTotal} chỗ)`, 400);
+    }
+    
     unitPrice = Number(tour.pricePerPerson);
   } else if (bookableType === 'homestay' && homestayId) {
     const homestay = await prisma.homestay.findUnique({ where: { id: homestayId } });
     if (!homestay) throw createError('Homestay không tồn tại', 404);
+
+    // Kiểm tra trùng lịch homestay
+    const overlapping = await prisma.booking.findFirst({
+      where: {
+        homestayId,
+        status: { in: ['PENDING', 'CONFIRMED'] },
+        AND: [
+          { checkIn: { lt: end } },
+          { checkOut: { gt: start } }
+        ]
+      }
+    });
+
+    if (overlapping) {
+      throw createError('Homestay đã có khách đặt trong khoảng thời gian này', 400);
+    }
+
     const nights = Math.ceil(
-      (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)
+      (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
     );
-    unitPrice = Number(homestay.pricePerNight) * nights;
+    unitPrice = Number(homestay.pricePerNight) * (nights || 1);
   } else {
     throw createError('Loại đặt chỗ không hợp lệ', 400);
   }
