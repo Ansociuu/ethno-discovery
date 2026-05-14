@@ -38,7 +38,7 @@ export function CustomerCareWidget() {
 
     try {
       const token = localStorage.getItem("token"); // Optional: if we want to attach auth
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/chatbot`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/chatbot`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
