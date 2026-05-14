@@ -162,7 +162,7 @@ export default function PaymentPage() {
 
               {/* Actions */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
-                <button onClick={checkStatus} disabled={checking} className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                <button onClick={() => checkStatus()} disabled={checking} className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
                   {checking
                     ? <><RefreshCw size={16} style={{ animation: "spin 0.8s linear infinite" }} /> Đang kiểm tra...</>
                     : <><CheckCircle size={16} /> Tôi Đã Chuyển Khoản</>
