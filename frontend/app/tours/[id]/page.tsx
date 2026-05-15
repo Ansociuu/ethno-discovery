@@ -160,20 +160,31 @@ export default function TourDetailPage() {
             <div>
               <h2 className="font-serif text-3xl font-bold text-white mb-8">Lịch Trình Chi Tiết</h2>
               <div className="space-y-6">
-                {JSON.parse(tour.itinerary || '[]').map((day: any, i: number) => (
-                  <div key={i} className="relative pl-10 border-l border-white/10 pb-10 last:pb-0">
-                    <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-pink border-4 border-midnight" />
-                    <div className="text-xs font-bold text-pink uppercase tracking-widest mb-2">Ngày {day.day}</div>
-                    <h4 className="text-xl font-bold text-white mb-3">{day.title}</h4>
-                    <ul className="space-y-2">
-                      {day.activities.map((act: string, j: number) => (
-                        <li key={j} className="text-white/40 text-sm flex items-center gap-2">
-                          <div className="w-1 h-1 rounded-full bg-white/20" /> {act}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                {(() => {
+                  let itineraryArray = [];
+                  try {
+                    itineraryArray = typeof tour.itinerary === 'string' ? JSON.parse(tour.itinerary || '[]') : (tour.itinerary || []);
+                  } catch (e) {
+                    itineraryArray = [];
+                  }
+                  
+                  if (!Array.isArray(itineraryArray)) itineraryArray = [];
+
+                  return itineraryArray.map((day: any, i: number) => (
+                    <div key={i} className="relative pl-10 border-l border-white/10 pb-10 last:pb-0">
+                      <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-pink border-4 border-midnight" />
+                      <div className="text-xs font-bold text-pink uppercase tracking-widest mb-2">Ngày {day.day || (i + 1)}</div>
+                      <h4 className="text-xl font-bold text-white mb-3">{day.title || "Đang cập nhật..."}</h4>
+                      <ul className="space-y-2">
+                        {(day.activities && Array.isArray(day.activities) ? day.activities : []).map((act: string, j: number) => (
+                          <li key={j} className="text-white/40 text-sm flex items-center gap-2">
+                            <div className="w-1 h-1 rounded-full bg-white/20" /> {act}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           </div>
