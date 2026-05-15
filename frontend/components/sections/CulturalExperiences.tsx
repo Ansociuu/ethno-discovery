@@ -1,74 +1,121 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 const EXPERIENCES = [
   { icon: "🏪", name: "Chợ Phiên H'Mông", desc: "Phiên chợ bản sắc mỗi cuối tuần, nơi giao thương và gặp gỡ văn hoá", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))" },
   { icon: "🎨", name: "Nhuộm Chàm Truyền Thống", desc: "Tự tay nhuộm vải chàm theo phương pháp cổ truyền H'Mông hàng trăm năm", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--dark), var(--amber))" },
   { icon: "🧵", name: "Dệt Vải Thổ Cẩm", desc: "Học dệt thổ cẩm từ những người phụ nữ H'Mông lành nghề nhất bản", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))" },
   { icon: "🎵", name: "Đêm Nhạc Khèn", desc: "Nghe tiếng khèn H'Mông dưới trăng bên bếp lửa — âm nhạc thuần khiết nhất", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))" },
-  { icon: "🍜", name: "Ẩm Thực Bản Địa", desc: "Nấu và thưởng thức thắng cố, mèn mén, rượu ngô — hương vị Tây Bắc", tag: "Ẩm thực", gradient: "linear-gradient(160deg, var(--dark), var(--pink))" },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
+};
 
 export function CulturalExperiences() {
   return (
-    <section style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 0" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px" }}>
+    <section className="bg-midnight py-24 m-0 max-w-full overflow-hidden">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-10">
+        
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60, flexWrap: "wrap", gap: 20 }}>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
+        >
           <div>
             <span className="section-tag">🌺 Trải Nghiệm Văn Hoá</span>
-            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 700, lineHeight: 1.1, margin: "12px 0" }}>
+            <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] my-4">
               Chạm Đến <span className="text-gradient-pink">Bản Sắc</span>
             </h2>
-            <p style={{ color: "var(--text)", fontSize: 17, fontWeight: 300, maxWidth: 500, lineHeight: 1.7 }}>
+            <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
               Không chỉ ngắm nhìn — mà thực sự sống trong văn hoá H&apos;Mông, Dao, Tày qua những hoạt động tay nghề độc đáo.
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Cards Grid with staggered layout */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(200px, 1fr))", gap: 16, overflowX: "auto", paddingBottom: 16 }}>
-          {EXPERIENCES.map((exp, i) => (
-            <div
-              key={exp.name}
-              style={{
-                position: "relative",
-                borderRadius: 20,
-                overflow: "hidden",
-                minHeight: 300,
-                cursor: "pointer",
-                transition: "transform 0.3s",
-                background: exp.gradient,
-                marginTop: i % 2 !== 0 ? 32 : 0,
-              }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.03)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "")}
-            >
-              {/* Overlay */}
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)" }} />
-
-              {/* Icon */}
-              <div style={{
-                position: "absolute", top: 20, left: 20,
-                width: 44, height: 44, borderRadius: 14,
-                background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)",
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22,
-              }}>
-                {exp.icon}
-              </div>
-
-              {/* Content */}
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: 20 }}>
-                <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, marginBottom: 6, color: "#fff" }}>
-                  {exp.name}
-                </h3>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5, marginBottom: 8 }}>
-                  {exp.desc}
-                </p>
-                <span className="badge badge-amber">{exp.tag}</span>
-              </div>
+        {/* Content Layout: 1 Large Image Feature + Grid of Experiences */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Main Feature Image */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, type: "spring" }}
+            className="lg:col-span-5 relative rounded-3xl overflow-hidden min-h-[400px] lg:min-h-full group"
+          >
+            <Image
+              src="/images/cultural-hmong.png"
+              alt="Hmong Cultural Experience"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 40vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-dark/90 via-dark/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 p-8">
+              <span className="badge badge-pink mb-4">Nổi bật</span>
+              <h3 className="font-serif text-3xl font-bold text-white mb-2">Vẻ Đẹp Sapa</h3>
+              <p className="text-white/70 text-sm max-w-sm">
+                Đắm chìm vào không gian văn hoá bản địa chân thực nhất với trang phục truyền thống đầy màu sắc.
+              </p>
             </div>
-          ))}
+          </motion.div>
+
+          {/* Grid of Experiences */}
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            {EXPERIENCES.map((exp, i) => (
+              <motion.div
+                key={exp.name}
+                variants={cardVariants}
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative rounded-3xl overflow-hidden min-h-[250px] cursor-pointer shadow-lg shadow-black/20 group"
+                style={{ background: exp.gradient }}
+              >
+                {/* Overlay highlight */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
+                
+                {/* Moving gradient noise for luxury feel */}
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:4px_4px] opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
+
+                {/* Icon */}
+                <div className="absolute top-5 left-5 w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl border border-white/10 group-hover:scale-110 transition-transform">
+                  {exp.icon}
+                </div>
+
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="font-serif text-[19px] font-bold mb-2 text-white group-hover:text-amber transition-colors">
+                    {exp.name}
+                  </h3>
+                  <p className="text-sm text-white/60 leading-relaxed mb-4 line-clamp-2">
+                    {exp.desc}
+                  </p>
+                  <span className="badge badge-amber text-[11px]">{exp.tag}</span>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+          
         </div>
       </div>
     </section>

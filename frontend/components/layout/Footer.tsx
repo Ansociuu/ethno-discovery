@@ -17,7 +17,7 @@ export function Footer() {
               🌿 <span className="text-gradient">EthnoDiscovery</span>
             </div>
             <p style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, maxWidth: 280 }}>
-              Nền tảng du lịch văn hoá cao cấp, kết nối du khách với trải nghiệm bản địa chân thực tại vùng cao Tây Bắc Việt Nam.
+              Nền tảng du lịch văn hoá cao cấp, kết nối du khách với trải nghiệm bản địa cùng hai dân tộc H'Mông và Dao.
             </p>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               {[Share2, ExternalLink, Send].map((Icon, i) => (

@@ -1,8 +1,9 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { ChevronRight, Users } from "lucide-react";
+import { ChevronRight, MapPin } from "lucide-react";
 import { homestaysApi } from "@/lib/api";
+import { motion } from "framer-motion";
 
 interface Homestay {
   id: number;
@@ -22,19 +23,32 @@ const FALLBACK_GRADIENTS = [
 ];
 
 const TAGS = [
-  { label: "⭐ Superhost", bg: "rgba(251,191,36,0.9)", color: "#000" },
-  { label: "🌟 Featured",  bg: "rgba(255,214,10,0.9)",  color: "#000" },
-  { label: "🏡 Authentic", bg: "rgba(255,60,172,0.9)",  color: "#fff" },
+  { label: "⭐ Superhost", bg: "bg-amber/90", color: "text-black" },
+  { label: "🌟 Featured",  bg: "bg-amber/90", color: "text-black" },
+  { label: "🏡 Authentic", bg: "bg-pink/90", color: "text-white" },
 ];
 
 // Mountain terrain SVG decoration
 function HomestayTerrain() {
   return (
-    <svg style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "50%", opacity: 0.2, pointerEvents: "none" }} viewBox="0 0 300 150" preserveAspectRatio="none">
+    <svg className="absolute bottom-0 left-0 w-full h-1/2 opacity-20 pointer-events-none" viewBox="0 0 300 150" preserveAspectRatio="none">
       <path d="M0 150 L0 80 Q40 50 80 70 Q120 90 150 40 Q180 0 210 30 Q240 60 300 20 L300 150Z" fill="rgba(255,255,255,0.3)" />
     </svg>
   );
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+};
 
 export function FeaturedHomestays() {
   const { data, isLoading } = useQuery({
@@ -45,71 +59,81 @@ export function FeaturedHomestays() {
   const homestays = data?.slice(0, 3) || [];
 
   return (
-    <section className="fade-up" style={{ padding: "100px 40px", maxWidth: 1280, margin: "0 auto" }}>
+    <section className="py-[100px] px-6 md:px-10 max-w-[1280px] mx-auto overflow-hidden">
       {/* Header */}
-      <span className="section-tag">Stay with Locals</span>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60, marginTop: 0, flexWrap: "wrap", gap: 20 }}>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-14 gap-6"
+      >
         <div>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 700, lineHeight: 1.1, marginBottom: 12, marginTop: 12 }}>
-            Homestay <em style={{ color: "var(--amber)", fontStyle: "italic" }}>sang trọng</em>
+          <span className="section-tag mb-4">Stay with Locals</span>
+          <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] mb-3">
+            Homestay <em className="text-amber not-italic relative inline-block">sang trọng<span className="absolute -bottom-2 left-0 w-full h-1 bg-amber/30 rounded-full blur-[2px]"></span></em>
           </h2>
-          <p style={{ color: "var(--text)", fontSize: 17, fontWeight: 300, maxWidth: 500, lineHeight: 1.7 }}>
+          <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
             Ngủ trong lòng bản làng — thức dậy giữa sương mây.
           </p>
         </div>
-        <Link href="/homestays" className="btn-ghost" style={{ padding: "12px 24px", fontSize: 14, whiteSpace: "nowrap" }}>
-          Xem tất cả <ChevronRight size={16} />
+        <Link href="/homestays" className="btn-ghost py-3 px-6 text-sm whitespace-nowrap group">
+          Xem tất cả <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
-      </div>
+      </motion.div>
 
-      {/* 3-column grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-        {isLoading
-          ? [...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: 380, borderRadius: 20 }} />)
-          : homestays.map((hs, i) => (
-              <Link key={hs.id} href={`/homestays/${hs.id}`} style={{ textDecoration: "none" }}>
-                <div style={{
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 20, overflow: "hidden", transition: "all 0.3s", cursor: "pointer",
-                }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.transform = "translateY(-8px)";
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,60,172,0.3)";
-                    (e.currentTarget as HTMLElement).style.boxShadow = "0 24px 60px rgba(255,60,172,0.1)";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.transform = "";
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)";
-                    (e.currentTarget as HTMLElement).style.boxShadow = "";
-                  }}>
+      {/* Grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-[380px] rounded-[20px]" />)}
+        </div>
+      ) : (
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          {homestays.map((hs, i) => (
+            <motion.div key={hs.id} variants={cardVariants} className="h-full">
+              <Link href={`/homestays/${hs.id}`} className="block h-full group outline-none">
+                <div className="bg-white/5 border border-white/10 rounded-[20px] overflow-hidden transition-all duration-300 group-hover:-translate-y-2 group-hover:border-pink/40 group-hover:shadow-[0_24px_60px_rgba(255,60,172,0.15)] group-focus-visible:ring-2 ring-pink h-full flex flex-col">
+                  
                   {/* Image area */}
-                  <div style={{ height: 220, position: "relative", overflow: "hidden" }}>
-                    {hs.coverImage
-                      ? <img src={hs.coverImage} alt={hs.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      : <div style={{ width: "100%", height: "100%", background: FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length] }} />
-                    }
+                  <div className="h-[220px] relative overflow-hidden">
+                    {hs.coverImage ? (
+                      <img 
+                        src={hs.coverImage} 
+                        alt={hs.name} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                      />
+                    ) : (
+                      <div className="w-full h-full" style={{ background: FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length] }} />
+                    )}
                     <HomestayTerrain />
+                    
                     {/* Dark overlay */}
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)" }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-midnight via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                    
                     {/* Tag */}
-                    <div style={{
-                      position: "absolute", top: 14, left: 14,
-                      background: TAGS[i % TAGS.length].bg, color: TAGS[i % TAGS.length].color,
-                      fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 10, letterSpacing: "0.04em",
-                    }}>
+                    <div className={`absolute top-4 left-4 ${TAGS[i % TAGS.length].bg} ${TAGS[i % TAGS.length].color} text-[11px] font-bold px-3 py-1.5 rounded-full tracking-wide shadow-lg`}>
                       {TAGS[i % TAGS.length].label}
                     </div>
                   </div>
 
                   {/* Body */}
-                  <div style={{ padding: 20 }}>
-                    <div style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 700, marginBottom: 6, color: "#fff" }}>{hs.name}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 14, display: "flex", alignItems: "center", gap: 4 }}>
-                      📍 {hs.destination?.nameVi}, {hs.destination?.province}
+                  <div className="p-6 flex-1 flex flex-col relative bg-gradient-to-b from-transparent to-midnight/50">
+                    <h3 className="font-serif text-[20px] font-bold mb-2 text-white group-hover:text-amber transition-colors line-clamp-1">
+                      {hs.name}
+                    </h3>
+                    
+                    <div className="text-[13px] text-white/50 mb-4 flex items-center gap-1.5 font-medium">
+                      <MapPin size={14} className="text-pink" /> 
+                      {hs.destination?.nameVi}, {hs.destination?.province}
                     </div>
 
                     {/* Amenities */}
-                    <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                    <div className="flex gap-2 mb-6 flex-wrap">
                       {(() => {
                         let amenities: string[] = [];
                         if (Array.isArray(hs.amenities)) amenities = hs.amenities;
@@ -118,7 +142,7 @@ export function FeaturedHomestays() {
                         }
                         const fallback = ["🔥 Fireplace", "🏔️ Mountain view", "🍳 Breakfast"];
                         return (amenities.length > 0 ? amenities : fallback).slice(0, 3).map((a: string) => (
-                          <span key={a} style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: 8 }}>
+                          <span key={a} className="text-[12px] text-white/60 bg-white/5 border border-white/5 px-2.5 py-1 rounded-md backdrop-blur-sm">
                             {a}
                           </span>
                         ));
@@ -126,28 +150,28 @@ export function FeaturedHomestays() {
                     </div>
 
                     {/* Footer */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 16 }}>
+                    <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
                       <div>
-                        <span style={{ fontSize: 22, fontWeight: 700, color: "var(--amber)" }}>
+                        <span className="text-[22px] font-bold text-amber">
                           {Number(hs.pricePerNight).toLocaleString("vi-VN")}₫
                         </span>
-                        <span style={{ fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>/đêm</span>
+                        <span className="text-[13px] text-white/40 font-medium ml-1">/đêm</span>
                       </div>
-                      <button style={{
-                        background: "transparent", border: "1px solid rgba(255,60,172,0.4)",
-                        color: "var(--pink)", padding: "8px 18px", borderRadius: 20,
-                        fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
-                      }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--pink)"; (e.currentTarget as HTMLElement).style.color = "#fff"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--pink)"; }}>
+                      <motion.button 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-transparent border border-pink/40 text-pink px-4 py-2 rounded-full text-[13px] font-bold group-hover:bg-pink group-hover:text-white transition-colors"
+                      >
                         Book Now
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
                 </div>
               </Link>
-            ))}
-      </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </section>
   );
 }

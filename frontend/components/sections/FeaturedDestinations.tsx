@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { destinationsApi } from "@/lib/api";
+import { motion } from "framer-motion";
 
 interface Destination {
   id: number;
@@ -19,19 +20,19 @@ interface Destination {
 // Terrain SVG per card
 function CardTerrain({ variant }: { variant: "large" | "tall" | "small" }) {
   if (variant === "large") return (
-    <svg style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60%", opacity: 0.25, pointerEvents: "none" }} viewBox="0 0 400 200" preserveAspectRatio="none">
+    <svg className="absolute bottom-0 left-0 w-full h-[60%] opacity-25 pointer-events-none" viewBox="0 0 400 200" preserveAspectRatio="none">
       <path d="M0 200 L0 120 Q50 80 100 100 Q150 120 200 60 Q230 30 260 50 Q290 70 320 40 Q360 10 400 50 L400 200Z" fill="rgba(255,255,255,0.08)" />
       <path d="M0 200 L0 150 Q80 110 160 140 Q240 170 320 120 Q360 100 400 130 L400 200Z" fill="rgba(255,255,255,0.05)" />
     </svg>
   );
   if (variant === "tall") return (
-    <svg style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60%", opacity: 0.25, pointerEvents: "none" }} viewBox="0 0 200 300" preserveAspectRatio="none">
+    <svg className="absolute bottom-0 left-0 w-full h-[60%] opacity-25 pointer-events-none" viewBox="0 0 200 300" preserveAspectRatio="none">
       <path d="M0 300 L0 180 Q50 130 100 160 Q150 190 200 120 L200 300Z" fill="rgba(255,255,255,0.08)" />
       <path d="M0 300 L0 230 Q80 200 160 220 Q180 228 200 210 L200 300Z" fill="rgba(255,255,255,0.05)" />
     </svg>
   );
   return (
-    <svg style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60%", opacity: 0.25, pointerEvents: "none" }} viewBox="0 0 200 200" preserveAspectRatio="none">
+    <svg className="absolute bottom-0 left-0 w-full h-[60%] opacity-25 pointer-events-none" viewBox="0 0 200 200" preserveAspectRatio="none">
       <path d="M0 200 L0 100 Q50 60 100 80 Q150 100 200 50 L200 200Z" fill="rgba(255,255,255,0.08)" />
     </svg>
   );
@@ -47,6 +48,19 @@ const FALLBACK_GRADIENTS = [
 
 const CARD_ICONS = ["🏔️", "🪨", "🎪", "🌾", "🌺"];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+};
+
 export function FeaturedDestinations() {
   const { data, isLoading } = useQuery({
     queryKey: ["destinations", "featured"],
@@ -56,65 +70,79 @@ export function FeaturedDestinations() {
   const destinations = data || [];
 
   return (
-    <section className="fade-up" style={{ padding: "100px 40px", maxWidth: 1280, margin: "0 auto" }}>
+    <section className="py-[100px] px-6 md:px-10 max-w-[1280px] mx-auto overflow-hidden">
       {/* Header */}
-      <div style={{ marginBottom: 16 }}>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className="mb-4"
+      >
         <span className="section-tag">Popular Destinations</span>
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60, flexWrap: "wrap", gap: 20 }}>
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ delay: 0.1 }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-14 gap-6"
+      >
         <div>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 700, lineHeight: 1.1, marginBottom: 12 }}>
-            Vùng cao <em style={{ color: "var(--pink)", fontStyle: "italic" }}>huyền ảo</em>
+          <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] mb-3">
+            Vùng cao <em className="text-pink not-italic relative inline-block">huyền ảo<span className="absolute -bottom-2 left-0 w-full h-1 bg-pink/30 rounded-full blur-[2px]"></span></em>
           </h2>
-          <p style={{ color: "var(--text)", fontSize: 17, fontWeight: 300, maxWidth: 500, lineHeight: 1.7 }}>
+          <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
             Từng bản làng là một câu chuyện chờ bạn khám phá.
           </p>
         </div>
-        <Link href="/destinations" className="btn-ghost" style={{ padding: "12px 24px", fontSize: 14, whiteSpace: "nowrap" }}>
-          Xem tất cả <ChevronRight size={16} />
+        <Link href="/destinations" className="btn-ghost py-3 px-6 text-sm whitespace-nowrap group">
+          Xem tất cả <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
-      </div>
+      </motion.div>
 
-      {/* Bento Grid — 4 cols, matches HTML exactly */}
+      {/* Bento Grid */}
       {isLoading ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: i === 0 ? 420 : 200, borderRadius: 20, gridColumn: i === 0 ? "span 2" : "span 1" }} />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
+          {[...Array(4)].map((_, i) => (
+            <div 
+              key={i} 
+              className={`skeleton rounded-3xl ${i === 0 ? "md:col-span-2 md:row-span-2" : "col-span-1"}`} 
+              style={{ height: "100%" }} 
+            />
+          ))}
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gridAutoRows: "200px", gap: 16 }}>
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 auto-rows-[200px] md:auto-rows-[220px] gap-4 lg:gap-6 bento-grid-mobile"
+        >
           {destinations.map((dest, i) => {
             const isLarge = i === 0;  // span 2 cols + 2 rows
             const isTall = i === 3;   // span 1 col + 2 rows
             const variant = isLarge ? "large" : isTall ? "tall" : "small";
 
             return (
-              <Link
+              <motion.div
                 key={dest.id}
-                href={`/destinations/${dest.slug}`}
-                style={{
-                  position: "relative",
-                  borderRadius: 20,
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  textDecoration: "none",
-                  display: "block",
-                  gridColumn: isLarge ? "span 2" : "span 1",
-                  gridRow: isLarge || isTall ? "span 2" : "span 1",
-                  transition: "transform 0.35s, box-shadow 0.35s",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 24px 60px rgba(0,0,0,0.5)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.transform = "";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "";
-                }}
+                variants={cardVariants}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className={`relative rounded-3xl overflow-hidden cursor-pointer shadow-lg shadow-black/30 group ${isLarge ? "md:col-span-2 md:row-span-2" : "col-span-1"} ${isTall ? "md:row-span-2" : ""}`}
               >
+                <Link href={`/destinations/${dest.slug}`} className="absolute inset-0 z-20" aria-label={dest.nameVi} />
+                
                 {/* Background image or gradient */}
-                <div style={{ position: "absolute", inset: 0, background: FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length] }}>
+                <div className="absolute inset-0" style={{ background: FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length] }}>
                   {dest.coverImage && (
-                    <img src={dest.coverImage} alt={dest.nameVi} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} />
+                    <img 
+                      src={dest.coverImage} 
+                      alt={dest.nameVi} 
+                      className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-110" 
+                    />
                   )}
                 </div>
 
@@ -122,44 +150,45 @@ export function FeaturedDestinations() {
                 <CardTerrain variant={variant} />
 
                 {/* Dark overlay */}
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-black/95 transition-colors" />
 
                 {/* Badge */}
                 {i === 0 && (
-                  <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,60,172,0.9)", backdropFilter: "blur(8px)", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, color: "#fff" }}>
+                  <div className="absolute top-4 right-4 bg-pink/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg shadow-pink/30 z-10">
                     🏆 #1 Pick
                   </div>
                 )}
                 {i === 3 && (
-                  <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(251,191,36,0.9)", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, color: "#000" }}>
+                  <div className="absolute top-4 right-4 bg-amber/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-black shadow-lg shadow-amber/30 z-10">
                     🌾 Harvest Season
                   </div>
                 )}
 
                 {/* Card Info */}
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: 24 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 10 }}>
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl mb-3 border border-white/10 group-hover:bg-white/30 transition-colors">
                     {CARD_ICONS[i]}
                   </div>
-                  <div style={{ fontFamily: "var(--font-serif)", fontSize: isLarge ? 32 : 22, fontWeight: 700, marginBottom: 4, color: "#fff" }}>
+                  <div className={`font-serif font-bold text-white mb-1 group-hover:text-amber transition-colors ${isLarge ? "text-3xl" : "text-xl md:text-2xl"}`}>
                     {dest.nameVi}
                   </div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 12 }}>
+                  <div className="text-xs text-white/70 mb-3 font-medium tracking-wide">
                     {dest.province}
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, fontWeight: 500 }}>
-                      <span style={{ color: "var(--amber)" }}>★</span> 4.{8 + i % 2} ({200 + i * 312})
+                  
+                  <div className="flex items-center gap-3 flex-wrap opacity-80 group-hover:opacity-100 transition-opacity">
+                    <span className="flex items-center gap-1 text-xs font-medium bg-black/40 px-2 py-1 rounded-md backdrop-blur-sm border border-white/5">
+                      <span className="text-amber">★</span> 4.{8 + i % 2} ({200 + i * 312})
                     </span>
-                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-                      from <strong style={{ color: "var(--amber)", fontSize: 15 }}>{(65 + i * 25).toLocaleString()}$</strong>/person
+                    <span className="text-xs text-white/70">
+                      from <strong className="text-amber text-[15px]">{(65 + i * 25).toLocaleString()}$</strong>/người
                     </span>
                   </div>
                 </div>
-              </Link>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       )}
     </section>
   );

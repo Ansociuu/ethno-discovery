@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Clock, Users, ChevronRight, Star } from "lucide-react";
 import { toursApi } from "@/lib/api";
+import { motion } from "framer-motion";
 
 interface Tour {
   id: number;
@@ -17,6 +18,19 @@ interface Tour {
   _count: { reviews: number };
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+};
+
 export function FeaturedTours() {
   const { data, isLoading } = useQuery({
     queryKey: ["tours", "featured"],
@@ -26,31 +40,46 @@ export function FeaturedTours() {
   const tours = data?.slice(0, 4) || [];
 
   return (
-    <section style={{ padding: "100px 40px", maxWidth: 1280, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60, flexWrap: "wrap", gap: 20 }}>
+    <section className="py-[100px] px-6 md:px-10 max-w-[1280px] mx-auto overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-14 gap-6"
+      >
         <div>
-          <span className="section-tag">🗺 Tours Văn Hoá</span>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 700, lineHeight: 1.1, margin: "12px 0" }}>
+          <span className="section-tag mb-4">🗺 Tours Văn Hoá</span>
+          <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] mb-3">
             Hành Trình <span className="text-gradient-amber">Đáng Nhớ</span>
           </h2>
-          <p style={{ color: "var(--text)", fontSize: 17, fontWeight: 300, maxWidth: 500, lineHeight: 1.7 }}>
+          <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
             Những tour được thiết kế tỉ mỉ, kết hợp thiên nhiên hùng vĩ và văn hoá bản địa chân thực.
           </p>
         </div>
-        <Link href="/tours" className="btn-ghost" style={{ padding: "12px 24px", fontSize: 14, whiteSpace: "nowrap" }}>
-          Xem tất cả <ChevronRight size={16} />
+        <Link href="/tours" className="btn-ghost py-3 px-6 text-sm whitespace-nowrap group">
+          Xem tất cả <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
-      </div>
+      </motion.div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
-        {isLoading
-          ? [...Array(4)].map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: 380, borderRadius: 20 }} />
-            ))
-          : tours.map((tour) => (
-              <TourCard key={tour.id} tour={tour} />
-            ))}
-      </div>
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="skeleton h-[380px] rounded-[20px]" />
+          ))}
+        </div>
+      ) : (
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {tours.map((tour) => (
+            <TourCard key={tour.id} tour={tour} />
+          ))}
+        </motion.div>
+      )}
     </section>
   );
 }
@@ -59,59 +88,66 @@ function TourCard({ tour }: { tour: Tour }) {
   const price = Number(tour.pricePerPerson);
 
   return (
-    <Link
-      href={`/tours/${tour.id}`}
-      style={{ textDecoration: "none" }}
-    >
-      <div className="card" style={{ height: "100%", display: "flex", flexDirection: "column" }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 24px 60px rgba(0,0,0,0.5)"; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}>
-        {/* Image */}
-        <div style={{ position: "relative", height: 220, overflow: "hidden" }}>
-          {tour.coverImage ? (
-            <img src={tour.coverImage} alt={tour.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s" }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "")} />
-          ) : (
-            <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--midnight), var(--pink))" }} />
-          )}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)" }} />
-          {tour.featured && (
-            <div className="badge badge-pink" style={{ position: "absolute", top: 12, left: 12 }}>✦ Nổi bật</div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: 20, flex: 1, display: "flex", flexDirection: "column" }}>
-          <p style={{ fontSize: 12, color: "var(--pink)", marginBottom: 8, display: "flex", alignItems: "center", gap: 4 }}>
-            📍 {tour.destination.nameVi}, {tour.destination.province}
-          </p>
-          <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 12, lineHeight: 1.3 }}>
-            {tour.title}
-          </h3>
-
-          <div style={{ display: "flex", gap: 16, marginBottom: 16, color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={14} /> {tour.durationDays} ngày</span>
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Users size={14} /> Tối đa {tour.maxGroupSize}</span>
-            {tour._count.reviews > 0 && (
-              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Star size={14} style={{ color: "var(--amber)" }} /> {tour._count.reviews} đánh giá</span>
+    <motion.div variants={cardVariants} className="h-full">
+      <Link href={`/tours/${tour.id}`} className="block h-full group outline-none">
+        <div className="card h-full flex flex-col transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_24px_60px_rgba(0,0,0,0.5)] group-focus-visible:ring-2 ring-pink">
+          
+          {/* Image */}
+          <div className="relative h-[220px] overflow-hidden rounded-t-[20px]">
+            {tour.coverImage ? (
+              <img 
+                src={tour.coverImage} 
+                alt={tour.title} 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-midnight to-pink" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+            
+            {tour.featured && (
+              <div className="absolute top-3 left-3 badge badge-pink shadow-lg shadow-pink/20">
+                ✦ Nổi bật
+              </div>
             )}
           </div>
 
-          <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Từ</span>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--amber)" }}>
-                {price.toLocaleString("vi-VN")}₫
-              </div>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>/người</span>
+          {/* Content */}
+          <div className="p-5 flex-1 flex flex-col bg-glass relative">
+            <p className="text-xs text-pink mb-2 flex items-center gap-1 font-medium">
+              📍 {tour.destination.nameVi}, {tour.destination.province}
+            </p>
+            <h3 className="font-serif text-[18px] font-bold text-white mb-3 leading-snug group-hover:text-amber transition-colors line-clamp-2">
+              {tour.title}
+            </h3>
+
+            <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[13px] text-white/60">
+              <span className="flex items-center gap-1.5"><Clock size={14} className="text-white/40" /> {tour.durationDays} ngày</span>
+              <span className="flex items-center gap-1.5"><Users size={14} className="text-white/40" /> Tối đa {tour.maxGroupSize}</span>
+              {tour._count.reviews > 0 && (
+                <span className="flex items-center gap-1.5"><Star size={14} className="text-amber" fill="currentColor" /> {tour._count.reviews} đánh giá</span>
+              )}
             </div>
-            <button className="btn-primary" style={{ padding: "10px 20px", fontSize: 14 }}>
-              Đặt ngay
-            </button>
+
+            <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
+              <div>
+                <span className="text-[11px] text-white/50 uppercase tracking-wider block mb-0.5">Từ</span>
+                <div className="text-[20px] font-bold text-amber">
+                  {price.toLocaleString("vi-VN")}₫
+                </div>
+                <span className="text-[11px] text-white/50 block -mt-1">/người</span>
+              </div>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-primary py-2.5 px-5 text-sm shadow-lg shadow-pink/20"
+              >
+                Đặt ngay
+              </motion.button>
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
