@@ -1,18 +1,9 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 
 export function VRExperienceSection() {
   const [location, setLocation] = useState<"sapa" | "fansipan">("sapa");
-  const [baseUrl, setBaseUrl] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setBaseUrl(window.location.origin);
-    }
-  }, []);
-
-  const configUrl = baseUrl ? `${baseUrl}/api/vr/config?location=${location}` : '';
 
   return (
     <div className="fade-up" style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 40px" }}>
@@ -21,19 +12,15 @@ export function VRExperienceSection() {
         {/* Left: VR Visual */}
         <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", aspectRatio: "4/3", background: "#0a1a2a" }}>
           
-          {baseUrl ? (
-            <iframe 
-              key={location} // Force iframe reload when location changes
-              ref={iframeRef}
-              width="100%" 
-              height="100%" 
-              style={{ border: "none" }}
-              allow="fullscreen"
-              src={`https://cdn.pannellum.org/2.5/pannellum.htm#config=${encodeURIComponent(configUrl)}`}
-            />
-          ) : (
-            <div className="w-full h-full bg-white/5 animate-pulse flex items-center justify-center text-white/40">Đang khởi tạo VR 360...</div>
-          )}
+          <iframe 
+            key={location} // Force iframe reload when location changes
+            ref={iframeRef}
+            width="100%" 
+            height="100%" 
+            style={{ border: "none" }}
+            allow="fullscreen"
+            src={`/vr/viewer.html?location=${location}`}
+          />
 
             {/* Top right VR Badge */}
             <div style={{

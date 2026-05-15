@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>EthnoDiscovery VR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a1a2a; font-family: sans-serif; }
+        #panorama { width: 100%; height: 100%; }
+        .loading { color: rgba(255,255,255,0.5); text-align: center; padding-top: 20%; font-size: 14px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+<div id="panorama">
+    <div class="loading">Đang tải không gian 360°...</div>
+</div>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationName = urlParams.get('location') || 'sapa';
+    
+    // Call the local API route
+    fetch('/api/vr/config?location=' + locationName)
+        .then(res => res.json())
+        .then(config => {
+            document.getElementById('panorama').innerHTML = ''; // clear loading
+            pannellum.viewer('panorama', config);
+        })
+        .catch(err => {
+            console.error("VR Error:", err);
+            document.getElementById('panorama').innerHTML = '<div style="color:#ff3cacaa;text-align:center;padding-top:20%;">Lỗi nạp dữ liệu VR. Vui lòng thử lại.</div>';
+        });
+</script>
+</body>
+</html>
