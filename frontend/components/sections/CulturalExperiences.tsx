@@ -4,10 +4,10 @@ import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 
 const EXPERIENCES = [
-  { icon: "🏪", name: "Chợ Phiên H'Mông", desc: "Phiên chợ bản sắc mỗi cuối tuần, nơi giao thương và gặp gỡ văn hoá", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))" },
-  { icon: "🎨", name: "Nhuộm Chàm Truyền Thống", desc: "Tự tay nhuộm vải chàm theo phương pháp cổ truyền H'Mông hàng trăm năm", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--dark), var(--amber))" },
-  { icon: "🧵", name: "Dệt Vải Thổ Cẩm", desc: "Học dệt thổ cẩm từ những người phụ nữ H'Mông lành nghề nhất bản", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))" },
-  { icon: "🎵", name: "Đêm Nhạc Khèn", desc: "Nghe tiếng khèn H'Mông dưới trăng bên bếp lửa — âm nhạc thuần khiết nhất", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))" },
+  { icon: "🏪", name: "Chợ Phiên Vùng Cao", desc: "Phiên chợ bản sắc H'Mông & Dao mỗi cuối tuần, nơi giao lưu văn hoá độc đáo", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))" },
+  { icon: "🎨", name: "Lễ Cấp Sắc Người Dao", desc: "Trải nghiệm nghi lễ trưởng thành linh thiêng và huyền bí của người Dao Đỏ", tag: "Nghi lễ", gradient: "linear-gradient(160deg, var(--dark), var(--amber))" },
+  { icon: "🧵", name: "Thêu Thừa Dao Đỏ", desc: "Học nghệ thuật thêu hoa văn tinh xảo trên trang phục truyền thống của người Dao", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))" },
+  { icon: "🎵", name: "Tiếng Khèn H'Mông", desc: "Nghe tiếng khèn gọi bạn tình dưới trăng bên bếp lửa — linh hồn của núi rừng", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))" },
 ];
 
 const containerVariants: Variants = {
@@ -42,7 +42,7 @@ export function CulturalExperiences() {
               Chạm Đến <span className="text-gradient-pink">Bản Sắc</span>
             </h2>
             <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
-              Không chỉ ngắm nhìn — mà thực sự sống trong văn hoá H&apos;Mông, Dao, Tày qua những hoạt động tay nghề độc đáo.
+              Không chỉ ngắm nhìn — mà thực sự sống trong văn hoá H&apos;Mông và Dao qua những hoạt động tay nghề độc đáo.
             </p>
           </div>
         </motion.div>

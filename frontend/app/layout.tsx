@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "EthnoDiscovery — Du Lịch Văn Hoá Vùng Cao Việt Nam",
   description:
-    "Khám phá vẻ đẹp bản địa H'Mông, Dao, Tày tại Hà Giang, Sapa, Mộc Châu. Trải nghiệm homestay, văn hoá và AI Journey Planner độc quyền.",
+    "Khám phá vẻ đẹp bản địa H'Mông và Dao tại Hà Giang, Sapa, Mộc Châu. Trải nghiệm homestay, văn hoá và AI Journey Planner độc quyền.",
   keywords: ["du lịch vùng cao", "homestay hà giang", "sapa", "văn hoá hmong", "ethno discovery"],
   openGraph: {
     title: "EthnoDiscovery — Du Lịch Văn Hoá Vùng Cao",

@@ -67,7 +67,7 @@ const SLIDES = [
     titleLine1Part2: "Giữa Đồi",
     titleLine2Part1: "Chè Xanh ",
     titleLine2Part2: "Mộc Châu",
-    description: "Tìm lại sự bình yên trong tâm hồn giữa những nương chè bát ngát và bản làng thanh bình của người Thái.",
+    description: "Tìm lại sự bình yên trong tâm hồn giữa những nương chè bát ngát và bản làng thanh bình của người H'Mông & Dao.",
     animation: "scale"
   }
 ];
