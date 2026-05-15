@@ -18,10 +18,12 @@ export async function GET(request: Request) {
         sapa: {
           title: "Thung lũng Sapa - Ruộng Bậc Thang",
           hfov: 110,
-          pitch: 10,
-          yaw: 180,
+          pitch: 0,
+          yaw: 0,
+          minPitch: -25,
+          maxPitch: 25,
           type: "equirectangular",
-          panorama: "https://pannellum.org/images/alma.jpg",
+          panorama: "/vr/sapa.png",
           autoLoad: true,
           hotSpots: [
             {
@@ -57,10 +59,12 @@ export async function GET(request: Request) {
         fansipan: {
           title: "Đỉnh Fansipan - Nóc nhà Đông Dương",
           hfov: 110,
-          pitch: -10,
-          yaw: 50,
+          pitch: 0,
+          yaw: 0,
+          minPitch: -25,
+          maxPitch: 25,
           type: "equirectangular",
-          panorama: "https://pannellum.org/images/cerro-toco-0.jpg",
+          panorama: "/vr/fansipan.png",
           autoLoad: true,
           hotSpots: [
             {
