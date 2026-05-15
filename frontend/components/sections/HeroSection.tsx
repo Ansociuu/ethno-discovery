@@ -12,6 +12,7 @@ import {
   Wallet,
   Search
 } from "lucide-react";
+import { searchApi } from "@/lib/api";
 
 // Terrain SVG component
 function TerrainSVG() {
@@ -155,7 +156,10 @@ const TypewriterText = ({ text }: { text: string }) => {
 
 export function HeroSection() {
   const router = useRouter();
-  const [fields, setFields] = useState({ destination: "", days: "", vibe: "", budget: "" });
+  const [query, setQuery] = useState("");
+  const [type, setType] = useState("all");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSugg, setShowSugg] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   useEffect(() => {
@@ -165,10 +169,27 @@ export function HeroSection() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = [fields.destination, fields.vibe].filter(Boolean).join(" ");
-    if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+  useEffect(() => {
+    if (query.length < 2) { setSuggestions([]); return; }
+    const t = setTimeout(async () => {
+      try {
+        const res = await searchApi.suggestions(query);
+        setSuggestions(res.data.data || []);
+      } catch {}
+    }, 300);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!query && type === "all") return;
+    router.push(`/search?q=${encodeURIComponent(query)}&type=${type}`);
+  };
+
+  const selectSuggestion = (s: string) => {
+    setQuery(s);
+    setShowSugg(false);
+    router.push(`/search?q=${encodeURIComponent(s)}&type=${type}`);
   };
 
   const currentSlide = SLIDES[currentSlideIndex];
@@ -268,56 +289,84 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
 
-        {/* Advanced Search Bar (Static) */}
+        {/* Advanced Search Bar (Standard) */}
         <motion.form
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, type: "spring", stiffness: 100 }}
           onSubmit={handleSearch}
-          className="glass mx-auto max-w-[860px] p-2 rounded-[24px] flex flex-col md:flex-row items-stretch gap-2 shadow-2xl shadow-black/40 border border-white/20 bg-white/5 backdrop-blur-2xl relative overflow-hidden"
+          className="glass mx-auto max-w-[860px] p-2 rounded-[24px] flex flex-col md:flex-row items-stretch gap-2 shadow-2xl shadow-black/40 border border-white/20 bg-white/5 backdrop-blur-2xl relative overflow-visible z-50"
         >
           {/* Subtle moving gradient highlight behind search bar */}
           <motion.div
             animate={{ x: ["-100%", "200%"] }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-1/2 -skew-x-12 z-0"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-1/2 -skew-x-12 z-0 pointer-events-none rounded-[24px]"
           />
 
-          <div className="relative z-10 flex-1 flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
+          <div className="relative z-10 flex-[2] flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
             <MapPin size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
-            <div className="text-left w-full">
-              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Điểm đến</span>
+            <div className="text-left w-full relative">
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Điểm đến / Tên Tour</span>
               <input
-                value={fields.destination}
-                onChange={e => setFields(f => ({ ...f, destination: e.target.value }))}
-                placeholder="Sa Pa, Hà Giang..."
+                value={query}
+                onChange={e => { setQuery(e.target.value); setShowSugg(true); }}
+                onFocus={() => setShowSugg(true)}
+                onBlur={() => setTimeout(() => setShowSugg(false), 200)}
+                placeholder="Sa Pa, Hà Giang, Homestay..."
                 className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/40 focus:placeholder:text-white/20 transition-colors"
               />
+              
+              {/* Suggestions Dropdown */}
+              <AnimatePresence>
+                {showSugg && suggestions.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-[calc(100%+16px)] left-[-40px] right-0 bg-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden z-[100]"
+                  >
+                    {suggestions.map((s, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => selectSuggestion(s)}
+                        className="px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors text-white text-sm"
+                      >
+                        <Search size={14} className="text-pink opacity-70" />
+                        {s}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
           <div className="relative z-10 flex-1 flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
-            <Calendar size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
+            <Compass size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
             <div className="text-left w-full">
-              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Thời gian</span>
-              <input
-                value={fields.days}
-                onChange={e => setFields(f => ({ ...f, days: e.target.value }))}
-                placeholder="3 - 5 ngày"
-                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/40 focus:placeholder:text-white/20 transition-colors"
-              />
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Loại hình</span>
+              <select 
+                value={type}
+                onChange={e => setType(e.target.value)}
+                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium cursor-pointer appearance-none"
+              >
+                <option value="all" className="bg-dark text-white">Tất cả</option>
+                <option value="destinations" className="bg-dark text-white">Điểm đến</option>
+                <option value="tours" className="bg-dark text-white">Tours</option>
+                <option value="homestays" className="bg-dark text-white">Homestays</option>
+              </select>
             </div>
           </div>
 
           <div className="relative z-10 flex-1 flex items-center gap-4 px-4 py-3 group">
-            <Wallet size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
+            <Calendar size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
             <div className="text-left w-full">
-              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Ngân sách</span>
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Ngày đi</span>
               <input
-                value={fields.budget}
-                onChange={e => setFields(f => ({ ...f, budget: e.target.value }))}
-                placeholder="2tr - 5tr"
-                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/40 focus:placeholder:text-white/20 transition-colors"
+                type="date"
+                className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/40 focus:placeholder:text-white/20 transition-colors cursor-pointer"
+                style={{ colorScheme: "dark" }}
               />
             </div>
           </div>
@@ -329,7 +378,7 @@ export function HeroSection() {
             className="relative z-10 bg-gradient-to-r from-pink to-amber text-midnight font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 border-none cursor-pointer shadow-lg shadow-pink/20 hover:shadow-pink/40 transition-shadow"
           >
             <Search size={20} />
-            AI Search
+            Tìm Kiếm
           </motion.button>
         </motion.form>
       </div>

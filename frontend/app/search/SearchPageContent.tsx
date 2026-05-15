@@ -15,15 +15,22 @@ export default function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQ = searchParams.get("q") || "";
+  const initialTypeRaw = searchParams.get("type");
+  const initialType = (initialTypeRaw && ["all", "destinations", "tours", "homestays"].includes(initialTypeRaw))
+    ? (initialTypeRaw as Tab)
+    : "all";
 
   const [query, setQuery] = useState(initialQ);
-  const [activeTab, setActiveTab] = useState<Tab>("all");
+  const [activeTab, setActiveTab] = useState<Tab>(initialType);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSugg, setShowSugg] = useState(false);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["search", query, activeTab],
-    queryFn: () => searchApi.search({ q: query, type: activeTab === "all" ? undefined : activeTab, limit: 20 }).then(r => r.data),
+    queryKey: ["search", query],
+    queryFn: () => searchApi.search({
+      q: query,
+      limit: 20
+    }).then(r => r.data),
     enabled: query.length >= 2,
   });
 
@@ -39,7 +46,7 @@ export default function SearchPageContent() {
       try {
         const res = await searchApi.suggestions(query);
         setSuggestions(res.data.data || []);
-      } catch {}
+      } catch { }
     }, 300);
     return () => clearTimeout(t);
   }, [query]);
@@ -56,6 +63,11 @@ export default function SearchPageContent() {
     ...(results.tours || []).map((t: any) => ({ ...t, _type: "tour" })),
     ...(results.homestays || []).map((h: any) => ({ ...h, _type: "homestay" })),
   ];
+
+  const displayedResults = activeTab === "all"
+    ? allResults
+    : allResults.filter(item => item._type === activeTab.replace(/s$/, ""));
+
   const totalCount = data?.total || allResults.length;
 
   const getItemLink = (item: any) => {
@@ -77,7 +89,7 @@ export default function SearchPageContent() {
     { key: "all", label: `Tất cả${totalCount ? ` (${totalCount})` : ""}` },
     { key: "destinations", label: `Điểm đến${results.destinations ? ` (${results.destinations.length})` : ""}` },
     { key: "tours", label: `Tours${results.tours ? ` (${results.tours.length})` : ""}` },
-    { key: "homestays", label: `Homestay${results.homestays ? ` (${results.homestays.length})` : ""}` },
+    { key: "homestays", label: `Homestays${results.homestays ? ` (${results.homestays.length})` : ""}` },
   ];
 
   return (
@@ -191,10 +203,10 @@ export default function SearchPageContent() {
           {!isLoading && query.length >= 2 && (
             <div>
               <p style={{ color: "var(--text)", fontSize: 15, marginBottom: 28 }}>
-                {totalCount > 0 ? `Tìm thấy ${totalCount} kết quả cho "${query}"` : `Không tìm thấy kết quả cho "${query}"`}
+                {displayedResults.length > 0 ? `Tìm thấy ${displayedResults.length} kết quả cho "${query}"` : `Không tìm thấy kết quả cho "${query}"`}
               </p>
 
-              {allResults.length === 0 ? (
+              {displayedResults.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "80px 0" }}>
                   <div style={{ fontSize: 60, marginBottom: 20 }}>🔍</div>
                   <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 24, marginBottom: 12 }}>Không tìm thấy kết quả</h3>
@@ -207,7 +219,7 @@ export default function SearchPageContent() {
                 </div>
               ) : (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
-                  {allResults.map((item: any) => {
+                  {displayedResults.map((item: any) => {
                     const type = TYPE_LABELS[item._type];
                     const price = getItemPrice(item);
                     return (
