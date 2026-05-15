@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Save } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { destinationsApi } from "@/lib/api";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 
 interface HomestayModalProps {
   isOpen: boolean;
@@ -169,15 +170,11 @@ export function HomestayModal({ isOpen, onClose, onSave, isLoading, initialData 
             />
           </div>
 
-          <div>
-            <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-2">Ảnh bìa (URL)</label>
-            <input 
-              value={formData.coverImage}
-              onChange={e => setFormData({...formData, coverImage: e.target.value})}
-              className="input" 
-              placeholder="https://images.unsplash.com/..."
-            />
-          </div>
+          <ImageUpload 
+            label="Ảnh bìa"
+            value={formData.coverImage}
+            onChange={url => setFormData({...formData, coverImage: url})}
+          />
 
           <div>
             <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-2">Tiện ích (JSON Array)</label>

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { X, Loader2, Save } from "lucide-react";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 
 interface DestinationModalProps {
   isOpen: boolean;
@@ -152,15 +153,11 @@ export function DestinationModal({ isOpen, onClose, onSave, isLoading, initialDa
             </div>
           </div>
 
-          <div>
-            <label className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-2">Ảnh bìa (URL)</label>
-            <input 
-              value={formData.coverImage}
-              onChange={e => setFormData({...formData, coverImage: e.target.value})}
-              className="input" 
-              placeholder="https://images.unsplash.com/..."
-            />
-          </div>
+          <ImageUpload 
+            label="Ảnh bìa"
+            value={formData.coverImage}
+            onChange={url => setFormData({...formData, coverImage: url})}
+          />
 
           <div className="flex gap-8 p-4 bg-white/5 rounded-2xl border border-white/5">
             <label className="flex items-center gap-3 cursor-pointer">

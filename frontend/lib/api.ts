@@ -125,3 +125,20 @@ export const adminApi = {
   getUsers: (params?: any) => api.get('/admin/users', { params }),
   updateUserRole: (id: number, role: string) => api.patch(`/admin/users/${id}/role`, { role }),
 };
+
+export const uploadApi = {
+  uploadSingle: (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post('/upload/single', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  uploadMultiple: (files: FileList) => {
+    const formData = new FormData();
+    Array.from(files).forEach(file => formData.append('images', file));
+    return api.post('/upload/multiple', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  }
+};
