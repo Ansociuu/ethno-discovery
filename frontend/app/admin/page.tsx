@@ -11,15 +11,13 @@ import {
   TrendingUp, 
   DollarSign, 
   Settings, 
-  BarChart3, 
-  LogOut,
-  Leaf,
-  Home,
-  ClipboardList
+  BarChart3,
+  ClipboardList,
+  Home
 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import api from "@/lib/api";
-import { AuthGuard } from "@/components/auth-guard";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 
 function StatCard({ icon: Icon, label, value, sub, color }: any) {
   return (
@@ -52,15 +50,6 @@ export default function AdminDashboard() {
 
 
 
-  const NAV_ITEMS = [
-    { href: "/admin", label: "Tổng quan", icon: BarChart3 },
-    { href: "/admin/destinations", label: "Điểm đến", icon: Map },
-    { href: "/admin/tours", label: "Quản lý Tours", icon: Compass },
-    { href: "/admin/homestays", label: "Homestays", icon: Home },
-    { href: "/admin/bookings", label: "Đơn đặt chỗ", icon: ClipboardList },
-    { href: "/admin/users", label: "Người dùng", icon: Users },
-  ];
-
   const QUICK_LINKS = [
     { title: "Quản lý Destinations", href: "/admin/destinations", icon: Map, count: stats?.totalDestinations, color: "var(--pink)" },
     { title: "Quản lý Tours", href: "/admin/tours", icon: Compass, count: stats?.totalTours, color: "var(--amber)" },
@@ -68,45 +57,8 @@ export default function AdminDashboard() {
     { title: "Quản lý Bookings", href: "/admin/bookings", icon: ClipboardList, count: stats?.totalBookings, color: "var(--pink)" },
     { title: "Quản lý Users", href: "/admin/users", icon: Users, count: stats?.totalUsers, color: "var(--amber)" },
     { title: "Cài đặt hệ thống", href: "/admin/settings", icon: Settings, color: "rgba(255,255,255,0.5)" },
-  ];
-
-  return (
-    <AuthGuard requireAdmin>
-      <div className="flex min-h-screen bg-midnight">
-      {/* Sidebar */}
-      <aside className="w-64 bg-midnight/50 backdrop-blur-xl border-r border-white/5 flex flex-col fixed inset-y-0 z-50">
-        <div className="p-8 border-b border-white/5">
-          <div className="flex items-center gap-3 no-underline">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink to-amber flex items-center justify-center shadow-lg shadow-pink/20">
-              <Leaf className="text-white w-5 h-5" />
-            </div>
-            <span className="font-serif text-xl font-black text-white">Admin<span className="text-pink">Panel</span></span>
-          </div>
-          <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-3">Quản trị viên</div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-1">
-          {NAV_ITEMS.map(item => (
-            <Link key={item.href} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 text-sm font-bold no-underline hover:bg-pink/10 hover:text-pink transition-all">
-              <item.icon size={18} /> {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-white/5">
-          <button onClick={() => { logout(); router.push("/"); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/30 text-sm font-bold bg-transparent border-none cursor-pointer hover:bg-white/5 transition-all">
-            <LogOut size={18} /> Đăng xuất
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 ml-64 p-12">
-        <header className="mb-12">
-          <h1 className="font-serif text-4xl font-black text-white mb-2">Bảng Điều Khiển</h1>
-          <p className="text-white/40">Chào mừng trở lại, <span className="text-white font-bold">{user?.name}</span></p>
-        </header>
-
+  ];  return (
+    <AdminLayout title="Bảng Điều Khiển" subtitle={`Chào mừng trở lại, ${user?.name}`}>
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <StatCard icon={DollarSign} label="Doanh thu tháng" value={stats?.monthlyRevenue ? `${(Number(stats.monthlyRevenue) / 1000000).toFixed(1)}M` : "0.0M"} sub={12} color="var(--amber)" />
@@ -163,8 +115,6 @@ export default function AdminDashboard() {
             <div className="text-center py-12 text-white/20 font-medium">Chưa có dữ liệu đặt chỗ mới.</div>
           )}
         </div>
-      </main>
-    </div>
-    </AuthGuard>
+    </AdminLayout>
   );
 }

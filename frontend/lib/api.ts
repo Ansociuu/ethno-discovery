@@ -35,18 +35,27 @@ export const destinationsApi = {
   getAll: (params?: any) => api.get('/destinations', { params }),
   getFeatured: () => api.get('/destinations/featured'),
   getBySlug: (slug: string) => api.get(`/destinations/${slug}`),
+  create: (data: any) => api.post('/destinations', data),
+  update: (id: number, data: any) => api.put(`/destinations/${id}`, data),
+  delete: (id: number) => api.delete(`/destinations/${id}`),
 };
 
 export const toursApi = {
   getAll: (params?: any) => api.get('/tours', { params }),
   getFeatured: () => api.get('/tours/featured'),
   getById: (id: number) => api.get(`/tours/${id}`),
+  create: (data: any) => api.post('/tours', data),
+  update: (id: number, data: any) => api.put(`/tours/${id}`, data),
+  delete: (id: number) => api.delete(`/tours/${id}`),
 };
 
 export const homestaysApi = {
   getAll: (params?: any) => api.get('/homestays', { params }),
   getFeatured: () => api.get('/homestays/featured'),
   getById: (id: number) => api.get(`/homestays/${id}`),
+  create: (data: any) => api.post('/homestays', data),
+  update: (id: number, data: any) => api.put(`/homestays/${id}`, data),
+  delete: (id: number) => api.delete(`/homestays/${id}`),
 };
 
 export const authApi = {
@@ -107,4 +116,12 @@ export const wishlistApi = {
   get: () => api.get('/wishlist'),
   add: (data: { itemType: string; itemId: number }) => api.post('/wishlist', data),
   remove: (itemType: string, itemId: number) => api.delete(`/wishlist/${itemType}/${itemId}`),
+};
+
+export const adminApi = {
+  getStats: () => api.get('/admin/stats'),
+  getBookings: (params?: any) => api.get('/admin/bookings', { params }),
+  updateBookingStatus: (id: number, status: string) => api.patch(`/admin/bookings/${id}/status`, { status }),
+  getUsers: (params?: any) => api.get('/admin/users', { params }),
+  updateUserRole: (id: number, role: string) => api.patch(`/admin/users/${id}/role`, { role }),
 };
