@@ -148,7 +148,10 @@ export function DestinationModal({ isOpen, onClose, onSave, isLoading, initialDa
                 onChange={e => setFormData({...formData, difficulty: e.target.value})}
                 className="input appearance-none"
               >
-                {difficulties.map(d => <option key={d} value={d}>{d}</option>)}
+                <option value="EASY" className="bg-dark text-white">Nghỉ dưỡng</option>
+                <option value="MODERATE" className="bg-dark text-white">Trải nghiệm</option>
+                <option value="HARD" className="bg-dark text-white">Chinh phục</option>
+                <option value="EXPERT" className="bg-dark text-white">Mạo hiểm</option>
               </select>
             </div>
           </div>

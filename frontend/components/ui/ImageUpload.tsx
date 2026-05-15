@@ -42,21 +42,60 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
       {label && <label className="block text-[10px] font-bold text-pink uppercase tracking-widest">{label}</label>}
       
       <div className="relative group">
+        <input 
+          id={`file-upload-${label}`}
+          type="file" 
+          className="hidden" 
+          accept="image/*" 
+          onChange={handleUpload}
+          disabled={isUploading}
+        />
+
         {value ? (
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/10 group">
+          <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/10 group/preview">
             <img src={value} alt="Preview" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-              <button 
-                type="button"
-                onClick={() => onChange("")}
-                className="p-3 bg-pink rounded-full text-white shadow-xl hover:scale-110 transition-transform"
-              >
-                <X size={20} />
-              </button>
+            
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-all duration-300 flex items-center justify-center gap-6 backdrop-blur-sm">
+              {isUploading ? (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="animate-spin text-pink" size={32} />
+                  <span className="text-[10px] text-white font-bold uppercase tracking-widest">Đang tải...</span>
+                </div>
+              ) : (
+                <>
+                  <button 
+                    type="button"
+                    onClick={() => document.getElementById(`file-upload-${label}`)?.click()}
+                    className="flex flex-col items-center gap-2 text-white hover:text-pink transition-colors group/btn"
+                  >
+                    <div className="p-4 bg-white/10 rounded-full group-hover/btn:bg-pink/20 transition-all">
+                      <Upload size={24} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Thay ảnh</span>
+                  </button>
+
+                  <div className="w-px h-12 bg-white/10" />
+
+                  <button 
+                    type="button"
+                    onClick={() => onChange("")}
+                    className="flex flex-col items-center gap-2 text-white hover:text-pink transition-colors group/btn"
+                  >
+                    <div className="p-4 bg-white/10 rounded-full group-hover/btn:bg-pink/20 transition-all">
+                      <X size={24} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Gỡ bỏ</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ) : (
-          <label className="flex flex-col items-center justify-center w-full aspect-video rounded-2xl border-2 border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-pink/50 transition-all cursor-pointer">
+          <label 
+            htmlFor={`file-upload-${label}`}
+            className="flex flex-col items-center justify-center w-full aspect-video rounded-2xl border-2 border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-pink/50 transition-all cursor-pointer"
+          >
             {isUploading ? (
               <div className="flex flex-col items-center gap-3">
                 <Loader2 className="animate-spin text-pink" size={32} />
@@ -73,13 +112,6 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
                 </div>
               </div>
             )}
-            <input 
-              type="file" 
-              className="hidden" 
-              accept="image/*" 
-              onChange={handleUpload}
-              disabled={isUploading}
-            />
           </label>
         )}
       </div>

@@ -17,7 +17,7 @@ import { Footer } from "@/components/layout/Footer";
 import { destinationsApi } from "@/lib/api";
 
 const DIFFICULTIES = ["", "EASY", "MODERATE", "HARD", "EXPERT"];
-const DIFFICULTY_LABELS: Record<string, string> = { "": "Tất cả", EASY: "Dễ", MODERATE: "Trung bình", HARD: "Khó", EXPERT: "Chuyên nghiệp" };
+const DIFFICULTY_LABELS: Record<string, string> = { "": "Tất cả", EASY: "Nghỉ dưỡng", MODERATE: "Trải nghiệm", HARD: "Chinh phục", EXPERT: "Mạo hiểm" };
 const PROVINCES = ["", "Hà Giang", "Lào Cai", "Sơn La", "Lai Châu", "Điện Biên", "Yên Bái"];
 
 function DestinationsContent() {
@@ -68,38 +68,55 @@ function DestinationsContent() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 py-12">
-          {/* Advanced Filters */}
-          <div className="flex flex-wrap items-center gap-4 mb-12">
-            <div className="relative flex-1 min-w-[280px]">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-              <input
-                value={search}
-                onChange={e => { setSearch(e.target.value); setPage(1); }}
-                placeholder="Tìm kiếm địa danh..."
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-pink/50 transition-all"
-              />
-            </div>
+          {/* Advanced Filters Upgrade */}
+          <div className="glass rounded-[32px] p-1.5 mb-16 border-white/10 shadow-2xl shadow-black/40 overflow-hidden">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+              
+              {/* Search Section */}
+              <div className="flex-[2] relative group">
+                <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-pink transition-transform group-focus-within:scale-110" />
+                <input
+                  value={search}
+                  onChange={e => { setSearch(e.target.value); setPage(1); }}
+                  placeholder="Tìm kiếm địa danh (ví dụ: Sapa, Đồng Văn...)"
+                  className="w-full bg-transparent border-none outline-none py-3.5 pl-16 pr-6 text-sm text-white font-medium placeholder:text-white/20"
+                />
+              </div>
 
-            <select
-              value={province}
-              onChange={e => { setProvince(e.target.value); setPage(1); }}
-              className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none"
-            >
-              {PROVINCES.map(p => <option key={p} value={p} className="bg-midnight">{p || "Tất cả tỉnh"}</option>)}
-            </select>
+              {/* Vertical Divider (Desktop) */}
+              <div className="hidden lg:block w-px h-8 bg-white/10 mx-2" />
 
-            <div className="flex gap-2 flex-wrap">
-              {DIFFICULTIES.map(d => (
-                <button
-                  key={d}
-                  onClick={() => { setDifficulty(d); setPage(1); }}
-                  className={`px-5 py-2 rounded-full text-xs font-bold border transition-all ${
-                    difficulty === d ? "bg-pink border-pink text-white" : "bg-white/5 border-white/10 text-white/50 hover:border-white/30"
-                  }`}
-                >
-                  {DIFFICULTY_LABELS[d]}
-                </button>
-              ))}
+              {/* Province Section */}
+              <div className="flex-1 relative group px-2">
+                <div className="flex items-center gap-3 w-full bg-white/5 lg:bg-transparent rounded-2xl lg:rounded-none px-4 lg:px-2">
+                  <MapPin size={16} className="text-amber" />
+                  <select
+                    value={province}
+                    onChange={e => { setProvince(e.target.value); setPage(1); }}
+                    className="flex-1 bg-transparent border-none outline-none py-3.5 text-sm text-white font-medium cursor-pointer appearance-none"
+                  >
+                    {PROVINCES.map(p => <option key={p} value={p} className="bg-dark text-white">{p || "Tất cả tỉnh"}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Difficulty Section */}
+              <div className="flex-[2] bg-white/5 lg:bg-white/10 lg:backdrop-blur-xl rounded-[24px] p-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar">
+                {DIFFICULTIES.map(d => (
+                  <button
+                    key={d}
+                    onClick={() => { setDifficulty(d); setPage(1); }}
+                    className={`whitespace-nowrap px-4 py-2.5 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex-1 min-w-fit ${
+                      difficulty === d 
+                        ? "bg-gradient-to-r from-pink to-amber text-midnight shadow-lg shadow-pink/20" 
+                        : "text-white/40 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {DIFFICULTY_LABELS[d]}
+                  </button>
+                ))}
+              </div>
+
             </div>
           </div>
 

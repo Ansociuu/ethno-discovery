@@ -74,36 +74,69 @@ function ToursContent() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 py-12">
-          {/* Advanced Filters */}
-          <div className="flex flex-wrap items-center gap-4 mb-12">
-            <div className="relative flex-1 min-w-[280px]">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-              <input
-                value={search}
-                onChange={e => { setSearch(e.target.value); setPage(1); }}
-                placeholder="Tìm kiếm tour..."
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-pink/50 transition-all"
-              />
-            </div>
+          {/* Advanced Filters Upgrade */}
+          <div className="glass rounded-[32px] p-1.5 mb-16 border-white/10 shadow-2xl shadow-black/40 overflow-hidden">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+              
+              {/* Search Section */}
+              <div className="flex-[2] relative group">
+                <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-amber transition-transform group-focus-within:scale-110" />
+                <input
+                  value={search}
+                  onChange={e => { setSearch(e.target.value); setPage(1); }}
+                  placeholder="Tìm kiếm hành trình (ví dụ: Trekking, Chợ phiên...)"
+                  className="w-full bg-transparent border-none outline-none py-3.5 pl-16 pr-6 text-sm text-white font-medium placeholder:text-white/20"
+                />
+              </div>
 
-            <div className="flex gap-4">
-              <select value={duration} onChange={e => { setDuration(e.target.value); setPage(1); }} className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none">
-                <option value="">Thời gian</option>
-                {[2, 3, 4, 5, 6, 7].map(d => <option key={d} value={d} className="bg-midnight">{d} ngày</option>)}
-              </select>
+              {/* Vertical Divider (Desktop) */}
+              <div className="hidden lg:block w-px h-8 bg-white/10 mx-2" />
 
-              <select value={priceMax} onChange={e => { setPriceMax(e.target.value); setPage(1); }} className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none">
-                <option value="">Mức giá</option>
-                <option value="2000000" className="bg-midnight">Dưới 2 triệu</option>
-                <option value="5000000" className="bg-midnight">Dưới 5 triệu</option>
-                <option value="10000000" className="bg-midnight">Dưới 10 triệu</option>
-              </select>
+              {/* Filters Section */}
+              <div className="flex-[3] flex flex-col md:flex-row items-center gap-2">
+                
+                {/* Duration */}
+                <div className="flex-1 relative group px-2 w-full">
+                  <div className="flex items-center gap-3 w-full bg-white/5 lg:bg-transparent rounded-2xl lg:rounded-none px-4 lg:px-2">
+                    <Clock size={16} className="text-pink" />
+                    <select value={duration} onChange={e => { setDuration(e.target.value); setPage(1); }} className="flex-1 bg-transparent border-none outline-none py-3.5 text-sm text-white font-medium cursor-pointer appearance-none">
+                      <option value="">Thời gian</option>
+                      {[2, 3, 4, 5, 6, 7].map(d => <option key={d} value={d} className="bg-dark text-white">{d} ngày</option>)}
+                    </select>
+                  </div>
+                </div>
 
-              <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none cursor-pointer focus:border-pink/50 appearance-none">
-                <option value="featured" className="bg-midnight">Nổi bật</option>
-                <option value="price_asc" className="bg-midnight">Giá thấp → cao</option>
-                <option value="price_desc" className="bg-midnight">Giá cao → thấp</option>
-              </select>
+                <div className="hidden md:block w-px h-6 bg-white/10" />
+
+                {/* Price */}
+                <div className="flex-1 relative group px-2 w-full">
+                  <div className="flex items-center gap-3 w-full bg-white/5 lg:bg-transparent rounded-2xl lg:rounded-none px-4 lg:px-2">
+                    <Sparkles size={16} className="text-amber" />
+                    <select value={priceMax} onChange={e => { setPriceMax(e.target.value); setPage(1); }} className="flex-1 bg-transparent border-none outline-none py-3.5 text-sm text-white font-medium cursor-pointer appearance-none">
+                      <option value="">Mức giá</option>
+                      <option value="2000000" className="bg-dark text-white">Dưới 2 triệu</option>
+                      <option value="5000000" className="bg-dark text-white">Dưới 5 triệu</option>
+                      <option value="10000000" className="bg-dark text-white">Dưới 10 triệu</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="hidden md:block w-px h-6 bg-white/10" />
+
+                {/* Sort */}
+                <div className="flex-1 relative group px-2 w-full">
+                  <div className="flex items-center gap-3 w-full bg-white/5 lg:bg-transparent rounded-2xl lg:rounded-none px-4 lg:px-2">
+                    <Star size={16} className="text-pink" />
+                    <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 bg-transparent border-none outline-none py-3.5 text-sm text-white font-medium cursor-pointer appearance-none">
+                      <option value="featured" className="bg-dark text-white">Nổi bật</option>
+                      <option value="price_asc" className="bg-dark text-white">Giá thấp → cao</option>
+                      <option value="price_desc" className="bg-dark text-white">Giá cao → thấp</option>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
           </div>
 
