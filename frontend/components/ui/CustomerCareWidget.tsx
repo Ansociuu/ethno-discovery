@@ -102,7 +102,7 @@ export function CustomerCareWidget() {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="btn-primary"
+        className="btn-primary floating-offset"
         style={{
           position: "fixed",
           bottom: "30px",
@@ -125,7 +125,7 @@ export function CustomerCareWidget() {
       {/* Widget Panel */}
       {isOpen && (
         <div
-          className="glass"
+          className="glass floating-panel-offset"
           style={{
             position: "fixed",
             bottom: "100px",

@@ -60,7 +60,7 @@ function DestinationsContent() {
             <Mountain size={14} /> Điểm Đến
           </div>
           <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-black mb-4 leading-tight">
-            Khám Phá <span className="text-gradient-pink">Tây Bắc</span>
+            Khám Phá <span className="text-gradient-pink">Vùng Cao</span>
           </h1>
           <p className="text-white/50 text-lg max-w-lg mx-auto">
             {pagination?.total || 0} vùng đất kỳ vĩ đang chờ bạn chinh phục.

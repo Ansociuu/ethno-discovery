@@ -75,7 +75,7 @@ export function Footer() {
         }}>
           <div>
             <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 24, marginBottom: 8 }}>Nhận ưu đãi độc quyền</h3>
-            <p style={{ color: "var(--text)", fontSize: 14 }}>Đăng ký nhận bản tin về tour mới, deals và tips du lịch Tây Bắc.</p>
+            <p style={{ color: "var(--text)", fontSize: 14 }}>Đăng ký nhận bản tin về tour mới, deals và tips du lịch vùng cao.</p>
           </div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <input className="input" type="email" placeholder="Email của bạn" style={{ width: 280 }} />

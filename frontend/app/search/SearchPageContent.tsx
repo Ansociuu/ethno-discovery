@@ -173,7 +173,7 @@ export default function SearchPageContent() {
               <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, marginBottom: 24 }}>Khám Phá</h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
                 {[
-                  { title: "Tours Tây Bắc", sub: "Hành trình văn hoá", href: "/tours", icon: "🗺", color: "var(--pink)" },
+                  { title: "Tours Vùng Cao", sub: "Hành trình văn hoá", href: "/tours", icon: "🗺", color: "var(--pink)" },
                   { title: "Homestay Bản Địa", sub: "Nghỉ đêm bản làng", href: "/homestays", icon: "🏠", color: "var(--amber)" },
                   { title: "Điểm Đến", sub: "Khám phá địa danh", href: "/destinations", icon: "🏔", color: "var(--pink)" },
                   { title: "AI Planner", sub: "Lịch trình thông minh", href: "/ai-planner", icon: "✨", color: "var(--amber)" },

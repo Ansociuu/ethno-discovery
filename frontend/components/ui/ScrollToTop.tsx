@@ -33,6 +33,7 @@ export function ScrollToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Quay về đầu trang"
+      className="floating-offset-high"
       style={{
         position: "fixed",
         bottom: "100px", // Just above the Customer Care Widget (which is at 30px, height 60px -> 90px)

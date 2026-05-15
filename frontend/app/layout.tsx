@@ -17,13 +17,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "EthnoDiscovery — Du Lịch Văn Hoá Tây Bắc Việt Nam",
+  title: "EthnoDiscovery — Du Lịch Văn Hoá Vùng Cao Việt Nam",
   description:
     "Khám phá vẻ đẹp bản địa H'Mông, Dao, Tày tại Hà Giang, Sapa, Mộc Châu. Trải nghiệm homestay, văn hoá và AI Journey Planner độc quyền.",
-  keywords: ["du lịch tây bắc", "homestay hà giang", "sapa", "văn hoá hmong", "ethno discovery"],
+  keywords: ["du lịch vùng cao", "homestay hà giang", "sapa", "văn hoá hmong", "ethno discovery"],
   openGraph: {
-    title: "EthnoDiscovery — Du Lịch Văn Hoá Tây Bắc",
-    description: "Nền tảng du lịch văn hoá cao cấp Tây Bắc Việt Nam",
+    title: "EthnoDiscovery — Du Lịch Văn Hoá Vùng Cao",
+    description: "Nền tảng du lịch văn hoá cao cấp Vùng Cao Việt Nam",
     type: "website",
   },
 };

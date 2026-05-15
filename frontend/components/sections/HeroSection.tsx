@@ -62,7 +62,7 @@ const SLIDES = [
   },
   {
     image: "/images/hero-bg-3.png",
-    badge: "Bản tình ca Tây Bắc · Đồi chè xanh mướt",
+    badge: "Bản tình ca vùng cao · Đồi chè xanh mướt",
     titleLine1Part1: "Thức Giấc ",
     titleLine1Part2: "Giữa Đồi",
     titleLine2Part1: "Chè Xanh ",

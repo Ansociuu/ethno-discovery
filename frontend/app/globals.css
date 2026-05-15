@@ -267,9 +267,19 @@ body::before {
     display: flex !important;
   }
 
-  /* Bento grid: 2 cols on mobile */
+  /* Bento grid: 2 cols on tablet */
   .bento-grid-mobile {
     grid-template-columns: 1fr 1fr !important;
+  }
+
+  .floating-offset {
+    bottom: 90px !important;
+  }
+  .floating-offset-high {
+    bottom: 160px !important;
+  }
+  .floating-panel-offset {
+    bottom: 160px !important;
   }
 
   /* Sections padding reduced */
@@ -304,6 +314,9 @@ body::before {
   .hero-btns-mobile {
     flex-direction: column;
     align-items: stretch;
+  }
+  .bento-grid-mobile {
+    grid-template-columns: 1fr !important;
   }
 }
 
