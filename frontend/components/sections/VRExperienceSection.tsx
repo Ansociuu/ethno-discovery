@@ -5,6 +5,11 @@ export function VRExperienceSection() {
   const [location, setLocation] = useState<"sapa" | "fansipan">("sapa");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  const mapsUrls = {
+    sapa: "https://www.google.com/maps/embed?pb=!4v1778805743777!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRHEzZkdtSkE.!2m2!1d21.84939676829333!2d104.1029369273855!3f265.4742670258581!4f4.91017821091279!5f0.7820865974627469",
+    fansipan: "https://www.google.com/maps/embed?pb=!4v1778805743777!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRHEzZkdtSkE.!2m2!1d21.84939676829333!2d104.1029369273855!3f265.4742670258581!4f4.91017821091279!5f0.7820865974627469" // Đang dùng tạm link Sapa, bạn thay bằng link Fansipan nhé
+  };
+
   return (
     <div className="fade-up" style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 40px" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 80, alignItems: "center" }}>
@@ -18,19 +23,21 @@ export function VRExperienceSection() {
             width="100%" 
             height="100%" 
             style={{ border: "none" }}
-            allow="fullscreen"
-            src={`/vr/viewer.html?location=${location}`}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={mapsUrls[location]}
           />
 
             {/* Top right VR Badge */}
             <div style={{
               position: "absolute", top: 20, right: 20, pointerEvents: "none",
-              background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,214,10,0.3)",
+              background: "rgba(0,0,0,0.4)", border: "1px solid rgba(66, 133, 244, 0.3)",
               padding: "8px 16px", borderRadius: 30, fontSize: 13, fontWeight: 600,
-              color: "rgba(255,214,10,0.9)", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(8px)",
+              color: "#4285F4", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(8px)",
             }}>
-              <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pink)" }} />
-              Có Thể Tương Tác
+              <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "#4285F4" }} />
+              Google Street View
             </div>
 
             {/* Bottom Controls Bar */}
