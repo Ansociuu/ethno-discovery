@@ -7,81 +7,81 @@ export async function GET(request: Request) {
 
   let config = {};
 
-  if (location === "sapa") {
+  if (location === "atacama") {
     config = {
       default: {
-        firstScene: "sapa",
+        firstScene: "atacama",
         sceneFadeDuration: 1000,
         autoLoad: true,
       },
       scenes: {
-        sapa: {
-          title: "Thung lũng Sapa - Ruộng Bậc Thang",
+        atacama: {
+          title: "Thung lũng Atacama (Chile) - Đài thiên văn ALMA",
           hfov: 110,
           pitch: 0,
           yaw: 0,
           hotSpotDebug: true,
           type: "equirectangular",
-          panorama: "/vr/sapa.png",
+          panorama: "https://pannellum.org/images/alma.jpg",
           autoLoad: true,
           hotSpots: [
             {
-              pitch: 5,
-              yaw: 160,
+              pitch: 2.1,
+              yaw: -17.5,
               type: "info",
-              text: "Bản Cát Cát - Làng nghề truyền thống"
+              text: "Đài thiên văn vô tuyến ALMA"
             },
             {
-              pitch: -5,
-              yaw: 210,
+              pitch: 3.5,
+              yaw: 161.4,
               type: "info",
-              text: "Ruộng bậc thang lúa chín vàng"
+              text: "Đỉnh núi Andes"
             },
             {
-              pitch: 15,
-              yaw: 100,
+              pitch: -7.5,
+              yaw: 15.6,
               type: "info",
-              text: "Homestay View Thung Lũng"
+              text: "Hoang mạc Atacama"
             }
           ]
         }
       }
     };
-  } else if (location === "fansipan") {
+  } else if (location === "cerrotoco") {
     config = {
       default: {
-        firstScene: "fansipan",
+        firstScene: "cerrotoco",
         sceneFadeDuration: 1000,
         autoLoad: true,
       },
       scenes: {
-        fansipan: {
-          title: "Đỉnh Fansipan - Nóc nhà Đông Dương",
+        cerrotoco: {
+          title: "Đỉnh Cerro Toco - 5,604m (Chile)",
           hfov: 110,
           pitch: 0,
           yaw: 0,
           hotSpotDebug: true,
           type: "equirectangular",
-          panorama: "/vr/fansipan.png",
+          panorama: "https://pannellum.org/images/cerro-toco-0.jpg",
           autoLoad: true,
           hotSpots: [
             {
-              pitch: 20,
-              yaw: 40,
+              pitch: 1.5,
+              yaw: -176.5,
               type: "info",
-              text: "Biển mây trên đỉnh Fansipan (3,143m)"
+              text: "Hành trình Trekking độ cao 5,000m"
             },
             {
-              pitch: -15,
-              yaw: 90,
+              pitch: -5.5,
+              yaw: 89.0,
               type: "info",
-              text: "Hệ thống cáp treo đạt kỷ lục thế giới"
+              text: "Tầm nhìn bao quát Sa mạc"
             },
             {
-              pitch: 0,
-              yaw: -30,
+              pitch: -18.0,
+              yaw: -5.0,
               type: "info",
-              text: "Chùa Trình - Không gian tâm linh"
+              text: "Địa hình núi đá núi lửa"
             }
           ]
         }
