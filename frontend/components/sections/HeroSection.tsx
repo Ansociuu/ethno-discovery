@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   Compass,
   Sparkles,
@@ -72,7 +72,7 @@ const SLIDES = [
   }
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -80,7 +80,7 @@ const containerVariants = {
   }
 };
 
-const getVariants = (type: string) => {
+const getVariants = (type: string): Record<string, Variants> => {
   // Lower stiffness = slower spring motion. Higher damping = less bounce
   switch (type) {
     case "left":
