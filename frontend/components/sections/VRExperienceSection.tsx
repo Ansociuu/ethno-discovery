@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 
 export function VRExperienceSection() {
-  const [location, setLocation] = useState<"atacama" | "cerrotoco">("atacama");
+  const [location, setLocation] = useState<"sapa" | "fansipan">("sapa");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   return (
@@ -40,25 +40,25 @@ export function VRExperienceSection() {
               border: "1px solid rgba(255,255,255,0.1)"
             }}>
               <button 
-                onClick={() => setLocation("atacama")}
+                onClick={() => setLocation("sapa")}
                 style={{
-                  background: location === "atacama" ? "var(--pink)" : "transparent",
-                  color: location === "atacama" ? "#fff" : "rgba(255,255,255,0.7)",
+                  background: location === "sapa" ? "var(--pink)" : "transparent",
+                  color: location === "sapa" ? "#fff" : "rgba(255,255,255,0.7)",
                   padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
                   display: "flex", alignItems: "center", gap: 8
                 }}>
-                <span>🏜️</span> Thung lũng Atacama
+                <span>🌾</span> Thung lũng Sapa
               </button>
 
               <button 
-                onClick={() => setLocation("cerrotoco")}
+                onClick={() => setLocation("fansipan")}
                 style={{
-                  background: location === "cerrotoco" ? "var(--pink)" : "transparent",
-                  color: location === "cerrotoco" ? "#fff" : "rgba(255,255,255,0.7)",
+                  background: location === "fansipan" ? "var(--pink)" : "transparent",
+                  color: location === "fansipan" ? "#fff" : "rgba(255,255,255,0.7)",
                   padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
                   display: "flex", alignItems: "center", gap: 8
                 }}>
-                <span>🏔️</span> Đỉnh Cerro Toco
+                <span>🏔️</span> Đỉnh Fansipan
               </button>
             </div>
         </div>

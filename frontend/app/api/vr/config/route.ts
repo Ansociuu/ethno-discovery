@@ -7,81 +7,59 @@ export async function GET(request: Request) {
 
   let config = {};
 
-  if (location === "atacama") {
+  if (location === "sapa") {
     config = {
       default: {
-        firstScene: "atacama",
+        firstScene: "sapa",
         sceneFadeDuration: 1000,
         autoLoad: true,
       },
       scenes: {
-        atacama: {
-          title: "Thung lũng Atacama (Chile) - Đài thiên văn ALMA",
+        sapa: {
+          title: "Thung lũng Sapa",
           hfov: 110,
           pitch: 0,
           yaw: 0,
           hotSpotDebug: true,
           type: "equirectangular",
-          panorama: "https://pannellum.org/images/alma.jpg",
+          panorama: "/vr/sapa.png",
           autoLoad: true,
           hotSpots: [
+            // Thay tọa độ ở đây sau khi bạn tải ảnh Sapa về và đo bằng F12
             {
-              pitch: 2.1,
-              yaw: -17.5,
+              pitch: 0,
+              yaw: 0,
               type: "info",
-              text: "Đài thiên văn vô tuyến ALMA"
-            },
-            {
-              pitch: 3.5,
-              yaw: 161.4,
-              type: "info",
-              text: "Đỉnh núi Andes"
-            },
-            {
-              pitch: -7.5,
-              yaw: 15.6,
-              type: "info",
-              text: "Hoang mạc Atacama"
+              text: "Điểm ví dụ (Cần thay đổi tọa độ)"
             }
           ]
         }
       }
     };
-  } else if (location === "cerrotoco") {
+  } else if (location === "fansipan") {
     config = {
       default: {
-        firstScene: "cerrotoco",
+        firstScene: "fansipan",
         sceneFadeDuration: 1000,
         autoLoad: true,
       },
       scenes: {
-        cerrotoco: {
-          title: "Đỉnh Cerro Toco - 5,604m (Chile)",
+        fansipan: {
+          title: "Đỉnh Fansipan - Nóc nhà Đông Dương",
           hfov: 110,
           pitch: 0,
           yaw: 0,
           hotSpotDebug: true,
           type: "equirectangular",
-          panorama: "https://pannellum.org/images/cerro-toco-0.jpg",
+          panorama: "/vr/fansipan.png",
           autoLoad: true,
           hotSpots: [
+            // Thay tọa độ ở đây sau khi bạn tải ảnh Fansipan về và đo bằng F12
             {
-              pitch: 1.5,
-              yaw: -176.5,
+              pitch: 0,
+              yaw: 0,
               type: "info",
-              text: "Hành trình Trekking độ cao 5,000m"
-            },
-            {
-              pitch: -5.5,
-              yaw: 89.0,
-              type: "info",
-              text: "Tầm nhìn bao quát Sa mạc"
-            },
-            {
-              pitch: -18.0,
-              yaw: -5.0,
-              type: "info",
-              text: "Địa hình núi đá núi lửa"
+              text: "Điểm ví dụ (Cần thay đổi tọa độ)"
             }
           ]
         }
