@@ -55,7 +55,21 @@ export function DestinationModal({ isOpen, onClose, onSave, isLoading, initialDa
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    
+    // Sanitize and parse data
+    const { tours, homestays, _count, createdAt, updatedAt, ...sanitizedData } = formData as any;
+    
+    let imagesParsed = [];
+    try {
+      imagesParsed = typeof sanitizedData.images === 'string' ? JSON.parse(sanitizedData.images) : sanitizedData.images;
+    } catch (e) {
+      imagesParsed = [];
+    }
+
+    onSave({
+      ...sanitizedData,
+      images: imagesParsed
+    });
   };
 
   const provinces = ["Hà Giang", "Lào Cai", "Sơn La", "Lai Châu", "Điện Biên", "Yên Bái"];

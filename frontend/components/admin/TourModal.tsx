@@ -73,12 +73,25 @@ export function TourModal({ isOpen, onClose, onSave, isLoading, initialData }: T
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Sanitize and parse data
+    const { destination, reviews, _count, createdAt, updatedAt, ...sanitizedData } = formData as any;
+    
+    const parseJson = (str: string) => {
+      try { return typeof str === 'string' ? JSON.parse(str) : str; }
+      catch (e) { return []; }
+    };
+
     onSave({
-      ...formData,
+      ...sanitizedData,
       destinationId: Number(formData.destinationId),
       pricePerPerson: Number(formData.pricePerPerson),
       durationDays: Number(formData.durationDays),
-      maxGroupSize: Number(formData.maxGroupSize)
+      maxGroupSize: Number(formData.maxGroupSize),
+      images: parseJson(formData.images),
+      includes: parseJson(formData.includes),
+      excludes: parseJson(formData.excludes),
+      itinerary: parseJson(formData.itinerary)
     });
   };
 

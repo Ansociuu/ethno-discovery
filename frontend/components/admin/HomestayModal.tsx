@@ -67,11 +67,22 @@ export function HomestayModal({ isOpen, onClose, onSave, isLoading, initialData 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Sanitize and parse data
+    const { destination, reviews, _count, createdAt, updatedAt, ...sanitizedData } = formData as any;
+    
+    const parseJson = (str: string) => {
+      try { return typeof str === 'string' ? JSON.parse(str) : str; }
+      catch (e) { return []; }
+    };
+
     onSave({
-      ...formData,
+      ...sanitizedData,
       destinationId: Number(formData.destinationId),
       pricePerNight: Number(formData.pricePerNight),
-      maxGuests: Number(formData.maxGuests)
+      maxGuests: Number(formData.maxGuests),
+      images: parseJson(formData.images),
+      amenities: parseJson(formData.amenities)
     });
   };
 
