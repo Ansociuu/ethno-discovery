@@ -203,7 +203,9 @@ export default function SearchPageContent() {
           {!isLoading && query.length >= 2 && (
             <div>
               <p style={{ color: "var(--text)", fontSize: 15, marginBottom: 28 }}>
-                {displayedResults.length > 0 ? `Tìm thấy ${displayedResults.length} kết quả cho "${query}"` : `Không tìm thấy kết quả cho "${query}"`}
+                {displayedResults.length > 0 
+                  ? `Hiển thị ${displayedResults.length} trong tổng số ${totalCount} kết quả cho "${query}"` 
+                  : `Không tìm thấy kết quả cho "${query}"`}
               </p>
 
               {displayedResults.length === 0 ? (

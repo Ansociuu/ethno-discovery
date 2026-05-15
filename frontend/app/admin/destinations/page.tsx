@@ -5,6 +5,8 @@ import { destinationsApi } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2, Trash2, Edit, Plus, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { DestinationModal } from "@/components/admin/DestinationModal";
 
 export default function AdminDestinationsPage() {
   const queryClient = useQueryClient();
@@ -12,6 +14,27 @@ export default function AdminDestinationsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-destinations"],
     queryFn: () => destinationsApi.getAll().then(r => r.data),
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingDest, setEditingDest] = useState<any>(null);
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => destinationsApi.create(data),
+    onSuccess: () => {
+      toast.success("Đã tạo điểm đến mới");
+      queryClient.invalidateQueries({ queryKey: ["admin-destinations"] });
+      setIsModalOpen(false);
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => destinationsApi.update(id, data),
+    onSuccess: () => {
+      toast.success("Đã cập nhật thông tin");
+      queryClient.invalidateQueries({ queryKey: ["admin-destinations"] });
+      setIsModalOpen(false);
+    }
   });
 
   const deleteMutation = useMutation({
@@ -25,6 +48,24 @@ export default function AdminDestinationsPage() {
     }
   });
 
+  const handleSave = (formData: any) => {
+    if (editingDest) {
+      updateMutation.mutate({ id: editingDest.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (dest: any) => {
+    setEditingDest(dest);
+    setIsModalOpen(true);
+  };
+
+  const handleAdd = () => {
+    setEditingDest(null);
+    setIsModalOpen(true);
+  };
+
   const destinations = data?.data || [];
 
   return (
@@ -33,7 +74,7 @@ export default function AdminDestinationsPage() {
         
         {/* Header Actions */}
         <div className="flex justify-end mb-8">
-          <button className="btn-primary flex items-center gap-2 text-sm px-6 py-3" onClick={() => toast.info("Tính năng thêm mới sẽ được phát triển trong bản cập nhật sau")}>
+          <button className="btn-primary flex items-center gap-2 text-sm px-6 py-3" onClick={handleAdd}>
             <Plus size={16} /> Thêm Điểm Đến Mới
           </button>
         </div>
@@ -90,9 +131,12 @@ export default function AdminDestinationsPage() {
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Link href={`/destinations/${d.slug}`} target="_blank" className="p-2 rounded-xl bg-white/5 hover:bg-amber/20 hover:text-amber text-white/50 transition-colors">
+                        <button 
+                          onClick={() => handleEdit(d)}
+                          className="p-2 rounded-xl bg-white/5 hover:bg-amber/20 hover:text-amber text-white/50 transition-colors"
+                        >
                           <Edit size={16} />
-                        </Link>
+                        </button>
                         <button 
                           onClick={() => {
                             if(confirm("Bạn có chắc muốn xóa điểm đến này? Cảnh báo: Việc này có thể ảnh hưởng đến các Tour/Homestay trực thuộc!")) deleteMutation.mutate(d.id);
@@ -111,6 +155,13 @@ export default function AdminDestinationsPage() {
           </table>
         </div>
       </div>
+      <DestinationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+        initialData={editingDest}
+      />
     </AdminLayout>
   );
 }

@@ -5,6 +5,8 @@ import { homestaysApi } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2, Trash2, Edit, Plus, Star } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { HomestayModal } from "@/components/admin/HomestayModal";
 
 export default function AdminHomestaysPage() {
   const queryClient = useQueryClient();
@@ -12,6 +14,27 @@ export default function AdminHomestaysPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-homestays"],
     queryFn: () => homestaysApi.getAll().then(r => r.data),
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingHs, setEditingHs] = useState<any>(null);
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => homestaysApi.create(data),
+    onSuccess: () => {
+      toast.success("Đã tạo homestay mới");
+      queryClient.invalidateQueries({ queryKey: ["admin-homestays"] });
+      setIsModalOpen(false);
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => homestaysApi.update(id, data),
+    onSuccess: () => {
+      toast.success("Đã cập nhật thông tin");
+      queryClient.invalidateQueries({ queryKey: ["admin-homestays"] });
+      setIsModalOpen(false);
+    }
   });
 
   const deleteMutation = useMutation({
@@ -25,6 +48,24 @@ export default function AdminHomestaysPage() {
     }
   });
 
+  const handleSave = (formData: any) => {
+    if (editingHs) {
+      updateMutation.mutate({ id: editingHs.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (hs: any) => {
+    setEditingHs(hs);
+    setIsModalOpen(true);
+  };
+
+  const handleAdd = () => {
+    setEditingHs(null);
+    setIsModalOpen(true);
+  };
+
   const homestays = data?.data || [];
 
   return (
@@ -33,7 +74,7 @@ export default function AdminHomestaysPage() {
         
         {/* Header Actions */}
         <div className="flex justify-end mb-8">
-          <button className="btn-primary flex items-center gap-2 text-sm px-6 py-3" onClick={() => toast.info("Tính năng thêm mới sẽ được phát triển trong bản cập nhật sau")}>
+          <button className="btn-primary flex items-center gap-2 text-sm px-6 py-3" onClick={handleAdd}>
             <Plus size={16} /> Thêm Homestay Mới
           </button>
         </div>
@@ -95,9 +136,12 @@ export default function AdminHomestaysPage() {
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Link href={`/homestays/${h.id}`} target="_blank" className="p-2 rounded-xl bg-white/5 hover:bg-amber/20 hover:text-amber text-white/50 transition-colors">
+                        <button 
+                          onClick={() => handleEdit(h)}
+                          className="p-2 rounded-xl bg-white/5 hover:bg-amber/20 hover:text-amber text-white/50 transition-colors"
+                        >
                           <Edit size={16} />
-                        </Link>
+                        </button>
                         <button 
                           onClick={() => {
                             if(confirm("Bạn có chắc muốn xóa homestay này?")) deleteMutation.mutate(h.id);
@@ -116,6 +160,13 @@ export default function AdminHomestaysPage() {
           </table>
         </div>
       </div>
+      <HomestayModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+        initialData={editingHs}
+      />
     </AdminLayout>
   );
 }

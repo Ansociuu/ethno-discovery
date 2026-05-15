@@ -6,6 +6,7 @@ import { toursApi } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2, Trash2, Edit, Plus } from "lucide-react";
 import Link from "next/link";
+import { TourModal } from "@/components/admin/TourModal";
 
 export default function AdminToursPage() {
   const queryClient = useQueryClient();
@@ -13,6 +14,27 @@ export default function AdminToursPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-tours"],
     queryFn: () => toursApi.getAll().then(r => r.data),
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTour, setEditingTour] = useState<any>(null);
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => toursApi.create(data),
+    onSuccess: () => {
+      toast.success("Đã tạo tour mới");
+      queryClient.invalidateQueries({ queryKey: ["admin-tours"] });
+      setIsModalOpen(false);
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => toursApi.update(id, data),
+    onSuccess: () => {
+      toast.success("Đã cập nhật thông tin");
+      queryClient.invalidateQueries({ queryKey: ["admin-tours"] });
+      setIsModalOpen(false);
+    }
   });
 
   const deleteMutation = useMutation({
@@ -26,6 +48,24 @@ export default function AdminToursPage() {
     }
   });
 
+  const handleSave = (formData: any) => {
+    if (editingTour) {
+      updateMutation.mutate({ id: editingTour.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (tour: any) => {
+    setEditingTour(tour);
+    setIsModalOpen(true);
+  };
+
+  const handleAdd = () => {
+    setEditingTour(null);
+    setIsModalOpen(true);
+  };
+
   const tours = data?.data || [];
 
   return (
@@ -34,7 +74,7 @@ export default function AdminToursPage() {
         
         {/* Header Actions */}
         <div className="flex justify-end mb-8">
-          <button className="btn-primary flex items-center gap-2 text-sm px-6 py-3" onClick={() => toast.info("Tính năng thêm mới sẽ được phát triển trong bản cập nhật sau")}>
+          <button className="btn-primary flex items-center gap-2 text-sm px-6 py-3" onClick={handleAdd}>
             <Plus size={16} /> Thêm Tour Mới
           </button>
         </div>
@@ -93,9 +133,12 @@ export default function AdminToursPage() {
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Link href={`/tours/${t.id}`} target="_blank" className="p-2 rounded-xl bg-white/5 hover:bg-amber/20 hover:text-amber text-white/50 transition-colors">
+                        <button 
+                          onClick={() => handleEdit(t)}
+                          className="p-2 rounded-xl bg-white/5 hover:bg-amber/20 hover:text-amber text-white/50 transition-colors"
+                        >
                           <Edit size={16} />
-                        </Link>
+                        </button>
                         <button 
                           onClick={() => {
                             if(confirm("Bạn có chắc muốn xóa tour này?")) deleteMutation.mutate(t.id);
@@ -114,6 +157,13 @@ export default function AdminToursPage() {
           </table>
         </div>
       </div>
+      <TourModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+        initialData={editingTour}
+      />
     </AdminLayout>
   );
 }
