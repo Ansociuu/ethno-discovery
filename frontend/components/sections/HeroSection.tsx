@@ -393,11 +393,13 @@ export function HeroSection() {
           className="opacity-60 flex flex-col items-center gap-3 pointer-events-none"
         >
           <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/80">Cuộn xuống</span>
-          <motion.div
-            animate={{ height: ["15px", "30px", "15px"] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-px bg-gradient-to-b from-pink to-transparent"
-          />
+          <div className="h-[30px] flex items-start justify-center">
+            <motion.div
+              animate={{ height: ["15px", "30px", "15px"] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-px bg-gradient-to-b from-pink to-transparent"
+            />
+          </div>
         </motion.div>
       </div>
     </section>

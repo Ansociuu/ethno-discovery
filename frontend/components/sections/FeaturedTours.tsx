@@ -90,7 +90,7 @@ function TourCard({ tour }: { tour: Tour }) {
   return (
     <motion.div variants={cardVariants} className="h-full">
       <Link href={`/tours/${tour.id}`} className="block h-full group outline-none">
-        <div className="card h-full flex flex-col transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_24px_60px_rgba(0,0,0,0.5)] group-focus-visible:ring-2 ring-pink">
+        <div className="card h-full flex flex-col group-focus-visible:ring-2 ring-pink">
           
           {/* Image */}
           <div className="relative h-[220px] overflow-hidden rounded-t-[20px]">

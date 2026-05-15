@@ -97,7 +97,7 @@ export function FeaturedHomestays() {
           {homestays.map((hs, i) => (
             <motion.div key={hs.id} variants={cardVariants} className="h-full">
               <Link href={`/homestays/${hs.id}`} className="block h-full group outline-none">
-                <div className="bg-white/5 border border-white/10 rounded-[20px] overflow-hidden transition-all duration-300 group-hover:-translate-y-2 group-hover:border-pink/40 group-hover:shadow-[0_24px_60px_rgba(255,60,172,0.15)] group-focus-visible:ring-2 ring-pink h-full flex flex-col">
+                <div className="bg-white/5 border border-white/10 rounded-[20px] overflow-hidden transition-all duration-300 group-hover:scale-[1.02] group-hover:border-pink/40 group-hover:shadow-[0_24px_60px_rgba(255,60,172,0.15)] group-focus-visible:ring-2 ring-pink h-full flex flex-col">
                   
                   {/* Image area */}
                   <div className="h-[220px] relative overflow-hidden">

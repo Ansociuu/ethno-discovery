@@ -100,27 +100,34 @@ export function CustomerCareWidget() {
   return (
     <>
       {/* Floating Action Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="btn-primary floating-offset"
+      <div
+        className="floating-offset"
         style={{
           position: "fixed",
           bottom: "30px",
           right: "30px",
-          width: "60px",
-          height: "60px",
-          borderRadius: "30px",
-          padding: 0,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          boxShadow: "0 10px 25px rgba(255, 214, 10, 0.4)",
           zIndex: 9999,
+          borderRadius: "30px",
           animation: !isOpen ? "pulse 2s infinite" : "none",
         }}
       >
-        {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
-      </button>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="btn-primary"
+          style={{
+            width: "60px",
+            height: "60px",
+            borderRadius: "30px",
+            padding: 0,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            boxShadow: "0 10px 25px rgba(255, 214, 10, 0.4)",
+          }}
+        >
+          {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+        </button>
+      </div>
 
       {/* Widget Panel */}
       {isOpen && (

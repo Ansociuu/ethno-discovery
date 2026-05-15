@@ -129,7 +129,7 @@ export function FeaturedDestinations() {
               <motion.div
                 key={dest.id}
                 variants={cardVariants}
-                whileHover={{ y: -8, scale: 1.02 }}
+                whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className={`relative rounded-3xl overflow-hidden cursor-pointer shadow-lg shadow-black/30 group ${isLarge ? "md:col-span-2 md:row-span-2" : "col-span-1"} ${isTall ? "md:row-span-2" : ""}`}
               >

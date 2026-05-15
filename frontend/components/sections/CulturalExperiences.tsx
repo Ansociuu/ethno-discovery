@@ -4,10 +4,10 @@ import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 
 const EXPERIENCES = [
-  { icon: "🏪", name: "Chợ Phiên Vùng Cao", desc: "Phiên chợ bản sắc H'Mông & Dao mỗi cuối tuần, nơi giao lưu văn hoá độc đáo", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))" },
-  { icon: "🎨", name: "Lễ Cấp Sắc Người Dao", desc: "Trải nghiệm nghi lễ trưởng thành linh thiêng và huyền bí của người Dao Đỏ", tag: "Nghi lễ", gradient: "linear-gradient(160deg, var(--dark), var(--amber))" },
-  { icon: "🧵", name: "Thêu Thừa Dao Đỏ", desc: "Học nghệ thuật thêu hoa văn tinh xảo trên trang phục truyền thống của người Dao", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))" },
-  { icon: "🎵", name: "Tiếng Khèn H'Mông", desc: "Nghe tiếng khèn gọi bạn tình dưới trăng bên bếp lửa — linh hồn của núi rừng", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))" },
+  { icon: "🏪", name: "Chợ Phiên Vùng Cao", desc: "Phiên chợ bản sắc H'Mông & Dao mỗi cuối tuần, nơi giao lưu văn hoá độc đáo", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))", image: "/images/cultural-market.png" },
+  { icon: "🎨", name: "Lễ Cấp Sắc Người Dao", desc: "Trải nghiệm nghi lễ trưởng thành linh thiêng và huyền bí của người Dao Đỏ", tag: "Nghi lễ", gradient: "linear-gradient(160deg, var(--dark), var(--amber))", image: "/images/cultural-ceremony.png" },
+  { icon: "🧵", name: "Thêu Thừa Dao Đỏ", desc: "Học nghệ thuật thêu hoa văn tinh xảo trên trang phục truyền thống của người Dao", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))", image: "/images/cultural-embroidery.png" },
+  { icon: "🎵", name: "Tiếng Khèn H'Mông", desc: "Nghe tiếng khèn gọi bạn tình dưới trăng bên bếp lửa — linh hồn của núi rừng", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))", image: "/images/cultural-hmong.png" },
 ];
 
 const containerVariants: Variants = {
@@ -87,23 +87,35 @@ export function CulturalExperiences() {
               <motion.div
                 key={exp.name}
                 variants={cardVariants}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="relative rounded-3xl overflow-hidden min-h-[250px] cursor-pointer shadow-lg shadow-black/20 group"
+                whileHover={{ y: -4 }}
+                className="relative rounded-3xl overflow-hidden min-h-[250px] cursor-pointer shadow-lg shadow-black/20 group hover:shadow-xl hover:shadow-pink/10 transition-shadow duration-300"
                 style={{ background: exp.gradient }}
               >
+                {/* Image Background */}
+                {exp.image && (
+                  <div className="absolute inset-0 z-0">
+                    <Image
+                      src={exp.image}
+                      alt={exp.name}
+                      fill
+                      className="object-cover mix-blend-overlay opacity-40 group-hover:opacity-60 group-hover:scale-110 transition-all duration-700"
+                    />
+                  </div>
+                )}
+
                 {/* Overlay highlight */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-t from-midnight/90 via-midnight/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
                 
                 {/* Moving gradient noise for luxury feel */}
-                <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:4px_4px] opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
+                <div className="absolute inset-0 z-0 bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:4px_4px] opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
 
                 {/* Icon */}
-                <div className="absolute top-5 left-5 w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl border border-white/10 group-hover:scale-110 transition-transform">
+                <div className="absolute top-5 left-5 z-10 w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl border border-white/10 group-hover:scale-110 transition-transform">
                   {exp.icon}
                 </div>
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
                   <h3 className="font-serif text-[19px] font-bold mb-2 text-white group-hover:text-amber transition-colors">
                     {exp.name}
                   </h3>

@@ -26,6 +26,9 @@ export const metadata: Metadata = {
     description: "Nền tảng du lịch văn hoá cao cấp Vùng Cao Việt Nam",
     type: "website",
   },
+  verification: {
+    google: "NWztNWjEM7U4CMl4I1R0GMqsYd__5jRS4VuRBap5gAA",
+  },
 };
 
 import { CustomerCareWidget } from "@/components/ui/CustomerCareWidget";
