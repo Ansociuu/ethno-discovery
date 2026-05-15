@@ -4,7 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata = {
   title: "Tìm Kiếm | EthnoDiscovery",
-  description: "Tìm kiếm tours, homestay và điểm đến vùng cao Tây Bắc Việt Nam",
+  description: "Tìm kiếm tours, homestay và điểm đến vùng cao Việt Nam",
 };
 
 export default function SearchPage() {

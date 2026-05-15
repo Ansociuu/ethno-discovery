@@ -122,7 +122,7 @@ function DestinationsContent() {
                     {/* Thumbnail */}
                     <div className="relative h-64 overflow-hidden">
                       <img 
-                        src={dest.coverImage || '/placeholder.jpg'} 
+                        src={dest.coverImage || '/images/ha-giang-mountains.png'} 
                         alt={dest.nameVi} 
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />

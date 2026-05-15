@@ -61,7 +61,7 @@ const SLIDES = [
     animation: "left"
   },
   {
-    image: "/images/hero-bg-3.png",
+    image: "/images/hmong-village.png",
     badge: "Bản tình ca vùng cao · Đồi chè xanh mướt",
     titleLine1Part1: "Thức Giấc ",
     titleLine1Part2: "Giữa Đồi",
@@ -264,7 +264,7 @@ export function HeroSection() {
             </motion.div>
 
             {/* Heading */}
-            <motion.h1 variants={slideVariants.heading} className="font-serif text-[clamp(40px,8vw,80px)] font-black leading-[1.1] mb-6 tracking-tight">
+            <motion.h1 variants={slideVariants.heading} className="font-serif text-[clamp(32px,7vw,80px)] font-black leading-[1.1] mb-4 md:mb-6 tracking-tight">
               {currentSlide.titleLine1Part1}<span className="text-gradient-pink">{currentSlide.titleLine1Part2}</span><br />
               {currentSlide.titleLine2Part1}<span className="text-gradient-amber">{currentSlide.titleLine2Part2}</span>
             </motion.h1>
@@ -295,7 +295,7 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, type: "spring", stiffness: 100 }}
           onSubmit={handleSearch}
-          className="glass mx-auto max-w-[860px] p-2 rounded-[24px] flex flex-col md:flex-row items-stretch gap-2 shadow-2xl shadow-black/40 border border-white/20 bg-white/5 backdrop-blur-2xl relative overflow-visible z-50"
+          className="glass mx-auto max-w-[860px] p-2 rounded-[24px] flex flex-col md:flex-row items-stretch gap-2 shadow-2xl shadow-black/40 border border-white/20 bg-white/5 backdrop-blur-2xl relative overflow-visible z-50 mb-24 md:mb-16"
         >
           {/* Subtle moving gradient highlight behind search bar */}
           <motion.div

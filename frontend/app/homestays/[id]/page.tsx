@@ -30,6 +30,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { homestaysApi, bookingsApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { StickyBookingBar } from "@/components/ui/StickyBookingBar";
 
 export default function HomestayDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -113,15 +114,15 @@ export default function HomestayDetailPage() {
             alt={hs.name} 
             className="w-full h-full object-cover animate-fade-up duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/40 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-midnight via-midnight/60 to-transparent z-10" />
           
-          <div className="absolute bottom-16 left-0 right-0 max-w-7xl mx-auto px-6 animate-fade-up">
-            <div className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest mb-6">
+          <div className="absolute bottom-12 left-0 right-0 max-w-7xl mx-auto px-6 z-20 animate-fade-up">
+            <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-white/60 uppercase tracking-widest mb-6 bg-black/20 backdrop-blur-md w-fit px-3 py-1.5 rounded-full border border-white/10">
               <Link href="/" className="text-inherit no-underline hover:text-white transition-colors">Trang chủ</Link>
-              <ChevronRight size={14} />
+              <ChevronRight size={12} />
               <Link href="/homestays" className="text-inherit no-underline hover:text-white transition-colors">Homestays</Link>
-              <ChevronRight size={14} />
-              <span className="text-white">{hs.name}</span>
+              <ChevronRight size={12} />
+              <span className="text-white truncate max-w-[150px] md:max-w-none">{hs.name}</span>
             </div>
 
             {hs.featured && (
@@ -130,7 +131,7 @@ export default function HomestayDetailPage() {
               </div>
             )}
 
-            <h1 className="font-serif text-[clamp(32px,5vw,60px)] font-black text-white leading-[1.1] mb-8 max-w-4xl">
+            <h1 className="font-serif text-[clamp(28px,5vw,60px)] font-black text-white leading-[1.1] mb-8 max-w-4xl text-shadow-lg">
               {hs.name}
             </h1>
 
@@ -154,7 +155,7 @@ export default function HomestayDetailPage() {
         </div>
 
         {/* Content Section */}
-        <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="max-w-7xl mx-auto px-6 pt-24 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column */}
           <div className="lg:col-span-8 space-y-16">
             <div>
@@ -307,6 +308,15 @@ export default function HomestayDetailPage() {
           </div>
         </div>
       </main>
+
+      <StickyBookingBar 
+        price={price} 
+        label={isAuthenticated ? "Đặt Phòng Ngay" : "Đăng Nhập Để Đặt"} 
+        onBook={() => bookMutation.mutate()} 
+        isLoading={bookMutation.isPending}
+        unit="/ đêm"
+      />
+      
       <Footer />
     </>
   );
