@@ -7,7 +7,7 @@ export function VRExperienceSection() {
 
   const mapsUrls = {
     sapa: "https://www.google.com/maps/embed?pb=!4v1778805743777!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRHEzZkdtSkE.!2m2!1d21.84939676829333!2d104.1029369273855!3f265.4742670258581!4f4.91017821091279!5f0.7820865974627469",
-    fansipan: "https://www.google.com/maps/embed?pb=!4v1778805743777!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRHEzZkdtSkE.!2m2!1d21.84939676829333!2d104.1029369273855!3f265.4742670258581!4f4.91017821091279!5f0.7820865974627469" // Đang dùng tạm link Sapa, bạn thay bằng link Fansipan nhé
+    fansipan: "https://www.google.com/maps/embed?pb=!4v1778806154492!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRENyNEQ3Ymc.!2m2!1d22.30463441906802!2d103.7772983226993!3f106.2586155908621!4f-5.154682589122899!5f0.4000000000000002"
   };
 
   return (
@@ -16,12 +16,12 @@ export function VRExperienceSection() {
 
         {/* Left: VR Visual */}
         <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", aspectRatio: "4/3", background: "#0a1a2a" }}>
-          
-          <iframe 
+
+          <iframe
             key={location} // Force iframe reload when location changes
             ref={iframeRef}
-            width="100%" 
-            height="100%" 
+            width="100%"
+            height="100%"
             style={{ border: "none" }}
             allowFullScreen
             loading="lazy"
@@ -29,45 +29,45 @@ export function VRExperienceSection() {
             src={mapsUrls[location]}
           />
 
-            {/* Top right VR Badge */}
-            <div style={{
-              position: "absolute", top: 20, right: 20, pointerEvents: "none",
-              background: "rgba(0,0,0,0.4)", border: "1px solid rgba(66, 133, 244, 0.3)",
-              padding: "8px 16px", borderRadius: 30, fontSize: 13, fontWeight: 600,
-              color: "#4285F4", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(8px)",
-            }}>
-              <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "#4285F4" }} />
-              Google Street View
-            </div>
+          {/* Top right VR Badge */}
+          <div style={{
+            position: "absolute", top: 20, right: 20, pointerEvents: "none",
+            background: "rgba(0,0,0,0.4)", border: "1px solid rgba(66, 133, 244, 0.3)",
+            padding: "8px 16px", borderRadius: 30, fontSize: 13, fontWeight: 600,
+            color: "#4285F4", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(8px)",
+          }}>
+            <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "#4285F4" }} />
+            Google Street View
+          </div>
 
-            {/* Bottom Controls Bar */}
-            <div style={{
-              position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
-              display: "flex", gap: 12, zIndex: 10, background: "rgba(0,0,0,0.5)", padding: "8px", borderRadius: 100, backdropFilter: "blur(12px)",
-              border: "1px solid rgba(255,255,255,0.1)"
-            }}>
-              <button 
-                onClick={() => setLocation("sapa")}
-                style={{
-                  background: location === "sapa" ? "var(--pink)" : "transparent",
-                  color: location === "sapa" ? "#fff" : "rgba(255,255,255,0.7)",
-                  padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
-                  display: "flex", alignItems: "center", gap: 8
-                }}>
-                <span>🌾</span> Thung lũng Sapa
-              </button>
+          {/* Bottom Controls Bar */}
+          <div style={{
+            position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
+            display: "flex", gap: 12, zIndex: 10, background: "rgba(0,0,0,0.5)", padding: "8px", borderRadius: 100, backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.1)"
+          }}>
+            <button
+              onClick={() => setLocation("sapa")}
+              style={{
+                background: location === "sapa" ? "var(--pink)" : "transparent",
+                color: location === "sapa" ? "#fff" : "rgba(255,255,255,0.7)",
+                padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
+                display: "flex", alignItems: "center", gap: 8
+              }}>
+              <span>🌾</span> Võng Lúa (Móng Ngựa)
+            </button>
 
-              <button 
-                onClick={() => setLocation("fansipan")}
-                style={{
-                  background: location === "fansipan" ? "var(--pink)" : "transparent",
-                  color: location === "fansipan" ? "#fff" : "rgba(255,255,255,0.7)",
-                  padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
-                  display: "flex", alignItems: "center", gap: 8
-                }}>
-                <span>🏔️</span> Đỉnh Fansipan
-              </button>
-            </div>
+            <button
+              onClick={() => setLocation("fansipan")}
+              style={{
+                background: location === "fansipan" ? "var(--pink)" : "transparent",
+                color: location === "fansipan" ? "#fff" : "rgba(255,255,255,0.7)",
+                padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
+                display: "flex", alignItems: "center", gap: 8
+              }}>
+              <span>🏔️</span> Đỉnh Fansipan
+            </button>
+          </div>
         </div>
 
         {/* Right: Content */}
@@ -80,21 +80,32 @@ export function VRExperienceSection() {
             Trải nghiệm tour 360° sống động — dạo quanh ruộng bậc thang, ghé thăm bản làng H&apos;Mông, tất cả ngay trên thiết bị của bạn.
           </p>
 
-          {/* Feature list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 36 }}>
-            {[
-              { icon: "🥽", text: "VR headset compatible (Meta Quest, Apple Vision Pro)" },
-              { icon: "📱", text: "Mobile AR — point & explore bản làng" },
-              { icon: "🎧", text: "Audio guide đa ngôn ngữ kèm theo" },
-              { icon: "🗺️", text: "GPS map realtime trong chuyến đi" },
-            ].map(feat => (
-              <div key={feat.icon} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "rgba(255,255,255,0.65)" }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(255,214,10,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                  {feat.icon}
-                </div>
-                {feat.text}
+          {/* Tính năng (đã cập nhật để sát với thực tế) */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 36 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                🌐
               </div>
-            ))}
+              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Toàn cảnh 360° chân thực từ Google Street View</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                👆
+              </div>
+              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Tương tác trực quan — vuốt & xoay để khám phá</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                📱
+              </div>
+              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Trải nghiệm mượt mà trên Mobile & Desktop</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                📍
+              </div>
+              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Tích hợp bản đồ & tọa độ GPS chính xác</span>
+            </div>
           </div>
 
           {/* VR Button */}
