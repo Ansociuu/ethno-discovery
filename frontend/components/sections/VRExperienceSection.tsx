@@ -12,10 +12,7 @@ export function VRExperienceSection() {
     }
   }, []);
 
-  const images = {
-    sapa: "/vr/sapa.png",
-    fansipan: "/vr/fansipan.png"
-  };
+  const configUrl = baseUrl ? `${baseUrl}/api/vr/config?location=${location}` : '';
 
   return (
     <div className="fade-up" style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 40px" }}>
@@ -26,62 +23,57 @@ export function VRExperienceSection() {
           
           {baseUrl ? (
             <iframe 
+              key={location} // Force iframe reload when location changes
               ref={iframeRef}
               width="100%" 
               height="100%" 
               style={{ border: "none" }}
               allow="fullscreen"
-              src={`https://cdn.pannellum.org/2.5/pannellum.htm#panorama=${encodeURIComponent(baseUrl + images[location])}&autoLoad=true&pitch=10&yaw=180&hfov=110`}
+              src={`https://cdn.pannellum.org/2.5/pannellum.htm#config=${encodeURIComponent(configUrl)}`}
             />
           ) : (
             <div className="w-full h-full bg-white/5 animate-pulse flex items-center justify-center text-white/40">Đang khởi tạo VR 360...</div>
           )}
 
-            {/* VR Badge center */}
+            {/* Top right VR Badge */}
             <div style={{
-              position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", pointerEvents: "none",
-              background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,214,10,0.2)",
-              padding: "10px 20px", borderRadius: 30, fontSize: 14, fontWeight: 600,
-              color: "rgba(255,214,10,0.7)", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(4px)",
-              opacity: 0.8
+              position: "absolute", top: 20, right: 20, pointerEvents: "none",
+              background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,214,10,0.3)",
+              padding: "8px 16px", borderRadius: 30, fontSize: 13, fontWeight: 600,
+              color: "rgba(255,214,10,0.9)", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(8px)",
             }}>
-              <div className="animate-pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--pink)" }} />
-              Kéo để xoay 360°
+              <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pink)" }} />
+              Có Thể Tương Tác
             </div>
 
-            {/* Location label 1: bottom-left */}
-            <button 
-              onClick={() => setLocation("fansipan")}
-              style={{
-                position: "absolute", bottom: 24, left: 24,
-                background: location === "fansipan" ? "rgba(255,60,172,0.2)" : "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
-                border: `1px solid ${location === "fansipan" ? "rgba(255,60,172,0.5)" : "rgba(255,255,255,0.1)"}`, padding: "10px 16px",
-                borderRadius: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", transition: "all 0.3s",
-                zIndex: 10
-              }}>
-              <span>🏔️</span>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: location === "fansipan" ? "var(--pink)" : "#fff" }}>Fansipan Peak</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>3,143m · Lào Cai</div>
-              </div>
-            </button>
+            {/* Bottom Controls Bar */}
+            <div style={{
+              position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
+              display: "flex", gap: 12, zIndex: 10, background: "rgba(0,0,0,0.5)", padding: "8px", borderRadius: 100, backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.1)"
+            }}>
+              <button 
+                onClick={() => setLocation("sapa")}
+                style={{
+                  background: location === "sapa" ? "var(--pink)" : "transparent",
+                  color: location === "sapa" ? "#fff" : "rgba(255,255,255,0.7)",
+                  padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
+                  display: "flex", alignItems: "center", gap: 8
+                }}>
+                <span>🌾</span> Thung lũng Sapa
+              </button>
 
-            {/* Location label 2: top-right */}
-            <button 
-              onClick={() => setLocation("sapa")}
-              style={{
-                position: "absolute", top: 24, right: 24,
-                background: location === "sapa" ? "rgba(255,214,10,0.2)" : "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
-                border: `1px solid ${location === "sapa" ? "rgba(255,214,10,0.5)" : "rgba(255,255,255,0.1)"}`, padding: "10px 16px",
-                borderRadius: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", transition: "all 0.3s",
-                zIndex: 10
-              }}>
-              <span>🌾</span>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: location === "sapa" ? "var(--amber)" : "#fff" }}>Mù Cang Chải</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>Harvest Season</div>
-              </div>
-            </button>
+              <button 
+                onClick={() => setLocation("fansipan")}
+                style={{
+                  background: location === "fansipan" ? "var(--pink)" : "transparent",
+                  color: location === "fansipan" ? "#fff" : "rgba(255,255,255,0.7)",
+                  padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
+                  display: "flex", alignItems: "center", gap: 8
+                }}>
+                <span>🏔️</span> Đỉnh Fansipan
+              </button>
+            </div>
         </div>
 
         {/* Right: Content */}
