@@ -10,6 +10,9 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/layout/Navbar";
 import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { Modal } from "@/components/ui/Modal";
+import { PrivacyContent } from "@/components/ui/PrivacyContent";
+import { TermsContent } from "@/components/ui/TermsContent";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
@@ -28,6 +31,10 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [regToken, setRegToken] = useState("");
   const [countdown, setCountdown] = useState(0);
+  
+  // Modal states
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -177,7 +184,23 @@ export default function RegisterPage() {
                   <div className="flex items-start gap-3 mt-2">
                     <input type="checkbox" required className="mt-1 accent-pink cursor-pointer" />
                     <p className="text-xs text-white/50 leading-relaxed">
-                      Tôi đồng ý với <Link href="/terms" className="text-pink hover:underline">Điều khoản dịch vụ</Link> và <Link href="/privacy" className="text-pink hover:underline">Chính sách bảo mật</Link> của EthnoDiscovery.
+                      Tôi đồng ý với {" "}
+                      <button 
+                        type="button" 
+                        onClick={() => setIsTermsOpen(true)}
+                        className="text-pink hover:underline bg-transparent border-none p-0 inline font-medium cursor-pointer"
+                      >
+                        Điều khoản dịch vụ
+                      </button> 
+                      {" "} và {" "}
+                      <button 
+                        type="button" 
+                        onClick={() => setIsPrivacyOpen(true)}
+                        className="text-pink hover:underline bg-transparent border-none p-0 inline font-medium cursor-pointer"
+                      >
+                        Chính sách bảo mật
+                      </button> 
+                      {" "} của EthnoDiscovery.
                     </p>
                   </div>
 
@@ -269,6 +292,23 @@ export default function RegisterPage() {
           </div>
         </div>
       </main>
+
+      {/* Modals */}
+      <Modal 
+        isOpen={isPrivacyOpen} 
+        onClose={() => setIsPrivacyOpen(false)} 
+        title="Chính Sách Bảo Mật"
+      >
+        <PrivacyContent />
+      </Modal>
+
+      <Modal 
+        isOpen={isTermsOpen} 
+        onClose={() => setIsTermsOpen(false)} 
+        title="Điều Khoản Dịch Vụ"
+      >
+        <TermsContent />
+      </Modal>
     </>
   );
 }

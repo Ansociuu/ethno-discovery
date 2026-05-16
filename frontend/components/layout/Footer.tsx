@@ -45,7 +45,7 @@ export function Footer() {
           {[
             { title: "Khám Phá", links: [["Điểm Đến", "/destinations"], ["Tours", "/tours"], ["Homestay", "/homestays"], ["AI Planner", "/ai-planner"]] },
             { title: "Tài Khoản", links: [["Đăng nhập", "/login"], ["Đăng ký", "/register"], ["Dashboard", "/dashboard"], ["Booking của tôi", "/dashboard/bookings"]] },
-            { title: "Hỗ Trợ", links: [["Liên hệ", "/contact"], ["FAQ", "/faq"], ["Hoàn tiền", "/refund"], ["Điều khoản", "/terms"]] },
+            { title: "Hỗ Trợ", links: [["Liên hệ", "/contact"], ["FAQ", "/faq"], ["Hoàn tiền", "/refund"], ["Điều khoản", "/terms"], ["Chính sách bảo mật", "/privacy"]] },
           ].map((col) => (
             <div key={col.title}>
               <h4 style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--pink)", marginBottom: 20 }}>
