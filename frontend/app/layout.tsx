@@ -5,7 +5,7 @@ import { Providers } from "@/components/providers";
 import { Toaster } from "sonner";
 
 const dmSans = DM_Sans({
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-dm-sans",
   weight: ["300", "400", "500", "600", "700"],
 });
