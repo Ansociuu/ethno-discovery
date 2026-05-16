@@ -11,120 +11,120 @@ export function VRExperienceSection() {
   };
 
   return (
-    <div className="fade-up" style={{ background: "var(--midnight)", margin: 0, maxWidth: "100%", padding: "100px 40px" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 80, alignItems: "center" }}>
+    <section className="bg-midnight section-py px-container overflow-hidden">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20 items-center">
+        
+        {/* Mobile Header (Visible only on mobile/tablet) */}
+        <div className="lg:hidden flex flex-col items-center text-center mb-2">
+          <span className="section-tag mb-3">VR / AR Experience</span>
+          <h2 className="h2-fluid mb-4">
+            Khám phá trước khi <em className="text-amber not-italic italic">đặt chân đến</em>
+          </h2>
+        </div>
 
         {/* Left: VR Visual */}
-        <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", aspectRatio: "4/3", background: "#0a1a2a" }}>
+        <div className="lg:col-span-7 flex flex-col gap-5">
+          <div className="relative rounded-[32px] overflow-hidden aspect-[4/3] bg-black/40 shadow-2xl border border-white/5 group">
+            <iframe
+              key={location}
+              ref={iframeRef}
+              width="100%"
+              height="100%"
+              className="border-none"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src={mapsUrls[location]}
+            />
 
-          <iframe
-            key={location} // Force iframe reload when location changes
-            ref={iframeRef}
-            width="100%"
-            height="100%"
-            style={{ border: "none" }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            src={mapsUrls[location]}
-          />
+            {/* Top right VR Badge */}
+            <div className="absolute top-4 right-4 pointer-events-none bg-black/40 border border-blue-500/30 px-3 py-1.5 rounded-full text-[10px] md:text-xs font-bold color-[#4285F4] flex items-center gap-2 z-10 backdrop-blur-md">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              Google Street View
+            </div>
 
-          {/* Top right VR Badge */}
-          <div style={{
-            position: "absolute", top: 20, right: 20, pointerEvents: "none",
-            background: "rgba(0,0,0,0.4)", border: "1px solid rgba(66, 133, 244, 0.3)",
-            padding: "8px 16px", borderRadius: 30, fontSize: 13, fontWeight: 600,
-            color: "#4285F4", display: "flex", alignItems: "center", gap: 8, zIndex: 1, backdropFilter: "blur(8px)",
-          }}>
-            <div className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "#4285F4" }} />
-            Google Street View
+            {/* Desktop Controls (Overlay) */}
+            <div className="hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 gap-3 z-30 bg-black/60 p-1.5 rounded-full backdrop-blur-xl border border-white/20 shadow-2xl">
+              <VRButtons location={location} setLocation={setLocation} />
+            </div>
           </div>
 
-          {/* Bottom Controls Bar */}
-          <div style={{
-            position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
-            display: "flex", gap: 12, zIndex: 10, background: "rgba(0,0,0,0.5)", padding: "8px", borderRadius: 100, backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255,255,255,0.1)"
-          }}>
-            <button
-              onClick={() => setLocation("sapa")}
-              style={{
-                background: location === "sapa" ? "var(--pink)" : "transparent",
-                color: location === "sapa" ? "#fff" : "rgba(255,255,255,0.7)",
-                padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
-                display: "flex", alignItems: "center", gap: 8
-              }}>
-              <span>🌾</span> Võng Lúa (Móng Ngựa)
-            </button>
-
-            <button
-              onClick={() => setLocation("fansipan")}
-              style={{
-                background: location === "fansipan" ? "var(--pink)" : "transparent",
-                color: location === "fansipan" ? "#fff" : "rgba(255,255,255,0.7)",
-                padding: "10px 20px", borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.3s",
-                display: "flex", alignItems: "center", gap: 8
-              }}>
-              <span>🏔️</span> Đỉnh Fansipan
-            </button>
+          {/* Mobile Controls (Below Iframe) */}
+          <div className="lg:hidden flex justify-center bg-white/5 p-1.5 rounded-3xl border border-white/10">
+            <VRButtons location={location} setLocation={setLocation} isMobile />
           </div>
         </div>
 
         {/* Right: Content */}
-        <div>
-          <span className="section-tag">VR / AR Experience</span>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(28px, 3.5vw, 48px)", fontWeight: 700, lineHeight: 1.1, margin: "12px 0 16px" }}>
-            Khám phá trước khi <em style={{ color: "var(--amber)", fontStyle: "italic" }}>đặt chân đến</em>
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 16, lineHeight: 1.7, marginBottom: 28 }}>
+        <div className="lg:col-span-5 flex flex-col items-start">
+          {/* Desktop Header (Hidden on mobile) */}
+          <div className="hidden lg:block">
+            <span className="section-tag mb-4">VR / AR Experience</span>
+            <h2 className="h2-fluid mb-6">
+              Khám phá trước khi <em className="text-amber not-italic italic">đặt chân đến</em>
+            </h2>
+          </div>
+
+          <p className="p-fluid text-white/50 mb-8 lg:mb-10 text-center lg:text-left">
             Trải nghiệm tour 360° sống động — dạo quanh ruộng bậc thang, ghé thăm bản làng H&apos;Mông, tất cả ngay trên thiết bị của bạn.
           </p>
 
-          {/* Tính năng (đã cập nhật để sát với thực tế) */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 36 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                🌐
+          {/* Features */}
+          <div className="space-y-3 md:space-y-4 mb-8 lg:mb-10 w-full max-w-sm mx-auto lg:mx-0">
+            {[
+              { icon: "🌐", text: "Toàn cảnh 360° chân thực từ Google Street View" },
+              { icon: "👆", text: "Tương tác trực quan — vuốt & xoay để khám phá" },
+              { icon: "📱", text: "Trải nghiệm mượt mà trên Mobile & Desktop" },
+              { icon: "📍", text: "Tích hợp bản đồ & tọa độ GPS chính xác" }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg md:text-xl shrink-0">
+                  {item.icon}
+                </div>
+                <span className="text-[13px] md:text-sm lg:text-base text-white/80 font-light">{item.text}</span>
               </div>
-              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Toàn cảnh 360° chân thực từ Google Street View</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                👆
-              </div>
-              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Tương tác trực quan — vuốt & xoay để khám phá</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                📱
-              </div>
-              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Trải nghiệm mượt mà trên Mobile & Desktop</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                📍
-              </div>
-              <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>Tích hợp bản đồ & tọa độ GPS chính xác</span>
-            </div>
+            ))}
           </div>
 
           {/* VR Button */}
-          <button style={{
-            background: "transparent", border: "1px solid var(--pink)", color: "var(--pink)",
-            padding: "14px 32px", borderRadius: 40, fontSize: 15, fontWeight: 600,
-            cursor: "pointer", transition: "all 0.3s", display: "inline-flex", alignItems: "center", gap: 8,
-          }}
-            onClick={() => {
-              if (iframeRef.current && iframeRef.current.requestFullscreen) {
-                iframeRef.current.requestFullscreen();
-              }
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--pink)"; (e.currentTarget as HTMLElement).style.color = "#fff"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--pink)"; (e.currentTarget as HTMLElement).style.transform = ""; }}>
-            🥽 Try VR Tour Free
-          </button>
+          <div className="w-full flex justify-center lg:justify-start">
+            <button 
+              className="btn-primary py-3.5 px-10 text-sm flex items-center gap-2 shadow-xl shadow-pink/20"
+              onClick={() => {
+                if (iframeRef.current && iframeRef.current.requestFullscreen) {
+                  iframeRef.current.requestFullscreen();
+                }
+              }}
+            >
+              <span className="text-lg">🥽</span> Try VR Tour Free
+            </button>
+          </div>
         </div>
       </div>
+    </section>
+  );
+}
+
+function VRButtons({ location, setLocation, isMobile = false }: { location: string; setLocation: any; isMobile?: boolean }) {
+  return (
+    <div className={`grid grid-cols-2 gap-2 ${isMobile ? "w-full" : "w-[380px]"}`}>
+      <button
+        onClick={() => setLocation("sapa")}
+        className={`flex items-center justify-center gap-2 px-4 py-2.5 md:py-3 rounded-full text-[11px] md:text-sm font-bold transition-all cursor-pointer ${
+          location === "sapa" ? "bg-pink text-white shadow-lg shadow-pink/30" : "text-white/70 hover:bg-white/20 bg-white/5"
+        }`}
+      >
+        <span className="text-sm md:text-base">🌾</span> Võng Lúa
+      </button>
+
+      <button
+        onClick={() => setLocation("fansipan")}
+        className={`flex items-center justify-center gap-2 px-4 py-2.5 md:py-3 rounded-full text-[11px] md:text-sm font-bold transition-all cursor-pointer ${
+          location === "fansipan" ? "bg-pink text-white shadow-lg shadow-pink/30" : "text-white/70 hover:bg-white/20 bg-white/5"
+        }`}
+      >
+        <span className="text-sm md:text-base">🏔️</span> Đỉnh Fansipan
+      </button>
     </div>
   );
 }

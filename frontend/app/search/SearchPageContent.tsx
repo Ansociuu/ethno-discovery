@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Search, MapPin, X } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { searchApi } from "@/lib/api";
 
 type Tab = "all" | "destinations" | "tours" | "homestays";
@@ -264,7 +263,6 @@ export default function SearchPageContent() {
         </div>
       </main>
       <Footer />
-      <MobileTabBar />
     </>
   );
 }

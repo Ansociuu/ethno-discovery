@@ -40,7 +40,7 @@ export function FeaturedTours() {
   const tours = data?.slice(0, 4) || [];
 
   return (
-    <section className="py-[100px] px-6 md:px-10 max-w-[1280px] mx-auto overflow-hidden">
+    <section className="section-py px-container max-w-[1280px] mx-auto overflow-hidden">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -49,10 +49,10 @@ export function FeaturedTours() {
       >
         <div>
           <span className="section-tag mb-4">🗺 Tours Văn Hoá</span>
-          <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] mb-3">
+          <h2 className="h2-fluid mb-3">
             Hành Trình <span className="text-gradient-amber">Đáng Nhớ</span>
           </h2>
-          <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
+          <p className="p-fluid text-text font-light max-w-[500px]">
             Những tour được thiết kế tỉ mỉ, kết hợp thiên nhiên hùng vĩ và văn hoá bản địa chân thực.
           </p>
         </div>

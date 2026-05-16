@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { FeaturedDestinations } from "@/components/sections/FeaturedDestinations";
 import { CulturalExperiences } from "@/components/sections/CulturalExperiences";
@@ -29,7 +28,6 @@ export default function HomePage() {
         <ReviewsSection />
       </main>
       <Footer />
-      <MobileTabBar />
     </>
   );
 }

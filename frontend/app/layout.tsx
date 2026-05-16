@@ -5,7 +5,7 @@ import { Providers } from "@/components/providers";
 import { Toaster } from "sonner";
 
 const dmSans = DM_Sans({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-dm-sans",
   weight: ["300", "400", "500", "600", "700"],
 });
@@ -33,6 +33,7 @@ export const metadata: Metadata = {
 
 import { CustomerCareWidget } from "@/components/ui/CustomerCareWidget";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
+import { MobileTabBar } from "@/components/layout/MobileTabBar";
 
 export default function RootLayout({
   children,
@@ -46,6 +47,7 @@ export default function RootLayout({
           {children}
           <CustomerCareWidget />
           <ScrollToTop />
+          <MobileTabBar />
           <Toaster position="top-center" theme="dark" richColors toastOptions={{ style: { background: "var(--midnight)", border: "1px solid var(--glass-border)", color: "#fff" } }} />
         </Providers>
       </body>

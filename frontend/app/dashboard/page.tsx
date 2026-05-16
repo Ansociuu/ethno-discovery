@@ -11,18 +11,25 @@ import {
   Clock, 
   CheckCircle,
   Package,
-  Compass
+  Compass,
+  LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { authApi, bookingsApi, wishlistApi, aiApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { AuthGuard } from "@/components/auth-guard";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
 
   const { data: userData } = useQuery({
     queryKey: ["me"],
@@ -61,9 +68,15 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="flex gap-4">
-              <Link href="/profile" className="btn-ghost py-2 px-6 text-sm no-underline">
+              <Link href="/profile" className="btn-ghost py-2 px-6 text-sm no-underline whitespace-nowrap">
                 <Settings size={16} /> Cài đặt
               </Link>
+              <button 
+                onClick={handleLogout}
+                className="bg-white/5 hover:bg-red-500/10 text-red-400 border border-white/10 hover:border-red-500/30 py-2 px-6 rounded-xl text-sm font-bold flex items-center gap-2 transition-all"
+              >
+                <LogOut size={16} /> Đăng xuất
+              </button>
             </div>
           </section>
 
@@ -172,7 +185,6 @@ export default function DashboardPage() {
         </div>
       </main>
       <Footer />
-      <MobileTabBar />
     </AuthGuard>
   );
 }

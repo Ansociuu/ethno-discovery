@@ -158,6 +158,8 @@ export function HeroSection() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [type, setType] = useState("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSugg, setShowSugg] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -183,7 +185,7 @@ export function HeroSection() {
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!query && type === "all") return;
-    router.push(`/search?q=${encodeURIComponent(query)}&type=${type}`);
+    router.push(`/search?q=${encodeURIComponent(query)}&type=${type}&start=${startDate}&end=${endDate}`);
   };
 
   const selectSuggestion = (s: string) => {
@@ -198,7 +200,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden max-w-full p-0 m-0 pt-20 pb-16">
       {/* Background Image Slideshow & Overlay */}
-      <div className="absolute inset-0 z-0 bg-dark">
+      <div className="absolute inset-0 z-0 bg-dark overflow-hidden">
         <AnimatePresence mode="popLayout">
           <motion.div
             key={currentSlideIndex}
@@ -264,12 +266,12 @@ export function HeroSection() {
             </motion.div>
 
             {/* Heading */}
-            <motion.h1 variants={slideVariants.heading} className="font-serif text-[clamp(32px,7vw,80px)] font-black leading-[1.1] mb-4 md:mb-6 tracking-tight">
+            <motion.h1 variants={slideVariants.heading} className="h2-fluid text-[clamp(2rem,8vw,5rem)] mb-4 md:mb-6 tracking-tight px-2">
               {currentSlide.titleLine1Part1}<span className="text-gradient-pink">{currentSlide.titleLine1Part2}</span><br />
               {currentSlide.titleLine2Part1}<span className="text-gradient-amber">{currentSlide.titleLine2Part2}</span>
             </motion.h1>
 
-            <motion.p variants={slideVariants.desc} className="text-lg md:text-xl text-white/80 font-light leading-relaxed mb-10 max-w-2xl mx-auto text-shadow-sm min-h-[80px]">
+            <motion.p variants={slideVariants.desc} className="p-fluid text-white/80 font-light mb-10 max-w-2xl mx-auto text-shadow-sm min-h-[60px] px-4">
               <TypewriterText text={currentSlide.description} />
             </motion.p>
           </motion.div>
@@ -297,17 +299,19 @@ export function HeroSection() {
           onSubmit={handleSearch}
           className="glass mx-auto max-w-[860px] p-2 rounded-[24px] flex flex-col md:flex-row items-stretch gap-2 shadow-2xl shadow-black/40 border border-white/20 bg-white/5 backdrop-blur-2xl relative overflow-visible z-50 mb-24 md:mb-16"
         >
-          {/* Subtle moving gradient highlight behind search bar */}
-          <motion.div
-            animate={{ x: ["-100%", "200%"] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-1/2 -skew-x-12 z-0 pointer-events-none rounded-[24px]"
-          />
+          {/* Subtle moving gradient highlight behind search bar - Wrapped in overflow-hidden to prevent page scroll */}
+          <div className="absolute inset-0 z-0 pointer-events-none rounded-[24px] overflow-hidden">
+            <motion.div
+              animate={{ x: ["-100%", "200%"] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-1/2 -skew-x-12"
+            />
+          </div>
 
-          <div className="relative z-10 flex-[2] flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
+          <div className="relative z-10 flex-[2] flex items-center gap-3 md:gap-4 px-3 md:px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
             <MapPin size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
-            <div className="text-left w-full relative">
-              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Điểm đến / Tên Tour</span>
+            <div className="text-left w-full relative min-w-0">
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Điểm đến</span>
               <input
                 value={query}
                 onChange={e => { setQuery(e.target.value); setShowSugg(true); }}
@@ -324,7 +328,7 @@ export function HeroSection() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-[calc(100%+16px)] left-[-40px] right-0 bg-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden z-[100]"
+                    className="absolute top-[calc(100%+16px)] left-0 md:left-[-40px] right-0 bg-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden z-[100]"
                   >
                     {suggestions.map((s, i) => (
                       <div 
@@ -342,9 +346,9 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="relative z-10 flex-1 flex items-center gap-4 px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
+          <div className="relative z-10 flex-1 flex items-center gap-3 md:gap-4 px-3 md:px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
             <Compass size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
-            <div className="text-left w-full">
+            <div className="text-left w-full min-w-0">
               <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Loại hình</span>
               <select 
                 value={type}
@@ -359,17 +363,43 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="relative z-10 flex-1 flex items-center gap-4 px-4 py-3 group">
+          <div className="relative z-10 flex-1 flex items-center gap-3 md:gap-4 px-3 md:px-4 py-3 border-b md:border-b-0 md:border-r border-white/10 group">
             <Calendar size={18} className="text-pink shrink-0 group-focus-within:animate-bounce" />
-            <div className="text-left w-full">
-              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">Ngày đi</span>
+            <div className="text-left w-full min-w-0">
+              <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1">
+                {type === "homestays" ? "Ngày đến" : "Ngày đi"}
+              </span>
               <input
                 type="date"
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
                 className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/40 focus:placeholder:text-white/20 transition-colors cursor-pointer"
                 style={{ colorScheme: "dark" }}
               />
             </div>
           </div>
+
+          <AnimatePresence>
+            {type === "homestays" && (
+              <motion.div 
+                initial={{ opacity: 0, width: 0, x: -20 }}
+                animate={{ opacity: 1, width: "auto", x: 0 }}
+                exit={{ opacity: 0, width: 0, x: -20 }}
+                className="relative z-10 flex-1 flex items-center gap-3 md:gap-4 px-3 md:px-4 py-3 group overflow-hidden"
+              >
+                <div className="text-left w-full min-w-0">
+                  <span className="block text-[10px] font-bold text-pink uppercase tracking-widest mb-1 whitespace-nowrap">Ngày về</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={e => setEndDate(e.target.value)}
+                    className="bg-transparent border-none outline-none text-white text-sm w-full font-medium placeholder:text-white/40 focus:placeholder:text-white/20 transition-colors cursor-pointer"
+                    style={{ colorScheme: "dark" }}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <motion.button
             whileHover={{ scale: 1.02 }}

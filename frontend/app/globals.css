@@ -12,6 +12,10 @@
 
   --font-dm: var(--font-dm-sans), 'DM Sans', sans-serif;
   --font-serif: var(--font-playfair), 'Playfair Display', serif;
+
+  /* Fluid Spacing Utilities */
+  --spacing-container: clamp(1rem, 5vw, 2.5rem);
+  --spacing-section: clamp(4rem, 10vw, 8rem);
 }
 
 /* ─── Design Tokens (CSS Variables) ─────────────────────── */
@@ -33,7 +37,10 @@
 /* ─── Base Reset ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { 
+  scroll-behavior: smooth; 
+  overflow-x: hidden;
+}
 
 body {
   background:
@@ -44,8 +51,34 @@ body {
   color: var(--white);
   font-family: var(--font-dm);
   overflow-x: hidden;
+  width: 100%;
   min-height: 100vh;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Responsive Utilities ───────────────────────────────── */
+.px-container {
+  padding-left: var(--spacing-container);
+  padding-right: var(--spacing-container);
+}
+
+.section-py {
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+}
+
+.h2-fluid {
+  font-family: var(--font-serif);
+  font-size: clamp(1.875rem, 5vw, 3.25rem);
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.p-fluid {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.6;
 }
 
 /* Grain overlay */

@@ -3,14 +3,13 @@ import prisma from '../lib/prisma';
 
 // GET /api/search
 export const search = async (req: Request, res: Response) => {
-  const { q, type, province, priceMin, priceMax, duration, page = '1', limit = '12' } = req.query;
+  const { q, type, province, priceMin, priceMax, duration, start, end, page = '1', limit = '12' } = req.query;
 
   if (!q) {
     return res.json({ success: true, data: { tours: [], homestays: [], destinations: [] } });
   }
 
   const query = q as string;
-
   const results: any = {};
 
   if (!type || type === 'tour') {
@@ -38,9 +37,46 @@ export const search = async (req: Request, res: Response) => {
   }
 
   if (!type || type === 'homestay') {
+    // Availability Filter (Airbnb style)
+    // Find homestays that do NOT have any overlapping bookings in the selected range
+    let dateFilter = {};
+    if (start && end) {
+      const startDate = new Date(start as string);
+      const endDate = new Date(end as string);
+
+      dateFilter = {
+        bookings: {
+          none: {
+            status: { not: 'CANCELLED' },
+            OR: [
+              {
+                AND: [
+                  { checkIn: { lte: startDate } },
+                  { checkOut: { gt: startDate } },
+                ],
+              },
+              {
+                AND: [
+                  { checkIn: { lt: endDate } },
+                  { checkOut: { gte: endDate } },
+                ],
+              },
+              {
+                AND: [
+                  { checkIn: { gte: startDate } },
+                  { checkOut: { lte: endDate } },
+                ],
+              },
+            ],
+          },
+        },
+      };
+    }
+
     results.homestays = await prisma.homestay.findMany({
       where: {
         active: true,
+        ...dateFilter,
         OR: [
           { name: { contains: query } },
           { description: { contains: query } },

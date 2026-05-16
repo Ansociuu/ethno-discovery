@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Calendar, MapPin, CreditCard, Clock, CheckCircle, XCircle, ChevronRight, Plus } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { bookingsApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { useEffect } from "react";
@@ -167,7 +166,6 @@ export default function BookingsPage() {
         </div>
       </main>
       <Footer />
-      <MobileTabBar />
     </>
   );
 }

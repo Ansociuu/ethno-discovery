@@ -59,7 +59,7 @@ export function FeaturedHomestays() {
   const homestays = data?.slice(0, 3) || [];
 
   return (
-    <section className="py-[100px] px-6 md:px-10 max-w-[1280px] mx-auto overflow-hidden">
+    <section className="section-py px-container max-w-[1280px] mx-auto overflow-hidden">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -69,10 +69,10 @@ export function FeaturedHomestays() {
       >
         <div>
           <span className="section-tag mb-4">Stay with Locals</span>
-          <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] mb-3">
+          <h2 className="h2-fluid mb-3">
             Homestay <em className="text-amber not-italic relative inline-block">sang trọng<span className="absolute -bottom-2 left-0 w-full h-1 bg-amber/30 rounded-full blur-[2px]"></span></em>
           </h2>
-          <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
+          <p className="p-fluid text-text font-light max-w-[500px]">
             Ngủ trong lòng bản làng — thức dậy giữa sương mây.
           </p>
         </div>
@@ -157,13 +157,9 @@ export function FeaturedHomestays() {
                         </span>
                         <span className="text-[13px] text-white/40 font-medium ml-1">/đêm</span>
                       </div>
-                      <motion.button 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="bg-transparent border border-pink/40 text-pink px-4 py-2 rounded-full text-[13px] font-bold group-hover:bg-pink group-hover:text-white transition-colors"
-                      >
+                      <div className="border border-pink/40 text-pink px-4 py-2 rounded-full text-[13px] font-bold group-hover:bg-pink group-hover:text-white transition-colors">
                         Book Now
-                      </motion.button>
+                      </div>
                     </div>
                   </div>
                 </div>

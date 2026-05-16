@@ -70,7 +70,7 @@ export function FeaturedDestinations() {
   const destinations = data || [];
 
   return (
-    <section className="py-[100px] px-6 md:px-10 max-w-[1280px] mx-auto overflow-hidden">
+    <section className="section-py px-container max-w-[1280px] mx-auto overflow-hidden">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -89,10 +89,10 @@ export function FeaturedDestinations() {
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-14 gap-6"
       >
         <div>
-          <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] mb-3">
+          <h2 className="h2-fluid mb-3">
             Vùng cao <em className="text-pink not-italic relative inline-block">huyền ảo<span className="absolute -bottom-2 left-0 w-full h-1 bg-pink/30 rounded-full blur-[2px]"></span></em>
           </h2>
-          <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
+          <p className="p-fluid text-text font-light max-w-[500px]">
             Từng bản làng là một câu chuyện chờ bạn khám phá.
           </p>
         </div>
@@ -131,7 +131,7 @@ export function FeaturedDestinations() {
                 variants={cardVariants}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className={`relative rounded-3xl overflow-hidden cursor-pointer shadow-lg shadow-black/30 group ${isLarge ? "md:col-span-2 md:row-span-2" : "col-span-1"} ${isTall ? "md:row-span-2" : ""}`}
+                className={`relative rounded-3xl overflow-hidden cursor-pointer shadow-lg shadow-black/30 group ${isLarge ? "sm:col-span-2 sm:row-span-2" : "col-span-1"} ${isTall ? "sm:row-span-2" : ""}`}
               >
                 <Link href={`/destinations/${dest.slug}`} className="absolute inset-0 z-20" aria-label={dest.nameVi} />
                 

@@ -26,6 +26,16 @@ export function CustomerCareWidget() {
     }
   }, [messages, isTyping]);
 
+  // Handle body scroll and visibility of other elements
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("chat-open");
+    } else {
+      document.body.classList.remove("chat-open");
+    }
+    return () => document.body.classList.remove("chat-open");
+  }, [isOpen]);
+
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
 
@@ -101,168 +111,171 @@ export function CustomerCareWidget() {
     <>
       {/* Floating Action Button */}
       <div
-        className="floating-offset"
-        style={{
-          position: "fixed",
-          bottom: "30px",
-          right: "30px",
-          zIndex: 9999,
-          borderRadius: "30px",
-          animation: !isOpen ? "pulse 2s infinite" : "none",
-        }}
+        className={`fixed z-[999] transition-all duration-300 ${
+          isOpen ? "opacity-0 invisible scale-90" : "opacity-100 visible scale-100"
+        } bottom-[100px] right-5 md:bottom-8 md:right-8`}
+        style={{ animation: !isOpen ? "pulse 2s infinite" : "none" }}
       >
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="btn-primary"
-          style={{
-            width: "60px",
-            height: "60px",
-            borderRadius: "30px",
-            padding: 0,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            boxShadow: "0 10px 25px rgba(255, 214, 10, 0.4)",
-          }}
+          onClick={() => setIsOpen(true)}
+          className="w-[60px] h-[60px] rounded-[30px] flex items-center justify-center transition-all active:scale-95 bg-gradient-to-tr from-[#FF3CAC] to-[#EE1D52] text-white shadow-[0_10px_25px_rgba(255,60,172,0.4)] hover:scale-105"
         >
-          {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+          <MessageCircle size={28} />
         </button>
       </div>
 
       {/* Widget Panel */}
-      {isOpen && (
-        <div
-          className="glass floating-panel-offset"
-          style={{
-            position: "fixed",
-            bottom: "100px",
-            right: "30px",
-            width: "350px",
-            height: "500px",
-            borderRadius: "24px",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            zIndex: 9998,
-            boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
-            border: "1px solid var(--amber)",
-          }}
-        >
-          {/* Header */}
-          <div style={{ background: "rgba(255, 214, 10, 0.15)", padding: "20px", borderBottom: "1px solid var(--glass-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fff", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
-                EthnoDiscovery Care <div style={{ width: 8, height: 8, background: "#10B981", borderRadius: 4 }}></div>
-              </h3>
-              <p style={{ fontSize: 13, color: "var(--amber)", margin: "4px 0 0 0" }}>Luôn sẵn sàng hỗ trợ bạn</p>
-            </div>
+      <div
+        className={`fixed z-[9998] transition-all duration-500 ease-in-out bg-midnight/95 backdrop-blur-2xl border-amber/30 border shadow-2xl overflow-hidden flex flex-col
+          ${isOpen 
+            ? "opacity-100 translate-y-0 visible" 
+            : "opacity-0 translate-y-10 invisible pointer-events-none"}
+          /* Mobile: Bottom Sheet Style */
+          bottom-0 left-0 right-0 h-[80vh] rounded-t-[32px] md:rounded-[24px]
+          /* Desktop: Floating Panel Style */
+          md:bottom-24 md:right-8 md:left-auto md:w-[380px] md:h-[600px] md:max-h-[70vh]
+        `}
+      >
+        {/* Header */}
+        <div className="bg-amber/10 p-5 md:p-6 border-b border-white/10 flex justify-between items-center shrink-0">
+          <div>
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              EthnoDiscovery Care <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            </h3>
+            <p className="text-xs text-amber mt-1 opacity-80">Luôn sẵn sàng hỗ trợ bạn</p>
           </div>
+          <button 
+            onClick={() => setIsOpen(false)}
+            className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-          {/* Tabs */}
-          <div style={{ display: "flex", borderBottom: "1px solid var(--glass-border)" }}>
-            <button 
-              onClick={() => setActiveTab("chat")}
-              style={{ flex: 1, padding: "12px", background: "transparent", border: "none", color: activeTab === "chat" ? "var(--amber)" : "#888", fontWeight: activeTab === "chat" ? 600 : 400, borderBottom: activeTab === "chat" ? "2px solid var(--amber)" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s" }}
-            >
-              Chat AI
-            </button>
-            <button 
-              onClick={() => setActiveTab("contact")}
-              style={{ flex: 1, padding: "12px", background: "transparent", border: "none", color: activeTab === "contact" ? "var(--amber)" : "#888", fontWeight: activeTab === "contact" ? 600 : 400, borderBottom: activeTab === "contact" ? "2px solid var(--amber)" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s" }}
-            >
-              Liên hệ
-            </button>
-          </div>
+        {/* Tabs */}
+        <div className="flex border-b border-white/5 shrink-0 bg-white/5">
+          <button 
+            onClick={() => setActiveTab("chat")}
+            className={`flex-1 py-4 text-sm font-medium transition-all border-b-2 ${
+              activeTab === "chat" ? "text-amber border-amber bg-amber/5" : "text-white/40 border-transparent"
+            }`}
+          >
+            Chat AI
+          </button>
+          <button 
+            onClick={() => setActiveTab("contact")}
+            className={`flex-1 py-4 text-sm font-medium transition-all border-b-2 ${
+              activeTab === "contact" ? "text-amber border-amber bg-amber/5" : "text-white/40 border-transparent"
+            }`}
+          >
+            Liên hệ
+          </button>
+        </div>
 
-          {/* Tab Content */}
-          <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", position: "relative" }}>
-            
-            {/* Chat View */}
-            {activeTab === "chat" && (
-              <>
-                <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
-                  {messages.map((msg, idx) => (
-                    <div key={idx} style={{ display: "flex", gap: 12, flexDirection: msg.role === "user" ? "row-reverse" : "row" }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 16, background: msg.role === "user" ? "rgba(255,255,255,0.1)" : "rgba(255, 214, 10, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        {msg.role === "user" ? <User size={16} color="#fff" /> : <Bot size={16} color="var(--amber)" />}
-                      </div>
-                      <div style={{ background: msg.role === "user" ? "var(--amber)" : "rgba(255,255,255,0.05)", color: msg.role === "user" ? "#000" : "#fff", padding: "12px 16px", borderRadius: "16px", borderTopRightRadius: msg.role === "user" ? 4 : 16, borderTopLeftRadius: msg.role === "assistant" ? 4 : 16, fontSize: 14, lineHeight: 1.6, maxWidth: "80%", wordWrap: "break-word" }}>
-                        {msg.content}
-                      </div>
+        {/* Tab Content */}
+        <div className="flex-1 overflow-hidden flex flex-col relative pb-safe">
+          
+          {/* Chat View */}
+          {activeTab === "chat" && (
+            <>
+              <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5 scrollbar-hide">
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
+                      msg.role === "user" ? "bg-white/10" : "bg-amber/20"
+                    }`}>
+                      {msg.role === "user" ? <User size={16} className="text-white" /> : <Bot size={16} className="text-amber" />}
                     </div>
-                  ))}
-                  {isTyping && (
-                    <div style={{ display: "flex", gap: 12 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 16, background: "rgba(255, 214, 10, 0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Bot size={16} color="var(--amber)" />
-                      </div>
-                      <div style={{ background: "rgba(255,255,255,0.05)", padding: "12px 16px", borderRadius: "16px", borderTopLeftRadius: 4, display: "flex", alignItems: "center" }}>
-                        <Loader2 size={16} className="animate-spin" color="var(--amber)" />
-                      </div>
+                    <div className={`p-4 rounded-2xl max-w-[85%] text-sm leading-relaxed shadow-sm ${
+                      msg.role === "user" 
+                        ? "bg-amber text-black rounded-tr-none font-medium" 
+                        : "bg-white/5 text-white border border-white/5 rounded-tl-none"
+                    }`}>
+                      {msg.content}
                     </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-                <div style={{ padding: "16px", borderTop: "1px solid var(--glass-border)", background: "rgba(10, 10, 15, 0.9)", display: "flex", gap: 10 }}>
+                  </div>
+                ))}
+                {isTyping && (
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-amber/20 flex items-center justify-center">
+                      <Bot size={16} className="text-amber" />
+                    </div>
+                    <div className="bg-white/5 px-4 py-3 rounded-2xl rounded-tl-none flex items-center border border-white/5">
+                      <Loader2 size={16} className="animate-spin text-amber" />
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} className="h-4" />
+              </div>
+
+              {/* Input Area */}
+              <div className="p-4 md:p-5 border-t border-white/10 bg-midnight/50 backdrop-blur-md">
+                <div className="flex gap-3 items-center bg-white/5 p-1.5 rounded-full border border-white/10 focus-within:border-amber/50 transition-colors">
                   <input 
                     type="text" 
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    placeholder="Nhập tin nhắn..."
-                    style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: "#fff", borderRadius: 20, padding: "10px 16px", outline: "none", fontSize: 14 }}
+                    placeholder="Bạn cần hỗ trợ gì?"
+                    className="flex-1 bg-transparent border-none text-white px-4 py-2 outline-none text-sm placeholder:text-white/20"
                   />
-                  <button onClick={handleSend} disabled={!input.trim() || isTyping} className="btn-primary" style={{ width: 42, height: 42, borderRadius: 21, padding: 0, display: "flex", justifyContent: "center", alignItems: "center", opacity: !input.trim() || isTyping ? 0.5 : 1 }}>
+                  <button 
+                    onClick={handleSend} 
+                    disabled={!input.trim() || isTyping} 
+                    className="btn-primary w-10 h-10 rounded-full p-0 flex items-center justify-center shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
                     <Send size={16} />
                   </button>
                 </div>
-              </>
-            )}
-
-            {/* Contact View */}
-            {activeTab === "contact" && (
-              <div style={{ padding: "30px 20px", display: "flex", flexDirection: "column", gap: 20, height: "100%" }}>
-                <p style={{ color: "#aaa", fontSize: 14, textAlign: "center", marginBottom: 10 }}>
-                  Đội ngũ của chúng tôi luôn sẵn sàng hỗ trợ bạn từ 8:00 đến 22:00 hàng ngày.
-                </p>
-
-                {/* Zalo Button */}
-                <Link href="https://zalo.me/0364603462" target="_blank" style={{ display: "flex", alignItems: "center", gap: 16, background: "rgba(255,255,255,0.05)", padding: "20px", borderRadius: 16, textDecoration: "none", border: "1px solid var(--glass-border)", transition: "all 0.3s" }}>
-                  <div style={{ width: 48, height: 48, background: "#0068FF", borderRadius: 24, display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    <MessageCircle size={24} color="#fff" />
-                  </div>
-                  <div>
-                    <h4 style={{ color: "#fff", margin: "0 0 4px 0", fontSize: 16 }}>Chat qua Zalo</h4>
-                    <p style={{ color: "var(--amber)", margin: 0, fontSize: 14, fontWeight: 600 }}>0364 603 462</p>
-                  </div>
-                </Link>
-
-                {/* Hotline Button */}
-                <Link href="tel:0364603462" style={{ display: "flex", alignItems: "center", gap: 16, background: "rgba(255,255,255,0.05)", padding: "20px", borderRadius: 16, textDecoration: "none", border: "1px solid var(--glass-border)", transition: "all 0.3s" }}>
-                  <div style={{ width: 48, height: 48, background: "rgba(255, 214, 10, 0.2)", borderRadius: 24, display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    <Phone size={24} color="var(--amber)" />
-                  </div>
-                  <div>
-                    <h4 style={{ color: "#fff", margin: "0 0 4px 0", fontSize: 16 }}>Gọi Hotline</h4>
-                    <p style={{ color: "var(--amber)", margin: 0, fontSize: 14, fontWeight: 600 }}>0364 603 462</p>
-                  </div>
-                </Link>
-                
-                <div style={{ marginTop: "auto", textAlign: "center", fontSize: 12, color: "#666" }}>
-                  Cam kết phản hồi trong vòng 5 phút.
-                </div>
               </div>
-            )}
-          </div>
+            </>
+          )}
+
+          {/* Contact View */}
+          {activeTab === "contact" && (
+            <div className="p-8 flex flex-col gap-5 h-full overflow-y-auto">
+              <p className="text-white/50 text-sm text-center mb-4 leading-relaxed">
+                Đội ngũ của chúng tôi luôn sẵn sàng hỗ trợ bạn từ 8:00 đến 22:00 hàng ngày.
+              </p>
+
+              {/* Zalo Button */}
+              <Link href="https://zalo.me/0364603462" target="_blank" className="flex items-center gap-4 bg-white/5 p-5 rounded-3xl border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <MessageCircle size={24} className="text-white" />
+                </div>
+                <div>
+                  <h4 className="text-white font-bold text-base">Chat qua Zalo</h4>
+                  <p className="text-amber text-sm font-semibold mt-0.5">0364 603 462</p>
+                </div>
+              </Link>
+
+              {/* Hotline Button */}
+              <Link href="tel:0364603462" className="flex items-center gap-4 bg-white/5 p-5 rounded-3xl border border-white/5 hover:border-amber/50 hover:bg-amber/5 transition-all group">
+                <div className="w-12 h-12 bg-amber/20 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Phone size={24} className="text-amber" />
+                </div>
+                <div>
+                  <h4 className="text-white font-bold text-base">Gọi Hotline</h4>
+                  <p className="text-amber text-sm font-semibold mt-0.5">0364 603 462</p>
+                </div>
+              </Link>
+              
+              <div className="mt-auto text-center py-4">
+                <span className="text-[11px] text-white/30 uppercase tracking-widest font-bold">Cam kết phản hồi trong 5 phút</span>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(255, 214, 10, 0.7); }
+          0% { box-shadow: 0 0 0 0 rgba(255, 214, 10, 0.4); }
           70% { box-shadow: 0 0 0 15px rgba(255, 214, 10, 0); }
           100% { box-shadow: 0 0 0 0 rgba(255, 214, 10, 0); }
         }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}} />
     </>
   );

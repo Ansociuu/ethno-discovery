@@ -32,55 +32,49 @@ const REVIEWS = [
 
 export function ReviewsSection() {
   return (
-    <div style={{ padding: "100px 0", background: "var(--dark)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px" }}>
-        <span className="section-tag fade-up">Traveler Stories</span>
-        <h2 className="fade-up" style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 700, margin: "12px 0 60px", lineHeight: 1.1 }}>
-          Họ nói gì về <em style={{ color: "var(--pink)", fontStyle: "italic" }}>EthnoDiscovery</em>
+    <section className="section-py bg-dark px-container overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <span className="section-tag mb-4">Traveler Stories</span>
+        <h2 className="h2-fluid mb-16">
+          Họ nói gì về <em className="text-pink not-italic italic">EthnoDiscovery</em>
         </h2>
 
-        {/* 3-col grid, first card spans 2 */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {REVIEWS.map((review, i) => (
             <div
               key={review.name}
-              style={{
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-                borderRadius: 20, padding: 28, transition: "all 0.3s",
-                gridColumn: review.featured ? "span 2" : "span 1",
-                display: review.featured ? "flex" : "block",
-                gap: review.featured ? 24 : 0,
-                alignItems: review.featured ? "flex-start" : "unset",
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; }}
+              className={`bg-white/5 border border-white/10 rounded-3xl p-8 hover:bg-white/10 hover:border-pink/30 transition-all duration-300 flex flex-col ${
+                review.featured ? "md:col-span-2 lg:flex-row lg:items-start lg:gap-8" : "col-span-1"
+              }`}
             >
-              {/* Avatar (only in featured, shown separately) */}
               {review.featured && (
-                <div style={{ width: 42, height: 42, borderRadius: "50%", background: review.avGradient, color: review.avColor, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
+                <div 
+                  style={{ background: review.avGradient, color: review.avColor }}
+                  className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 mb-6 lg:mb-0"
+                >
                   {review.initials}
                 </div>
               )}
 
-              <div style={{ flex: 1 }}>
-                {/* Stars */}
-                <div style={{ color: "var(--amber)", fontSize: 18, marginBottom: 16, letterSpacing: 2 }}>★★★★★</div>
-
-                {/* Text */}
-                <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 20, fontStyle: "italic" }}>
+              <div className="flex-1">
+                <div className="text-amber text-lg mb-4 tracking-widest">★★★★★</div>
+                
+                <p className="text-white/70 text-base md:text-lg leading-relaxed italic mb-8">
                   &ldquo;{review.text}&rdquo;
                 </p>
 
-                {/* Reviewer info */}
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div className="flex items-center gap-4 mt-auto">
                   {!review.featured && (
-                    <div style={{ width: 42, height: 42, borderRadius: "50%", background: review.avGradient, color: review.avColor, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
+                    <div 
+                      style={{ background: review.avGradient, color: review.avColor }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                    >
                       {review.initials}
                     </div>
                   )}
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{review.name}</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{review.from}</div>
+                    <div className="text-sm font-bold text-white">{review.name}</div>
+                    <div className="text-[12px] text-white/40">{review.from}</div>
                   </div>
                 </div>
               </div>
@@ -88,6 +82,6 @@ export function ReviewsSection() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

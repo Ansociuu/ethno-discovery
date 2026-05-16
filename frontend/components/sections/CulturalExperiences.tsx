@@ -4,10 +4,10 @@ import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 
 const EXPERIENCES = [
-  { icon: "🏪", name: "Chợ Phiên Vùng Cao", desc: "Phiên chợ bản sắc H'Mông & Dao mỗi cuối tuần, nơi giao lưu văn hoá độc đáo", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))", image: "/images/cultural-market.png" },
-  { icon: "🎨", name: "Lễ Cấp Sắc Người Dao", desc: "Trải nghiệm nghi lễ trưởng thành linh thiêng và huyền bí của người Dao Đỏ", tag: "Nghi lễ", gradient: "linear-gradient(160deg, var(--dark), var(--amber))", image: "/images/cultural-ceremony.png" },
-  { icon: "🧵", name: "Thêu Thừa Dao Đỏ", desc: "Học nghệ thuật thêu hoa văn tinh xảo trên trang phục truyền thống của người Dao", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))", image: "/images/cultural-embroidery.png" },
-  { icon: "🎵", name: "Tiếng Khèn H'Mông", desc: "Nghe tiếng khèn gọi bạn tình dưới trăng bên bếp lửa — linh hồn của núi rừng", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))", image: "/images/cultural-hmong.png" },
+  { icon: "🏪", name: "Chợ Phiên Vùng Cao", desc: "Phiên chợ bản sắc H'Mông & Dao mỗi cuối tuần, nơi giao lưu văn hoá độc đáo", tag: "Văn hoá", gradient: "linear-gradient(160deg, var(--bg3), var(--pink))", image: "/images/chợ-vùng-cao.jpg" },
+  { icon: "🎨", name: "Lễ Cấp Sắc Người Dao", desc: "Trải nghiệm nghi lễ trưởng thành linh thiêng và huyền bí của người Dao Đỏ", tag: "Nghi lễ", gradient: "linear-gradient(160deg, var(--dark), var(--amber))", image: "/images/cấp-sắc.jpg" },
+  { icon: "🧵", name: "Thêu Thừa Dao Đỏ", desc: "Học nghệ thuật thêu hoa văn tinh xảo trên trang phục truyền thống của người Dao", tag: "Thủ công", gradient: "linear-gradient(160deg, var(--midnight), var(--pink))", image: "/images/thêu.jpg" },
+  { icon: "🎵", name: "Tiếng Khèn H'Mông", desc: "Nghe tiếng khèn gọi bạn tình dưới trăng bên bếp lửa — linh hồn của núi rừng", tag: "Âm nhạc", gradient: "linear-gradient(160deg, var(--bg3), var(--amber))", image: "/images/khèn.jpg" },
 ];
 
 const containerVariants: Variants = {
@@ -25,11 +25,11 @@ const cardVariants: Variants = {
 
 export function CulturalExperiences() {
   return (
-    <section className="bg-midnight py-24 m-0 max-w-full overflow-hidden">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-        
+    <section className="bg-midnight section-py px-container overflow-hidden">
+      <div className="max-w-[1280px] mx-auto">
+
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -38,25 +38,25 @@ export function CulturalExperiences() {
         >
           <div>
             <span className="section-tag">🌺 Trải Nghiệm Văn Hoá</span>
-            <h2 className="font-serif text-[clamp(32px,4vw,52px)] font-bold leading-[1.1] my-4">
+            <h2 className="h2-fluid my-4">
               Chạm Đến <span className="text-gradient-pink">Bản Sắc</span>
             </h2>
-            <p className="text-text text-[17px] font-light max-w-[500px] leading-relaxed">
+            <p className="p-fluid text-text font-light max-w-[500px]">
               Không chỉ ngắm nhìn — mà thực sự sống trong văn hoá H&apos;Mông và Dao qua những hoạt động tay nghề độc đáo.
             </p>
           </div>
         </motion.div>
 
         {/* Content Layout: 1 Large Image Feature + Grid of Experiences */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+
           {/* Main Feature Image */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, type: "spring" }}
-            className="lg:col-span-5 relative rounded-3xl overflow-hidden min-h-[400px] lg:min-h-full group"
+            className="md:col-span-12 lg:col-span-5 relative rounded-3xl overflow-hidden min-h-[400px] lg:min-h-full group"
           >
             <Image
               src="/images/cultural-hmong.png"
@@ -76,12 +76,12 @@ export function CulturalExperiences() {
           </motion.div>
 
           {/* Grid of Experiences */}
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4"
+            className="md:col-span-12 lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
             {EXPERIENCES.map((exp, i) => (
               <motion.div
@@ -105,7 +105,7 @@ export function CulturalExperiences() {
 
                 {/* Overlay highlight */}
                 <div className="absolute inset-0 z-0 bg-gradient-to-t from-midnight/90 via-midnight/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
-                
+
                 {/* Moving gradient noise for luxury feel */}
                 <div className="absolute inset-0 z-0 bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:4px_4px] opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
 
@@ -127,7 +127,7 @@ export function CulturalExperiences() {
               </motion.div>
             ))}
           </motion.div>
-          
+
         </div>
       </div>
     </section>

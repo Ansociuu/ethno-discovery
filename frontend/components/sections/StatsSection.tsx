@@ -43,8 +43,8 @@ function AnimatedNumber({ target, suffix, display }: { target: number; suffix: s
 
 export function StatsSection() {
   return (
-    <div className="py-24 bg-white/5 border-y border-white/5 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16">
+    <section className="section-py bg-white/5 border-y border-white/5 relative overflow-hidden px-container">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16">
         {STATS.map((stat, i) => (
           <div key={i} className="text-center flex flex-col items-center gap-4 animate-fade-up">
             <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-pink mb-2">
@@ -57,6 +57,6 @@ export function StatsSection() {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
